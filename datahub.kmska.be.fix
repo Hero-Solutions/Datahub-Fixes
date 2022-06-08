@@ -2653,6 +2653,27 @@
 
     do list(path:or_record.translations.db.translations, var:t)
 
+        unless all_match(descriptiveMetadata.eventWrap.eventSet.$last.event.eventType.term.$last._, 'restoration')
+
+            # Add a new, empty LIDO eventSet field (if restoration is present) and add the created event type to LIDO eventType
+
+            set_array(translations, "123", "122", "149", "150", "151", "152", "153")
+
+            if in(t.textTypeID, translations)
+
+                lido_term(
+                    descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
+                    or_record.event_type
+                )
+
+            end
+
+            # Remove the created field translations
+
+            remove_field(translations)
+
+        end
+
         if all_match(t.textTypeID, '123')
 
             # Remove unnecessary whitespaces
