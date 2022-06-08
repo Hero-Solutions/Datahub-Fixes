@@ -1854,7 +1854,7 @@
 
         if all_match(t.textTypeID, '131')
 
-            lido_term(
+            lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
                 t.textEntry,
                 -lang: nl
@@ -1864,7 +1864,7 @@
 
         if all_match(t.textTypeID, '132')
 
-            lido_term(
+            lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
                 t.textEntry,
                 -lang: fr
@@ -1874,7 +1874,7 @@
 
         if all_match(t.textTypeID, '133')
 
-            lido_term(
+            lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
                 t.textEntry,
                 -lang: en
@@ -1884,7 +1884,7 @@
 
         if all_match(t.textTypeID, '134')
 
-            lido_term(
+            lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
                 t.textEntry,
                 -lang: de
@@ -1894,7 +1894,7 @@
 
         if all_match(t.textTypeID, '135')
 
-            lido_term(
+            lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
                 t.textEntry,
                 -lang: es
@@ -1904,7 +1904,7 @@
 
         if all_match(t.textTypeID, '136')
 
-            lido_term(
+            lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
                 t.textEntry,
                 -lang: it
@@ -1914,7 +1914,7 @@
 
         if all_match(t.textTypeID, '137')
 
-            lido_term(
+            lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
                 t.textEntry,
                 -lang: ru
@@ -1924,7 +1924,7 @@
 
         if all_match(t.textTypeID, '138')
 
-            lido_term(
+            lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
                 t.textEntry,
                 -lang: zh
