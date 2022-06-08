@@ -1831,7 +1831,7 @@
 
     do list(path:or_record.translations.db.translations, var:t)
 
-        unless all_match(descriptiveMetadata.eventWrap.eventSet.$last.event.eventType, 'acquisition')
+        unless all_match(descriptiveMetadata.eventWrap.eventSet.$last.event.eventType.term, 'acquisition')
 
             # Add a new, empty LIDO eventSet field (if acquisition is present) and add the created event type to LIDO eventType
 
