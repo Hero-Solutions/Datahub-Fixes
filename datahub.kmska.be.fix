@@ -1345,6 +1345,92 @@
 
     end
 
+    # Add highlights for museum app from TMS (if present) to LIDO objectDescriptionSet as LIDO descriptiveNoteValue
+
+    do list(path:or_record.translations.db.translations, var:t)
+
+        if all_match(t.textEntry, '.*\S.*')
+
+            # Add a new, empty LIDO objectDescriptionSet field
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
+
+            # Remove unnecessary whitespaces
+
+            trim(t.textEntry)
+
+            if all_match(t.textTypeID, '175')
+
+                copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'nl')
+
+            end
+
+            if all_match(t.textTypeID, '176')
+
+                copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'en')
+
+            end
+
+            if all_match(t.textTypeID, '173')
+
+                copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'fr')
+
+            end
+
+            if all_match(t.textTypeID, '174')
+
+                copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'de')
+
+            end
+
+            if all_match(t.textTypeID, '178')
+
+                copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'es')
+
+            end
+
+            if all_match(t.textTypeID, '177')
+
+                copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'it')
+
+            end
+
+            if all_match(t.textTypeID, '179')
+
+                copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'ru')
+
+            end
+
+            if all_match(t.textTypeID, '172')
+
+                copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'zh')
+
+            end
+
+            # Add the text type as type for LIDO objectDescriptionSet
+
+            set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type, 'highlights app')
+
+        end
+
+    end
+
     # Add page number from TMS (if present) to LIDO objectDescriptionSet as LIDO descriptiveNoteValue
 
     if all_match('or_record.pageNumber.db.pageNumber', '.*\S.*')
@@ -1729,6 +1815,115 @@
 
     end
 
+# LIDO displayEvent [eventType/term="acquisition"]
+
+    # Loop over the acquisition translations from TMS
+
+    do list(path:or_record.translations.db.translations, var:t)
+
+        unless all_match(descriptiveMetadata.eventWrap.eventSet.$last.event.eventType, 'acquisition')
+
+            # Add a new, empty LIDO eventSet field (if acquisition is present) and add the created event type to LIDO eventType
+
+            set_array(translations, "131", "132", "133", "134", "135", "136", "137", "138")
+
+            if in(t.textTypeID, translations)
+
+                lido_term(
+                    descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
+                    or_record.event_type
+                )
+
+            end
+
+            # Remove the created field translations
+
+            remove_field(translations)
+
+        end
+
+        if all_match(t.textTypeID, '131')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: nl
+            )
+
+        end
+
+        if all_match(t.textTypeID, '132')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(t.textTypeID, '133')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: en
+            )
+
+        end
+
+        if all_match(t.textTypeID, '134')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: de
+            )
+
+        end
+
+        if all_match(t.textTypeID, '135')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: es
+            )
+
+        end
+
+        if all_match(t.textTypeID, '136')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: it
+            )
+
+        end
+
+        if all_match(t.textTypeID, '137')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: ru
+            )
+
+        end
+
+        if all_match(t.textTypeID, '138')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: zh
+            )
+
+        end
+
+    end
+
 # LIDO eventType [eventType/term="production"]
 
     # Create event_type
@@ -1980,6 +2175,56 @@
                 descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
                 t.textEntry,
                 -lang: fr
+            )
+
+        end
+
+        if all_match(t.textTypeID, '144')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -lang: de
+            )
+
+        end
+
+        if all_match(t.textTypeID, '145')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -lang: es
+            )
+
+        end
+
+        if all_match(t.textTypeID, '146')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -lang: it
+            )
+
+        end
+
+        if all_match(t.textTypeID, '147')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -lang: ru
+            )
+
+        end
+
+        if all_match(t.textTypeID, '148')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -lang: zh
             )
 
         end
@@ -2274,6 +2519,56 @@
 
         end
 
+        if all_match(t.textTypeID, '139')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: de
+            )
+
+        end
+
+        if all_match(t.textTypeID, '140')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: es
+            )
+
+        end
+
+        if all_match(t.textTypeID, '141')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: it
+            )
+
+        end
+
+        if all_match(t.textTypeID, '142')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: ru
+            )
+
+        end
+
+        if all_match(t.textTypeID, '143')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: zh
+            )
+
+        end
+
     end
 
 # LIDO eventType [eventType/term="provenance"]
@@ -2367,6 +2662,61 @@
 
             copy_field(t.textEntry, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
             add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, "fr")
+
+        end
+
+        if all_match(t.textTypeID, '149')
+
+            # Remove unnecessary whitespaces
+
+            trim(t.textEntry)
+
+            copy_field(t.textEntry, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, "de")
+
+        end
+
+        if all_match(t.textTypeID, '150')
+
+            # Remove unnecessary whitespaces
+
+            trim(t.textEntry)
+
+            copy_field(t.textEntry, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, "es")
+
+        end
+
+        if all_match(t.textTypeID, '151')
+
+            # Remove unnecessary whitespaces
+
+            trim(t.textEntry)
+
+            copy_field(t.textEntry, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, "it")
+
+        end
+
+        if all_match(t.textTypeID, '152')
+
+            # Remove unnecessary whitespaces
+
+            trim(t.textEntry)
+
+            copy_field(t.textEntry, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, "ru")
+
+        end
+
+        if all_match(t.textTypeID, '153')
+
+            # Remove unnecessary whitespaces
+
+            trim(t.textEntry)
+
+            copy_field(t.textEntry, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, "zh")
 
         end
 
