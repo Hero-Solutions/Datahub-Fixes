@@ -1351,9 +1351,23 @@
 
         if all_match(t.textEntry, '.*\S.*')
 
-            # Add a new, empty LIDO objectDescriptionSet field
+            # Add a new, empty LIDO objectDescriptionSet field (if highlights for museum app are present)
 
-            add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
+            set_array(translations, "175", "176", "173", "174", "178", "177", "179", "172")
+
+            if in(t.textTypeID, translations)
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
+
+                # Add the text type as type for LIDO objectDescriptionSet
+
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type, 'highlights app')
+
+            end
+
+            # Remove the created field translations
+
+            remove_field(translations)
 
             # Remove unnecessary whitespaces
 
@@ -1422,10 +1436,6 @@
                 set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'zh')
 
             end
-
-            # Add the text type as type for LIDO objectDescriptionSet
-
-            set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type, 'highlights app')
 
         end
 
