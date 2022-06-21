@@ -219,6 +219,12 @@
     copy_field(ObjectID, or_record.translations.db)
     lookup_in_store(or_record.translations.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.translations.sqlite')
 
+    # app number
+
+    copy_field(ObjectID, or_record.app_number)
+    lookup_in_store(or_record.app_number, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.appnumbers.sqlite')
+
+
 # Remove all fields from Objects, retaining only the ones necessary to create the LIDO structure
 
     retain(or_record)
@@ -3193,6 +3199,14 @@
         administrativeMetadata.recordWrap.recordID,
         or_record.object_number.tms,
         -type: local
+    )
+
+    # Add app number
+
+    lido_baseid(
+        administrativeMetadata.recordWrap.recordID,
+        or_record.app_number.appNumber,
+        -type: app-number
     )
 
 # LIDO recordType
