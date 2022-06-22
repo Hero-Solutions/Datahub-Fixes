@@ -1555,6 +1555,117 @@
 
     add_field(or_record.event_type, "acquisition")
 
+# LIDO displayEvent [eventType/term="acquisition"]
+
+    # Loop over the acquisition translations from TMS
+
+    do list(path:or_record.translations.db.translations, var:t)
+
+        unless all_match(descriptiveMetadata.eventWrap.eventSet.$last.event.eventType.term.$last._, 'acquisition')
+
+            # Add a new, empty LIDO eventSet field (if acquisition is present) and add the created event type to LIDO eventType
+
+            set_array(translations, "131", "132", "133", "134", "135", "136", "137", "138")
+
+            if in(t.textTypeID, translations)
+
+                lido_term(
+                    descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
+                    or_record.event_type
+                )
+
+            end
+
+            # Remove the created field translations
+
+            remove_field(translations)
+
+        end
+
+        if all_match(t.textTypeID, '131')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: nl
+            )
+
+        end
+
+        if all_match(t.textTypeID, '132')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(t.textTypeID, '133')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: en
+            )
+
+        end
+
+        if all_match(t.textTypeID, '134')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: de
+            )
+
+        end
+
+        if all_match(t.textTypeID, '135')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: es
+            )
+
+        end
+
+        if all_match(t.textTypeID, '136')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: it
+            )
+
+        end
+
+        if all_match(t.textTypeID, '137')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: ru
+            )
+
+        end
+
+        if all_match(t.textTypeID, '138')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
+                t.textEntry,
+                -lang: zh
+            )
+
+        end
+
+    end
+
+# LIDO eventType [eventType/term="acquisition"]
+
     # Loop over the acquisitions from TMS
 
     do list(path:or_record.acquisition.db.acquisition, var:a)
@@ -1826,115 +1937,6 @@
 
             copy_field(or_record.acquisition_description_fr, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
             add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, "fr")
-
-        end
-
-    end
-
-# LIDO displayEvent [eventType/term="acquisition"]
-
-    # Loop over the acquisition translations from TMS
-
-    do list(path:or_record.translations.db.translations, var:t)
-
-        unless all_match(descriptiveMetadata.eventWrap.eventSet.$last.event.eventType.term.$last._, 'acquisition')
-
-            # Add a new, empty LIDO eventSet field (if acquisition is present) and add the created event type to LIDO eventType
-
-            set_array(translations, "131", "132", "133", "134", "135", "136", "137", "138")
-
-            if in(t.textTypeID, translations)
-
-                lido_term(
-                    descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
-                    or_record.event_type
-                )
-
-            end
-
-            # Remove the created field translations
-
-            remove_field(translations)
-
-        end
-
-        if all_match(t.textTypeID, '131')
-
-            lido_basevalue(
-                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
-                t.textEntry,
-                -lang: nl
-            )
-
-        end
-
-        if all_match(t.textTypeID, '132')
-
-            lido_basevalue(
-                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
-                t.textEntry,
-                -lang: fr
-            )
-
-        end
-
-        if all_match(t.textTypeID, '133')
-
-            lido_basevalue(
-                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
-                t.textEntry,
-                -lang: en
-            )
-
-        end
-
-        if all_match(t.textTypeID, '134')
-
-            lido_basevalue(
-                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
-                t.textEntry,
-                -lang: de
-            )
-
-        end
-
-        if all_match(t.textTypeID, '135')
-
-            lido_basevalue(
-                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
-                t.textEntry,
-                -lang: es
-            )
-
-        end
-
-        if all_match(t.textTypeID, '136')
-
-            lido_basevalue(
-                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
-                t.textEntry,
-                -lang: it
-            )
-
-        end
-
-        if all_match(t.textTypeID, '137')
-
-            lido_basevalue(
-                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
-                t.textEntry,
-                -lang: ru
-            )
-
-        end
-
-        if all_match(t.textTypeID, '138')
-
-            lido_basevalue(
-                descriptiveMetadata.eventWrap.eventSet.$last.displayEvent,
-                t.textEntry,
-                -lang: zh
-            )
 
         end
 
@@ -3120,6 +3122,110 @@
 
 # LIDO rightsWorkWrap
 
+    # Add the lender to LIDO creditLine
+
+    do list(path:or_record.translations.db.translations, var:t)
+
+        unless exists(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine)
+
+            # Add a new, empty LIDO rightsWorkSet field (if lender is present)
+
+            set_array(translations, "181", "182", "183", "184", "185", "186", "187", "188")
+
+            if in(t.textTypeID, translations)
+
+                add_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$append)
+
+            end
+
+            # Remove the created field translations
+
+            remove_field(translations)
+
+        end
+
+        if all_match(t.textTypeID, '181')
+
+            lido_basevalue(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
+                t.textEntry,
+                -lang: nl
+            )
+
+        end
+
+        if all_match(t.textTypeID, '182')
+
+            lido_basevalue(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
+                t.textEntry,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(t.textTypeID, '183')
+
+            lido_basevalue(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
+                t.textEntry,
+                -lang: en
+            )
+
+        end
+
+        if all_match(t.textTypeID, '184')
+
+            lido_basevalue(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
+                t.textEntry,
+                -lang: de
+            )
+
+        end
+
+        if all_match(t.textTypeID, '185')
+
+            lido_basevalue(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
+                t.textEntry,
+                -lang: es
+            )
+
+        end
+
+        if all_match(t.textTypeID, '186')
+
+            lido_basevalue(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
+                t.textEntry,
+                -lang: it
+            )
+
+        end
+
+        if all_match(t.textTypeID, '187')
+
+            lido_basevalue(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
+                t.textEntry,
+                -lang: zh
+            )
+
+        end
+
+        if all_match(t.textTypeID, '188')
+
+            lido_basevalue(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
+                t.textEntry,
+                -lang: ru
+            )
+
+        end
+
+    end
+
     # Loop over the different constituents from TMS
 
     do list(path:or_record.constituentWrap.db.constituents, var:c)
@@ -3158,26 +3264,30 @@
 
     # If the copyright notice is "CC0", add this to LIDO rightsType as LIDO term along with the URI from creativecommons.org as LIDO conceptID
 
-    if all_match(or_record.copyright, 'CC0')
-
-        set_field(or_record.copyrightUrl, 'https://creativecommons.org/publicdomain/zero/1.0/')
-
-        lido_term(
-            administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType,
-            or_record.copyright,
-            -conceptid: or_record.copyrightUrl,
-            -source: 'Creative Commons',
-            -type: 'purl'
-        )
-
-    end
-
-    # Add the copyright notice to LIDO creditLine
-
     if all_match(or_record.copyright, '.*\S.*')
 
+        # Add a new, empty LIDO rightsWorkSet
+
+        add_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$append)
+
+        if all_match(or_record.copyright, 'CC0')
+
+            set_field(or_record.copyrightUrl, 'https://creativecommons.org/publicdomain/zero/1.0/')
+
+            lido_term(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.rightsType,
+                or_record.copyright,
+                -conceptid: or_record.copyrightUrl,
+                -source: 'Creative Commons',
+                -type: 'purl'
+            )
+
+        end
+
+        # Add the copyright notice to LIDO creditLine
+
         lido_basevalue(
-            administrativeMetadata.rightsWorkWrap.rightsWorkSet.creditLine,
+            administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
             or_record.copyright
         )
 
