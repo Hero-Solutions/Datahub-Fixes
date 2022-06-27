@@ -1363,11 +1363,7 @@
 
             if in(t.textTypeID, translations)
 
-                add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
-
-                # Add the text type as type for LIDO objectDescriptionSet
-
-                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type, 'highlights app')
+                add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append.type, 'highlights app')
 
             end
 
@@ -3149,7 +3145,8 @@
             lido_basevalue(
                 administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
                 t.textEntry,
-                -lang: nl
+                -lang: nl,
+                -label: lender
             )
 
         end
@@ -3159,7 +3156,8 @@
             lido_basevalue(
                 administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
                 t.textEntry,
-                -lang: fr
+                -lang: fr,
+                -label: lender
             )
 
         end
@@ -3169,7 +3167,8 @@
             lido_basevalue(
                 administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
                 t.textEntry,
-                -lang: en
+                -lang: en,
+                -label: lender
             )
 
         end
@@ -3179,7 +3178,8 @@
             lido_basevalue(
                 administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
                 t.textEntry,
-                -lang: de
+                -lang: de,
+                -label: lender
             )
 
         end
@@ -3189,7 +3189,8 @@
             lido_basevalue(
                 administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
                 t.textEntry,
-                -lang: es
+                -lang: es,
+                -label: lender
             )
 
         end
@@ -3199,7 +3200,8 @@
             lido_basevalue(
                 administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
                 t.textEntry,
-                -lang: it
+                -lang: it,
+                -label: lender
             )
 
         end
@@ -3209,7 +3211,8 @@
             lido_basevalue(
                 administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
                 t.textEntry,
-                -lang: zh
+                -lang: zh,
+                -label: lender
             )
 
         end
@@ -3219,7 +3222,8 @@
             lido_basevalue(
                 administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
                 t.textEntry,
-                -lang: ru
+                -lang: ru,
+                -label: lender
             )
 
         end
