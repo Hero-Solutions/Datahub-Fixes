@@ -125,9 +125,18 @@
 #                                                                           pref: preferred                 Vervaardiger            naam vervaardiger
 #                                                                           pref: alternate
 #                                                                       lido:vitalDatesActor
-#   Production.creator\.date_of_birth                                       lido:earliestDate
-#   Production.creator\.date_of_death                                       lido:latestDate
-#   Production.creator\.role                                            lido:roleActor                      Vervaardiger            rol vervaardiger
+#                                                                           type: birth-date
+#   Production.creator.birth\.date\.start                                       lido:earliestDate
+#   Production.creator.birth\.date\.end                                         lido:latestDate
+#                                                                           type: death-date
+#   Production.creator.death\.date\.start                                       lido:earliestDate
+#   Production.creator.death\.date\.end                                         lido:latestDate
+#                                                                       lido:roleActor
+#   Production.creator\.role.source + term\.number                          lido:conceptID
+#                                                                           lido:term
+#   Production.creator\.role.term                                               lang: nl                    Vervaardiger            rol vervaardiger
+#   Production.creator\.role.notes                                              lang: fr
+#   Production.creator\.role.notes                                              lang: en
 #   Production.creator\.qualifier                                       lido:attributionQualifierActor      Vervaardiger            kwalificatie vervaardiger
 #                                                                   lido:eventDate
 #                                                                       lido:displayDate                    Datering
@@ -579,15 +588,23 @@
 
             else
 
-                if all_match(c.source, '.*\S.*')
+                if all_match(c.notes, '.*\S.*')
 
                     add_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append.type, "collection")
 
                 else
 
-                    if all_match('c.term\.number', '.*\S.*')
+                    if all_match(c.source, '.*\S.*')
 
                         add_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append.type, "collection")
+
+                    else
+
+                        if all_match('c.term\.number', '.*\S.*')
+
+                            add_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append.type, "collection")
+
+                        end
 
                     end
 
@@ -603,6 +620,16 @@
                 descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last,
                 c.term,
                 -lang: nl
+            )
+
+        end
+
+        if all_match(c.notes, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last,
+                c.notes,
+                -lang: fr
             )
 
         end
@@ -1089,17 +1116,66 @@
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append,
                 'c.creator\.lref',
                 c.creator.name,
+                -name_lang: nl,
                 -id_source: Adlib,
                 -id_type: local,
                 -name_pref: preferred
             )
 
-            if all_match('c.creator\.date_of_birth', '.*\S.*')
-                copy_field('c.creator\.date_of_birth', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.earliestDate._)
+            if all_match('c.creator.birth\.date\.start', '.*\S.*')
+
+                if all_match('c.creator.birth\.date\.end', '.*\S.*')
+                    copy_field('c.creator.birth\.date\.start', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$append.earliestDate._)
+                    copy_field('c.creator.birth\.date\.end', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.latestDate._)
+                else
+                    copy_field('c.creator.birth\.date\.start', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$append.earliestDate._)
+                end
+
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'birth-date')
+
+                if all_match('c.creator.birth\.date\.precision', '.*\S.*')
+                    copy_field('c.creator.birth\.date\.precision', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.earliestDate.type)
+                end
+
+            else
+
+                if all_match('c.creator.birth\.date\.end', '.*\S.*')
+                    copy_field('c.creator.birth\.date\.end', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$append.earliestDate._)
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'birth-date')
+                end
+
+                if all_match('c.creator.birth\.date\.precision', '.*\S.*')
+                    copy_field('c.creator.birth\.date\.precision', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.earliestDate.type)
+                end
+
             end
 
-            if all_match('c.creator\.date_of_death', '.*\S.*')
-                copy_field('c.creator\.date_of_death', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.latestDate._)
+            if all_match('c.creator.death\.date\.start', '.*\S.*')
+
+                if all_match('c.creator.death\.date\.end', '.*\S.*')
+                    copy_field('c.creator.death\.date\.start', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$append.earliestDate._)
+                    copy_field('c.creator.death\.date\.end', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.latestDate._)
+                else
+                    copy_field('c.creator.death\.date\.start', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$append.earliestDate._)
+                end
+
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'death-date')
+
+                if all_match('c.creator.death\.date\.precision', '.*\S.*')
+                    copy_field('c.creator.death\.date\.precision', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.earliestDate.type)
+                end
+
+            else
+
+                if all_match('c.creator.death\.date\.end', '.*\S.*')
+                    copy_field('c.creator.death\.date\.end', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$append.earliestDate._)
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'death-date')
+                end
+
+                if all_match('c.creator.death\.date\.precision', '.*\S.*')
+                    copy_field('c.creator.death\.date\.precision', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.earliestDate.type)
+                end
+
             end
 
             if all_match('c.creator\.qualifier', '.*\S.*')
@@ -1110,14 +1186,73 @@
 
         # Role. Work around. -role switch in lido_actor does not work correctly.
 
-        if all_match('c.creator\.role', '.*\S.*')
+        if all_match('c.creator\.role.term', '.*\S.*')
 
             lido_term(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor,
-                'c.creator\.role',
+                'c.creator\.role.term',
+                -lang: nl
             )
 
         end
+
+        if all_match('c.creator\.role.notes', '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor,
+                'c.creator\.role.notes',
+                -lang: fr
+            )
+
+        end
+
+        if all_match('c.creator\.role.notes.0', '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor,
+                'c.creator\.role.notes.0',
+                -lang: fr
+            )
+
+        end
+
+        if all_match('c.creator\.role.notes.1', '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor,
+                'c.creator\.role.notes.1',
+                -lang: en
+            )
+
+        end
+
+        if all_match('c.creator\.role.source', '.*\S.*')
+
+            copy_field('c.creator\.role.source', or_record.creator_role_source)
+
+        end
+
+        if all_match('c.creator\.role.term\.number', '.*\S.*')
+
+            paste(or_record.creator_role_source, or_record.creator_role_source, 'c.creator\.role.term\.number', join_char:'')
+
+        end
+
+        if all_match(or_record.creator_role_source, '.*\S.*')
+
+            copy_field(or_record.creator_role_source, descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.conceptID._)
+
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.conceptID.type, 'purl')
+
+        end
+
+        if all_match('c.creator\.role.source', 'http://vocab.getty.edu/page/aat/')
+
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.conceptID.source, 'AAT')
+
+        end
+
+        remove_field(or_record.creator_role_source)
 
         # Add Persistent URI data to actor, if not available from API, use Persistent URI's from Flemish Art Collection concordance database
 
@@ -2101,20 +2236,179 @@
 
 # LIDO creditLine
 
-    do list(path: or_record.object_number, var: c)
+    do list (path: or_record.production, var: c)
 
-        lookup_in_store(c, DBI, data_source: 'dbi:SQLite:/tmp/import.RIGHTS.sqlite')
+        copy_field(c.creator.name, or_record.creator_name)
 
-        if all_match(c.rights, '.*\S.*')
+        if all_match(or_record.creator_name, '.*\S.*')
 
-            lido_basevalue(
-                administrativeMetadata.rightsWorkWrap.rightsWorkSet.creditLine,
-                c.rights
-            )
+            lookup_in_store(or_record.creator_name, DBI, data_source: 'dbi:SQLite:/tmp/import.Copyrights.sqlite')
+
+            unless exists(or_record.creator_name.legalStatus)
+
+                set_field(or_record.no_copyright, 'true')
+
+                if exists(or_record.legal_status)
+
+                    remove_field(or_record.legal_status)
+
+                end
+
+                if exists(or_record.creativeCommons)
+
+                    remove_field(or_record.creativeCommons)
+
+                end
+
+                if exists(or_record.rightsStatements)
+
+                    remove_field(or_record.rightsStatements)
+
+                end
+
+            end
+
+            if exists(or_record.creator_name.legalStatus)
+
+                unless all_match(or_record.creator_name.legalStatus, '.*\S.*')
+
+                    set_field(or_record.no_copyright, 'true')
+
+                    if exists(or_record.legal_status)
+
+                        remove_field(or_record.legal_status)
+
+                    end
+
+                    if exists(or_record.creativeCommons)
+
+                        remove_field(or_record.creativeCommons)
+
+                    end
+
+                    if exists(or_record.rightsStatements)
+
+                        remove_field(or_record.rightsStatements)
+
+                    end
+
+                end
+
+                if all_match(or_record.creator_name.legalStatus, '.*\S.*')
+
+                    unless exists(or_record.no_copyright)
+
+                        if all_match(or_record.creator_name.legalStatus, 'Auteursrechtplichtig.*')
+
+                            copy_field(or_record.creator_name.legalStatus, or_record.legal_status)
+
+                            if all_match(or_record.creator_name.creativeCommons, '.*\S.*')
+
+                                copy_field(or_record.creator_name.creativeCommons, or_record.creativeCommons)
+
+                            else
+
+                                if exists(or_record.creativeCommons)
+
+                                    remove_field(or_record.creativeCommons)
+
+                                end
+
+                            end
+
+                            if all_match(or_record.creator_name.rightsStatements, '.*\S.*')
+
+                                copy_field(or_record.creator_name.rightsStatements, or_record.rightsStatements)
+
+                            else
+
+                                if exists(or_record.rightsStatements)
+
+                                    remove_field(or_record.rightsStatements)
+
+                                end
+
+                            end
+
+                        else
+
+                            unless exists(or_record.legal_status)
+
+                                copy_field(or_record.creator_name.legalStatus, or_record.legal_status)
+
+                                if all_match(or_record.creator_name.creativeCommons, '.*\S.*')
+
+                                    copy_field(or_record.creator_name.creativeCommons, or_record.creativeCommons)
+
+                                else
+
+                                    if exists(or_record.creativeCommons)
+
+                                        remove_field(or_record.creativeCommons)
+
+                                    end
+
+                                end
+
+                                if all_match(or_record.creator_name.rightsStatements, '.*\S.*')
+
+                                    copy_field(or_record.creator_name.rightsStatements, or_record.rightsStatements)
+
+                                else
+
+                                    if exists(or_record.rightsStatements)
+
+                                        remove_field(or_record.rightsStatements)
+
+                                    end
+
+                                end
+
+                            end
+
+                        end
+
+                    end
+
+                end
+
+            end
 
         end
 
+        remove_field(or_record.creator_name)
+
     end
+
+    if all_match(or_record.legal_status, '.*\S.*')
+
+        lido_basevalue(
+            administrativeMetadata.rightsWorkWrap.rightsWorkSet.creditLine,
+            or_record.legal_status
+        )
+
+    end
+
+    if all_match(or_record.creativeCommons, '.*\S.*')
+
+        copy_field(or_record.creativeCommons, administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$append.conceptID._)
+        set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.source, 'Creative Commons')
+        set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.type, 'purl')
+
+    end
+
+    if all_match(or_record.rightsStatements, '.*\S.*')
+
+        copy_field(or_record.rightsStatements, administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$append.conceptID._)
+        set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.source, 'Rights Statements')
+        set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.type, 'purl')
+
+    end
+
+    remove_field(or_record.no_copyright)
+    remove_field(or_record.legal_status)
+    remove_field(or_record.creativeCommons)
+    remove_field(or_record.rightsStatements)
 
 
 ## LIDO recordWrap
