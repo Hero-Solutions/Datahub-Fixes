@@ -23,6 +23,7 @@
     copy_field(_metadata.object_number, or_record.object_number)
     copy_field(_metadata.Description, or_record.description)
     copy_field(_metadata.Dimension, or_record.dimensions)
+    copy_field(_metadata.Inscription, or_record.inscription)
 #    copy_field(_metadata.Acquisition_source, or_record.acquisition_source)
 #    copy_field('_metadata.acquisition\.date', or_record.acquisition_date)
 #    copy_field('_metadata.acquisition\.method', or_record.acquisition_method)
@@ -76,8 +77,15 @@
 #   object_category                                                 pref: preferred                         Type                    term
 #                                                                   pref: alternate                         Type
 #                                                       lido:titleSet
-#   Title                                                   pref: preferred                                                         titel
-#   Titel_translation                                       pref: alternate
+#   Title.title\.type                                       type
+#   Title.title                                                 pref: preferred                                                     titel
+#   Titel_translation.title\.translation                        pref: alternate
+#                                                       lido:inscriptions
+#   Inscription.inscription\.content                        lido:inscriptionTranscription
+#                                                           lido:inscriptionDescription
+#   Inscription.inscription\.type                               type: type
+#   Inscription.inscription\.position                           type: position
+#   Inscription.inscription\.method                             type: method
 #                                                       lido:repositorySet
 #   administration_name                                     lido:repositoryName                             Instelling              naam bewaarinstelling
 #                                                           lido:workID
@@ -499,6 +507,12 @@
                 -value_pref: preferred
             )
 
+            if all_match('c.title\.type', '.*\S.*')
+
+                copy_field('c.title\.type', descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$last.type)
+
+            end
+
         end
 
     end
@@ -614,6 +628,79 @@
         if all_match('c.dimension\.part', '.*\S.*')
 
             copy_field('c.dimension\.part', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.extentMeasurements._)
+
+        end
+
+    end
+
+# LIDO inscriptions
+
+    unless is_array(or_record.inscription)
+        move_field(or_record.inscription, or_record.tmp)
+        set_array(or_record.inscription)
+        move_field(or_record.tmp, or_record.inscription.$append)
+    end
+
+    do list(path:or_record.inscription, var:c)
+
+        if all_match('c.inscription\.content', '.*\S.*')
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+        else
+
+            if all_match('c.inscription\.type', '.*\S.*')
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+            else
+
+                if all_match('c.inscription\.position', '.*\S.*')
+
+                    add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+                else
+
+                    if all_match('c.inscription\.method', '.*\S.*')
+
+                        add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+                    end
+
+                end
+
+            end
+
+        end
+
+
+        if all_match('c.inscription\.content', '.*\S.*')
+
+            copy_field('c.inscription\.content', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionTranscription._)
+
+        end
+
+        if all_match('c.inscription\.type', '.*\S.*')
+
+            copy_field('c.inscription\.type', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.descriptiveNoteValue._)
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.type, "type")
+
+        end
+
+        if all_match('c.inscription\.position', '.*\S.*')
+
+            copy_field('c.inscription\.position', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.descriptiveNoteValue._)
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.type, "position")
+
+        end
+
+        if all_match('c.inscription\.method', '.*\S.*')
+
+            copy_field('c.inscription\.method', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.descriptiveNoteValue._)
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.type, "method")
 
         end
 
