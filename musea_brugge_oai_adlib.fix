@@ -1655,6 +1655,8 @@
 
 # LIDO creditLine
 
+    set_array(creator_roles, 'architect', 'auteur', 'beeldhouwer', 'boekverluchter', 'cartograaf', 'etser', 'fotograaf', 'fotograveur', 'glazenier', 'graveur', 'houtsnijder', 'illustrator', 'kunstenaar', 'lithograaf', 'medailleur', 'ontwerper', 'ontwerper en uitgever', 'prentmaker', 'prentmaker en uitgever', 'schilder', 'schrijver', 'steenhouwer', 'tekenaar', 'tweede vervaardiger', 'vervaardiger')
+
     do list (path: or_record.production, var: c)
 
         copy_field(c.creator.name, or_record.creator_name)
@@ -1662,6 +1664,62 @@
         if all_match(or_record.creator_name, '.*\S.*')
 
             lookup_in_store(or_record.creator_name, DBI, data_source: 'dbi:SQLite:/tmp/import.Copyrights.sqlite')
+
+            if all_match('c.creator\.qualifier', '.*\S.*')
+
+                unless in('c.creator\.qualifier', creator_roles)
+
+                    set_field(or_record.no_copyright, 'true')
+
+                    if exists(or_record.legal_status)
+
+                        remove_field(or_record.legal_status)
+
+                    end
+
+                    if exists(or_record.creativeCommons)
+
+                        remove_field(or_record.creativeCommons)
+
+                    end
+
+                    if exists(or_record.rightsStatements)
+
+                        remove_field(or_record.rightsStatements)
+
+                    end
+
+                end
+
+            end
+
+            if all_match('c.creator\.role', '.*\S.*')
+
+                unless in('c.creator\.role', creator_roles)
+
+                    set_field(or_record.no_copyright, 'true')
+
+                    if exists(or_record.legal_status)
+
+                        remove_field(or_record.legal_status)
+
+                    end
+
+                    if exists(or_record.creativeCommons)
+
+                        remove_field(or_record.creativeCommons)
+
+                    end
+
+                    if exists(or_record.rightsStatements)
+
+                        remove_field(or_record.rightsStatements)
+
+                    end
+
+                end
+
+            end
 
             unless exists(or_record.creator_name.legalStatus)
 
@@ -1828,6 +1886,7 @@
     remove_field(or_record.legal_status)
     remove_field(or_record.creativeCommons)
     remove_field(or_record.rightsStatements)
+    remove_field(creator_roles)
 
 
 ## LIDO recordWrap
