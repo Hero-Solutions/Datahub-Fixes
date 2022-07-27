@@ -33,6 +33,7 @@
     copy_field(_metadata.Production_date, or_record.production_date)
     copy_field('_metadata.production\.period', or_record.production_period)
     copy_field('_metadata.production\.period\.lref', or_record.production_period_id)
+    copy_field(_metadata.school_style, or_record.style)
     copy_field(_metadata.Material, or_record.materials)
     copy_field(_metadata.physical_description, or_record.physical_description)
     copy_field('_metadata.content\.motif\.general', or_record.content_motif_general)
@@ -80,10 +81,11 @@
 #                                                               lido:term
 #   collection.term                                                 lang: nl
 #   collection.notes                                                lang: fr
-#   collection.notes                                                lang: nl
+#   collection.notes                                                lang: en
 #                                                       lido:titleSet
-#   Title                                                   pref: preferred                                                         titel
-#   Titel_translation                                       pref: alternate
+#   Title.title                                             lang: nl                                                                titel
+#   Titel_translation.title\.translation                    lang: fr
+#   Titel_translation.title\.translation                    lang: en
 #                                                       lido:inscriptions
 #   Inscription.inscription\.type                           type
 #   Inscription.inscription\.content                        lido:inscriptionTranscription
@@ -131,6 +133,19 @@
 #                                                                           type: death-date
 #   Production.creator.death\.date\.start                                       lido:earliestDate
 #   Production.creator.death\.date\.end                                         lido:latestDate
+#                                                                       lido:vitalPlaceActor
+#                                                                           type: birth-place
+#   Production.creator.birth\.place.source + term\.number                       lido:placeID
+#                                                                               lido:namePlaceSet
+#   Production.creator.birth\.place.term                                            lang: nl
+#   Production.creator.birth\.place.notes                                           lang: fr
+#   Production.creator.birth\.place.notes                                           lang: en
+#                                                                           type: death-place
+#   Production.creator.death\.place.source + term\.number                       lido:placeID
+#                                                                               lido:namePlaceSet
+#   Production.creator.death\.place.term                                            lang: nl
+#   Production.creator.death\.place.notes                                           lang: fr
+#   Production.creator.death\.place.notes                                           lang: en
 #                                                                       lido:roleActor
 #   Production.creator\.role.source + term\.number                          lido:conceptID
 #                                                                           lido:term
@@ -145,8 +160,18 @@
 #   Production_date.production\.date\.end                               lido:latestDate                                             einddatum
 #   Production_date.production\.date\.end\.prec                             type
 #                                                                   lido:periodName
-#   production\.period\.lref                                            lido:conceptID
-#   production\.period                                                  lido:term
+#                                                                       no type
+#   production\.period\.lref                                                lido:conceptID
+#                                                                           lido:term
+#   production\.period.term                                                     lang: nl
+#   production\.period.notes                                                    lang: fr
+#   production\.period.notes                                                    lang: en
+#                                                                       type: style
+#   school_style.source + term\.number                                      lido:conceptID
+#                                                                           lido:term
+#   school_style.term                                                           lang: nl
+#   school_style.notes                                                          lang: fr
+#   school_style.notes                                                          lang: en
 #                                                                   lido:eventPlace
 #                                                                       lido:placeID
 #   Production.production\.place\.lref                                      type: local
@@ -702,7 +727,8 @@
             lido_basenameset(
                 descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$append,
                 c.title,
-                -value_pref: preferred
+                -value_pref: preferred,
+                -value_lang: nl
             )
 
         end
@@ -809,7 +835,9 @@
 
         if all_match('c.inscription\.type', '.*\S.*')
 
-            copy_field('c.inscription\.type', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.type)
+            copy_field('c.inscription\.type', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.descriptiveNoteValue._)
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.type, "type")
 
         end
 
@@ -1177,6 +1205,222 @@
                 end
 
             end
+
+            if all_match('c.creator.birth\.place.term', '.*\S.*')
+
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "birth-place")
+
+            else
+
+                if all_match('c.creator.birth\.place.notes.0', '.*\S.*')
+
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "birth-place")
+
+                else
+
+                    if all_match('c.creator.birth\.place.notes', '.*\S.*')
+
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "birth-place")
+
+                    else
+
+                        if all_match('c.creator.birth\.place.source', '.*\S.*')
+
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "birth-place")
+
+                        else
+
+                            if all_match('c.creator.birth\.place.term\.number', '.*\S.*')
+
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "birth-place")
+
+                            end
+
+                        end
+
+                    end
+
+                end
+
+            end
+
+            if all_match('c.creator.birth\.place.term', '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.namePlaceSet,
+                    'c.creator.birth\.place.term',
+                    -value_lang: nl
+                )
+
+            end
+
+            if all_match('c.creator.birth\.place.notes', '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.namePlaceSet,
+                    'c.creator.birth\.place.notes',
+                    -value_lang: fr
+                )
+
+            end
+
+            if all_match('c.creator.birth\.place.notes.0', '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.namePlaceSet,
+                    'c.creator.birth\.place.notes.0',
+                    -value_lang: fr
+                )
+
+            end
+
+            if all_match('c.creator.birth\.place.notes.1', '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.namePlaceSet,
+                    'c.creator.birth\.place.notes.1',
+                    -value_lang: en
+                )
+
+            end
+
+            if all_match('c.creator.birth\.place.source', '.*\S.*')
+
+                copy_field('c.creator.birth\.place.source', or_record.birth_place_source)
+
+            end
+
+            if all_match('c.creator.birth\.place.term\.number', '.*\S.*')
+
+                paste(or_record.birth_place_source, or_record.birth_place_source, 'c.creator.birth\.place.term\.number', join_char:'')
+
+            end
+
+            if all_match(or_record.birth_place_source, '.*\S.*')
+
+                lido_baseid(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.placeID,
+                    or_record.birth_place_source,
+                    -type: purl
+                )
+
+            end
+
+            if all_match('c.creator.birth\.place.source', 'http://vocab.getty.edu/page/tgn/')
+
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.placeID.$last.source, 'TGN')
+
+            end
+
+            remove_field(or_record.birth_place_source)
+
+            if all_match('c.creator.death\.place.term', '.*\S.*')
+
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "death-place")
+
+            else
+
+                if all_match('c.creator.death\.place.notes.0', '.*\S.*')
+
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "death-place")
+
+                else
+
+                    if all_match('c.creator.death\.place.notes', '.*\S.*')
+
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "death-place")
+
+                    else
+
+                        if all_match('c.creator.death\.place.source', '.*\S.*')
+
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "death-place")
+
+                        else
+
+                            if all_match('c.creator.death\.place.term\.number', '.*\S.*')
+
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.type, "death-place")
+
+                            end
+
+                        end
+
+                    end
+
+                end
+
+            end
+
+            if all_match('c.creator.death\.place.term', '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.namePlaceSet,
+                    'c.creator.death\.place.term',
+                    -value_lang: nl
+                )
+
+            end
+
+            if all_match('c.creator.death\.place.notes', '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.namePlaceSet,
+                    'c.creator.death\.place.notes',
+                    -value_lang: fr
+                )
+
+            end
+
+            if all_match('c.creator.death\.place.notes.0', '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.namePlaceSet,
+                    'c.creator.death\.place.notes.0',
+                    -value_lang: fr
+                )
+
+            end
+
+            if all_match('c.creator.death\.place.notes.1', '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.namePlaceSet,
+                    'c.creator.death\.place.notes.1',
+                    -value_lang: en
+                )
+
+            end
+
+            if all_match('c.creator.death\.place.source', '.*\S.*')
+
+                copy_field('c.creator.death\.place.source', or_record.death_place_source)
+
+            end
+
+            if all_match('c.creator.death\.place.term\.number', '.*\S.*')
+
+                paste(or_record.death_place_source, or_record.death_place_source, 'c.creator.death\.place.term\.number', join_char:'')
+
+            end
+
+            if all_match(or_record.death_place_source, '.*\S.*')
+
+                lido_baseid(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.placeID,
+                    or_record.death_place_source,
+                    -type: purl
+                )
+
+            end
+
+            if all_match('c.creator.death\.place.source', 'http://vocab.getty.edu/page/tgn/')
+
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$last.placeID.$last.source, 'TGN')
+
+            end
+
+            remove_field(or_record.death_place_source)
 
             if all_match('c.creator\.qualifier', '.*\S.*')
                 copy_field('c.creator\.qualifier', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.attributionQualifierActor._)
@@ -1664,44 +1908,189 @@
         move_field(or_record.tmp, or_record.production_period.$append)
     end
 
-    unless is_array(or_record.production_period_id) 
-        move_field(or_record.production_period_id, or_record.tmp)
-        set_array(or_record.production_period_id)
-        move_field(or_record.tmp, or_record.production_period_id.$append)
-    end
+    do list(path: or_record.production_period, var: c)
 
-    do list (path: or_record.production_period_id, var: c)
-        copy_field(c, or_record.production_period.$append.id)
-    end
+        if all_match(c.term, '.*\S.*')
 
-    assoc(or_record.period, or_record.production_period.*.id, or_record.production_period.*)
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append)
 
-    do each (path: or_record.period, var: c)
+        else
 
-        if all_match(c.value, '.*\S.*')
+            if all_match(c.notes.0, '.*\S.*')
 
-            if all_match(c.key, '.*\S.*')
-
-                lido_term(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append,
-                    c.value,
-                    -conceptid: c.key,
-                    -lang: nl,
-                    -source: Adlib,
-                    -type: local
-                )
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append)
 
             else
 
-                lido_term(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append,
-                    c.value,
-                    -lang: nl
-                )
+                if all_match(c.notes, '.*\S.*')
+
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append)
+
+                end
 
             end
 
         end
+
+        if all_match(c.term, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                c.term,
+                -lang: nl
+            )
+
+        end
+
+        if all_match(c.notes, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                c.notes,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(c.notes.0, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                c.notes.0,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(c.notes.1, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                c.notes.1,
+                -lang: en
+            )
+
+        end
+
+    end
+
+    # School/style
+
+    unless is_array(or_record.style)
+        move_field(or_record.style, or_record.tmp)
+        set_array(or_record.style)
+        move_field(or_record.tmp, or_record.style.$append)
+    end
+
+    do list(path: or_record.style, var: c)
+
+        if all_match(c.term, '.*\S.*')
+
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append.type, "style")
+
+        else
+
+            if all_match(c.notes.0, '.*\S.*')
+
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append.type, "style")
+
+            else
+
+                if all_match(c.notes, '.*\S.*')
+
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append.type, "style")
+
+                else
+
+                    if all_match(c.source, '.*\S.*')
+
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append.type, "style")
+
+                    else
+
+                        if all_match('c.term\.number', '.*\S.*')
+
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append.type, "style")
+
+                        end
+
+                    end
+
+                end
+
+            end
+
+        end
+
+        if all_match(c.term, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                c.term,
+                -lang: nl
+            )
+
+        end
+
+        if all_match(c.notes, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                c.notes,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(c.notes.0, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                c.notes.0,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(c.notes.1, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                c.notes.1,
+                -lang: en
+            )
+
+        end
+
+        if all_match(c.source, '.*\S.*')
+
+            copy_field(c.source, or_record.style_source)
+
+        end
+
+        if all_match('c.term\.number', '.*\S.*')
+
+            paste(or_record.style_source, or_record.style_source, 'c.term\.number', join_char:'')
+
+        end
+
+        if all_match(or_record.style_source, '.*\S.*')
+
+            lido_baseid(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last.conceptID,
+                or_record.style_source,
+                -type: purl
+            )
+
+        end
+
+        if all_match(c.source, 'http://vocab.getty.edu/page/aat/')
+
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last.conceptID.$last.source, 'AAT')
+
+        end
+
+        remove_field(or_record.style_source)
 
     end
 
@@ -2236,6 +2625,8 @@
 
 # LIDO creditLine
 
+    set_array(creator_roles, 'architect', 'auteur', 'beeldhouwer', 'boekverluchter', 'cartograaf', 'etser', 'fotograaf', 'fotograveur', 'glazenier', 'graveur', 'houtsnijder', 'illustrator', 'kunstenaar', 'lithograaf', 'medailleur', 'ontwerper', 'ontwerper en uitgever', 'prentmaker', 'prentmaker en uitgever', 'schilder', 'schrijver', 'steenhouwer', 'tekenaar', 'tweede vervaardiger', 'vervaardiger')
+
     do list (path: or_record.production, var: c)
 
         copy_field(c.creator.name, or_record.creator_name)
@@ -2243,6 +2634,62 @@
         if all_match(or_record.creator_name, '.*\S.*')
 
             lookup_in_store(or_record.creator_name, DBI, data_source: 'dbi:SQLite:/tmp/import.Copyrights.sqlite')
+
+            if all_match('c.creator\.qualifier.term', '.*\S.*')
+
+                unless in('c.creator\.qualifier.term', creator_roles)
+
+                    set_field(or_record.no_copyright, 'true')
+
+                    if exists(or_record.legal_status)
+
+                        remove_field(or_record.legal_status)
+
+                    end
+
+                    if exists(or_record.creativeCommons)
+
+                        remove_field(or_record.creativeCommons)
+
+                    end
+
+                    if exists(or_record.rightsStatements)
+
+                        remove_field(or_record.rightsStatements)
+
+                    end
+
+                end
+
+            end
+
+            if all_match('c.creator\.role.term', '.*\S.*')
+
+                unless in('c.creator\.role.term', creator_roles)
+
+                    set_field(or_record.no_copyright, 'true')
+
+                    if exists(or_record.legal_status)
+
+                        remove_field(or_record.legal_status)
+
+                    end
+
+                    if exists(or_record.creativeCommons)
+
+                        remove_field(or_record.creativeCommons)
+
+                    end
+
+                    if exists(or_record.rightsStatements)
+
+                        remove_field(or_record.rightsStatements)
+
+                    end
+
+                end
+
+            end
 
             unless exists(or_record.creator_name.legalStatus)
 
@@ -2409,6 +2856,7 @@
     remove_field(or_record.legal_status)
     remove_field(or_record.creativeCommons)
     remove_field(or_record.rightsStatements)
+    remove_field(creator_roles)
 
 
 ## LIDO recordWrap
