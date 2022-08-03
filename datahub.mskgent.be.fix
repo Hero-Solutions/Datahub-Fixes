@@ -94,10 +94,19 @@
 #   Titel_translation.title\.translation                    lang: fr
 #   Titel_translation.title\.translation                    lang: en
 #                                                       lido:inscriptions
-#   Inscription.inscription\.type                           type
 #   Inscription.inscription\.content                        lido:inscriptionTranscription
 #                                                           lido:inscriptionDescription
-#   Inscription.inscription\.position                           type: position
+#                                                               type: type
+#   Inscription.inscription\.type.source + term\.number             liod:descriptiveNoteID
+#                                                                   lido:descriptiveNoteValue
+#   Inscription.inscription\.type.term                                  lang: nl
+#   Inscription.inscription\.type.notes                                 lang: fr
+#   Inscription.inscription\.type.notes                                 lang: en
+#                                                               type: position
+#                                                                   lido:descriptiveNoteValue
+#   Inscription.inscription\.position.term                              lang: nl
+#   Inscription.inscription\.position.notes                             lang: fr
+#   Inscription.inscription\.position.notes                             lang: en
 #                                                       lido:repositorySet
 #   institution\.name.name                                  lido:repositoryName                             Instelling              naam bewaarinstelling
 #                                                           lido:workID
@@ -108,11 +117,13 @@
 #   Description.description                                 lang: fr
 #   Description.description                                 lang: en
 #                                                       lido:objectMeasurementsSet
-#                                                           lido:measurementsSet
-#   Dimension.dimension\.type                                   lido:measurementType                                                dimensie afmeting
-#   Dimension.dimension\.unit                                   lido:measurementUnit                        Dimensies               eenheid afmeting
-#   Dimension.dimension\.value                                  lido:measurementValue                       Dimensies               waarde afmeting
-#   Dimension.dimension\.part                               lido:extentMeasurements                                                 onderdeel afmeting
+#                                                           lido:objectMeasurements
+#                                                               lido:measurementsSet
+#   Dimension.dimension\.type                                       lido:measurementType                                            dimensie afmeting
+#   Dimension.dimension\.unit                                       lido:measurementUnit                                            eenheid afmeting
+#   Dimension.dimension\.value                                      lido:measurementValue                                           waarde afmeting
+#   Dimension.dimension\.part                                   lido:extentMeasurements                                             onderdeel afmeting
+#                                                           lido:displayObjectMeasurements                  Dimensies
 #                                                       lido:eventType
 #                                                           lido:term
 #                                                               acquisition
@@ -997,15 +1008,63 @@
 
         else
 
-            if all_match('c.inscription\.type', '.*\S.*')
+            if all_match('c.inscription\.type.term', '.*\S.*')
 
                 add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
 
             else
 
-                if all_match('c.inscription\.position', '.*\S.*')
+                if all_match('c.inscription\.type.notes.0', '.*\S.*')
 
                     add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+                else
+
+                    if all_match('c.inscription\.type.notes', '.*\S.*')
+
+                        add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+                    else
+
+                        if all_match('c.inscription\.type.source', '.*\S.*')
+
+                            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+                        else
+
+                            if all_match('c.inscription\.type.term\.number', '.*\S.*')
+
+                                add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+                            else
+
+                                if all_match('c.inscription\.position.term', '.*\S.*')
+
+                                    add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+                                else
+
+                                    if all_match('c.inscription\.position.notes.0', '.*\S.*')
+
+                                        add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+                                    else
+
+                                        if all_match('c.inscription\.position.notes', '.*\S.*')
+
+                                            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$append)
+
+                                        end
+
+                                    end
+
+                                end
+
+                            end
+
+                        end
+
+                    end
 
                 end
 
@@ -1013,28 +1072,300 @@
 
         end
 
-
         if all_match('c.inscription\.content', '.*\S.*')
 
             copy_field('c.inscription\.content', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionTranscription._)
+            copy_field('c.inscription\.content', or_record.inscription_content)
 
         end
 
-        if all_match('c.inscription\.type', '.*\S.*')
+        if all_match('c.inscription\.type.term', '.*\S.*')
 
-            copy_field('c.inscription\.type', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.descriptiveNoteValue._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.type, 'type')
 
-            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.type, "type")
+        else
+
+            if all_match('c.inscription\.type.notes.0', '.*\S.*')
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.type, 'type')
+
+            else
+
+                if all_match('c.inscription\.type.notes', '.*\S.*')
+
+                    add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.type, 'type')
+
+                else
+
+                    if all_match('c.inscription\.type.source', '.*\S.*')
+
+                        add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.type, 'type')
+
+                    else
+
+                        if all_match('c.inscription\.type.term\.number', '.*\S.*')
+
+                            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.type, 'type')
+
+                        end
+
+                    end
+
+                end
+
+            end
 
         end
 
-        if all_match('c.inscription\.position', '.*\S.*')
+        if all_match('c.inscription\.type.term', '.*\S.*')
 
-            copy_field('c.inscription\.position', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.descriptiveNoteValue._)
-
-            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.type, "position")
+            copy_field('c.inscription\.type.term', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'nl')
+            copy_field('c.inscription\.type.term', or_record.inscription_type)
 
         end
+
+        if all_match('c.inscription\.type.notes', '.*\S.*')
+
+            copy_field('c.inscription\.type.notes', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'fr')
+            copy_field('c.inscription\.type.notes', or_record.inscription_type_fr)
+
+        end
+
+        if all_match('c.inscription\.type.notes.0', '.*\S.*')
+
+            copy_field('c.inscription\.type.notes.0', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'fr')
+            copy_field('c.inscription\.type.notes.0', or_record.inscription_type_fr)
+
+        end
+
+        if all_match('c.inscription\.type.notes.1', '.*\S.*')
+
+            copy_field('c.inscription\.type.notes.1', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'en')
+            copy_field('c.inscription\.type.notes.1', or_record.inscription_type_en)
+
+        end
+
+        if all_match('c.inscription\.type.source', '.*\S.*')
+
+            copy_field('c.inscription\.type.source', or_record.inscription_type_source)
+
+        end
+
+        if all_match('c.inscription\.type.term\.number', '.*\S.*')
+
+            paste(or_record.inscription_type_source, or_record.inscription_type_source, 'c.inscription\.type.term\.number', join_char:'')
+
+        end
+
+        if all_match(or_record.inscription_type_source, '.*\S.*')
+
+            copy_field(or_record.inscription_type_source, descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteID._)
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteID.type, 'purl')
+
+        end
+
+        if all_match('c.inscription\.type.source', 'http://vocab.getty.edu/page/aat/')
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteID.source, 'AAT')
+
+        end
+
+        remove_field(or_record.inscription_type_source)
+
+        if all_match('c.inscription\.position.term', '.*\S.*')
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.type, 'position')
+
+        else
+
+            if all_match('c.inscription\.position.notes.0', '.*\S.*')
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.type, 'position')
+
+            else
+
+                if all_match('c.inscription\.position.notes', '.*\S.*')
+
+                    add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.type, 'position')
+
+                end
+
+            end
+
+        end
+
+        if all_match('c.inscription\.position.term', '.*\S.*')
+
+            copy_field('c.inscription\.position.term', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'nl')
+            copy_field('c.inscription\.position.term', or_record.inscription_position)
+
+        end
+
+        if all_match('c.inscription\.position.notes', '.*\S.*')
+
+            copy_field('c.inscription\.position.notes', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'fr')
+            copy_field('c.inscription\.position.notes', or_record.inscription_position_fr)
+
+        end
+
+        if all_match('c.inscription\.position.notes.0', '.*\S.*')
+
+            copy_field('c.inscription\.position.notes.0', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'fr')
+            copy_field('c.inscription\.position.notes.0', or_record.inscription_position_fr)
+
+        end
+
+        if all_match('c.inscription\.position.notes.1', '.*\S.*')
+
+            copy_field('c.inscription\.position.notes.1', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'en')
+            copy_field('c.inscription\.position.notes.1', or_record.inscription_position_en)
+
+        end
+
+        if all_match(or_record.inscription_type, '.*\S.*')
+
+            copy_field(or_record.inscription_type, or_record.inscription_display)
+
+        end
+
+        if all_match(or_record.inscription_position, '.*\S.*')
+
+            if exists(or_record.inscription_display)
+
+                paste(or_record.inscription_display, or_record.inscription_display, or_record.inscription_position, join_char:' ')
+
+            else
+
+                copy_field(or_record.inscription_position, or_record.inscription_display)
+
+            end
+
+        end
+
+        if all_match(or_record.inscription_content, '.*\S.*')
+
+            if exists(or_record.inscription_display)
+
+                paste(or_record.inscription_display, or_record.inscription_display, or_record.inscription_content, join_char:': ')
+
+            else
+
+                copy_field(or_record.inscription_content, or_record.inscription_display)
+
+            end
+
+        end
+
+        if all_match(or_record.inscription_display, '.*\S.*')
+
+            copy_field(or_record.inscription_display, descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'nl')
+
+        end
+
+        remove_field(or_record.inscription_display)
+
+        if all_match(or_record.inscription_type_fr, '.*\S.*')
+
+            copy_field(or_record.inscription_type_fr, or_record.inscription_display)
+
+        end
+
+        if all_match(or_record.inscription_position_fr, '.*\S.*')
+
+            if exists(or_record.inscription_display)
+
+                paste(or_record.inscription_display, or_record.inscription_display, or_record.inscription_position_fr, join_char:' ')
+
+            else
+
+                copy_field(or_record.inscription_position_fr, or_record.inscription_display)
+
+            end
+
+        end
+
+        if all_match(or_record.inscription_content, '.*\S.*')
+
+            if exists(or_record.inscription_display)
+
+                paste(or_record.inscription_display, or_record.inscription_display, or_record.inscription_content, join_char:': ')
+
+            else
+
+                copy_field(or_record.inscription_content, or_record.inscription_display)
+
+            end
+
+        end
+
+        if all_match(or_record.inscription_display, '.*\S.*')
+
+            copy_field(or_record.inscription_display, descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'fr')
+
+        end
+
+        remove_field(or_record.inscription_display)
+
+        if all_match(or_record.inscription_type_en, '.*\S.*')
+
+            copy_field(or_record.inscription_type_en, or_record.inscription_display)
+
+        end
+
+        if all_match(or_record.inscription_position_en, '.*\S.*')
+
+            if exists(or_record.inscription_display)
+
+                paste(or_record.inscription_display, or_record.inscription_display, or_record.inscription_position_en, join_char:' ')
+
+            else
+
+                copy_field(or_record.inscription_position_en, or_record.inscription_display)
+
+            end
+
+        end
+
+        if all_match(or_record.inscription_content, '.*\S.*')
+
+            if exists(or_record.inscription_display)
+
+                paste(or_record.inscription_display, or_record.inscription_display, or_record.inscription_content, join_char:': ')
+
+            else
+
+                copy_field(or_record.inscription_content, or_record.inscription_display)
+
+            end
+
+        end
+
+        if all_match(or_record.inscription_display, '.*\S.*')
+
+            copy_field(or_record.inscription_display, descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.descriptiveNoteValue.$last.lang, 'en')
+
+        end
+
+        remove_field(or_record.inscription_display)
+        remove_field(or_record.inscription_content)
+        remove_field(or_record.inscription_type)
+        remove_field(or_record.inscription_position)
+        remove_field(or_record.inscription_type_fr)
+        remove_field(or_record.inscription_position_fr)
+        remove_field(or_record.inscription_type_en)
+        remove_field(or_record.inscription_position_en)
 
     end
 
@@ -1224,9 +1555,217 @@
 
             copy_field('c.dimension\.part', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.extentMeasurements._)
 
+            if all_match('c.dimension\.part', 'geheel')
+
+                if all_match('c.dimension\.type', 'hoogte')
+
+                    if all_match('c.dimension\.unit', '.*\S.*')
+
+                        copy_field('c.dimension\.unit', or_record.dimension_height_unit)
+
+                    end
+
+                    if all_match('c.dimension\.value', '.*\S.*')
+
+                        copy_field('c.dimension\.value', or_record.dimension_height_value)
+
+                    end
+
+                end
+
+                if all_match('c.dimension\.type', 'breedte')
+
+                    if all_match('c.dimension\.unit', '.*\S.*')
+
+                        copy_field('c.dimension\.unit', or_record.dimension_width_unit)
+
+                    end
+
+                    if all_match('c.dimension\.value', '.*\S.*')
+
+                        copy_field('c.dimension\.value', or_record.dimension_width_value)
+
+                    end
+
+                end
+
+                if all_match('c.dimension\.type', 'diepte')
+
+                    if all_match('c.dimension\.unit', '.*\S.*')
+
+                        copy_field('c.dimension\.unit', or_record.dimension_depth_unit)
+
+                    end
+
+                    if all_match('c.dimension\.value', '.*\S.*')
+
+                        copy_field('c.dimension\.value', or_record.dimension_depth_value)
+
+                    end
+
+                end
+
+                if all_match('c.dimension\.type', 'diameter')
+
+                    if all_match('c.dimension\.unit', '.*\S.*')
+
+                        copy_field('c.dimension\.unit', or_record.dimension_diameter_unit)
+
+                    end
+
+                    if all_match('c.dimension\.value', '.*\S.*')
+
+                        copy_field('c.dimension\.value', or_record.dimension_diameter_value)
+
+                    end
+
+                end
+
+            end
+
         end
 
     end
+
+    if all_match(or_record.dimension_height_value, '.*\S.*')
+
+        copy_field(or_record.dimension_height_value, or_record.display_dimension)
+
+        if all_match(or_record.dimension_height_unit, '.*\S.*')
+
+            if all_match(or_record.dimension_width_unit, '.*\S.*')
+
+                unless in(or_record.dimension_height_unit, or_record.dimension_width_unit)
+
+                    set_field(or_record.dimension_height_unit_different, 'true')
+
+                end
+
+            end
+
+            if all_match(or_record.dimension_depth_unit, '.*\S.*')
+
+                unless in(or_record.dimension_height_unit, or_record.dimension_depth_unit)
+
+                    set_field(or_record.dimension_height_unit_different, 'true')
+
+                end
+
+            end
+
+            if all_match(or_record.dimension_width_value, '.*\S.*')
+
+                if all_match(or_record.dimension_height_unit_different, 'true')
+
+                    paste(or_record.display_dimension, or_record.display_dimension, or_record.dimension_height_unit, join_char:' ')
+
+                end
+
+            else
+
+                if all_match(or_record.dimension_depth_value, '.*\S.*')
+
+                    if all_match(or_record.dimension_height_unit_different, 'true')
+
+                        paste(or_record.display_dimension, or_record.display_dimension, or_record.dimension_height_unit, join_char:' ')
+
+                    end
+
+                else
+
+                    paste(or_record.display_dimension, or_record.display_dimension, or_record.dimension_height_unit, join_char:' ')
+
+                end
+
+            end
+
+        end
+
+    end
+
+    if all_match(or_record.dimension_width_value, '.*\S.*')
+
+        paste(or_record.display_dimension, or_record.display_dimension, or_record.dimension_width_value, join_char:' x ')
+
+        if all_match(or_record.dimension_width_unit, '.*\S.*')
+
+            if all_match(or_record.dimension_depth_unit, '.*\S.*')
+
+                unless in(or_record.dimension_width_unit, or_record.dimension_depth_unit)
+
+                    set_field(or_record.dimension_width_unit_different, 'true')
+
+                end
+
+            end
+
+            if all_match(or_record.dimension_depth_value, '.*\S.*')
+
+                if all_match(or_record.dimension_width_unit_different, 'true')
+
+                    paste(or_record.display_dimension, or_record.display_dimension, or_record.dimension_width_unit, join_char:' ')
+
+                end
+
+            else
+
+                paste(or_record.display_dimension, or_record.display_dimension, or_record.dimension_width_unit, join_char:' ')
+
+            end
+
+        end
+
+    end
+
+    if all_match(or_record.dimension_depth_value, '.*\S.*')
+
+        paste(or_record.display_dimension, or_record.display_dimension, or_record.dimension_depth_value, join_char:' x ')
+
+        if all_match(or_record.dimension_depth_unit, '.*\S.*')
+
+            paste(or_record.display_dimension, or_record.display_dimension, or_record.dimension_depth_unit, join_char:' ')
+
+        end
+
+    end
+
+    unless exists(or_record.display_dimension)
+
+        if all_match(or_record.dimension_diameter_value, '.*\S.*')
+
+            copy_field(or_record.dimension_diameter_value, or_record.display_dimension)
+
+            if all_match(or_record.dimension_diameter_unit, '.*\S.*')
+
+                paste(or_record.display_dimension, or_record.display_dimension, or_record.dimension_diameter_unit, join_char:' ')
+
+            end
+
+            append(or_record.display_dimension, ' (diameter)')
+
+        end
+
+    end
+
+    if all_match(or_record.display_dimension, '.*\S.*')
+
+        add_field(descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$append)
+
+        copy_field(or_record.display_dimension, descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.displayObjectMeasurements._)
+
+    end
+
+    remove_field(or_record.dimension_height_unit)
+    remove_field(or_record.dimension_height_value)
+    remove_field(or_record.dimension_height_unit_different)
+    remove_field(or_record.dimension_width_unit)
+    remove_field(or_record.dimension_width_value)
+    remove_field(or_record.dimension_width_unit_different)
+    remove_field(or_record.dimension_depth_unit)
+    remove_field(or_record.dimension_depth_value)
+    remove_field(or_record.dimension_diameter_unit)
+    remove_field(or_record.dimension_diameter_value)
+    remove_field(or_record.display_dimension)
 
 
 ## LIDO eventWrap
