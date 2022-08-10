@@ -18,12 +18,13 @@
     copy_field('_metadata.object_category\.lref', or_record.object_category_id)
     copy_field(_metadata.Title, or_record.title)
     copy_field(_metadata.Titel_translation, or_record.title_translation)
+    copy_field(_metadata.Inscription, or_record.inscription)
     copy_field('_metadata.institution\.name', or_record.institution)
     copy_field(_metadata.administration_name, or_record.administration_name)
     copy_field(_metadata.object_number, or_record.object_number)
+    copy_field(_metadata.Current_location, or_record.current_location)
     copy_field(_metadata.Description, or_record.description)
     copy_field(_metadata.Dimension, or_record.dimensions)
-    copy_field(_metadata.Inscription, or_record.inscription)
 #    copy_field(_metadata.Acquisition_source, or_record.acquisition_source)
 #    copy_field('_metadata.acquisition\.date', or_record.acquisition_date)
 #    copy_field('_metadata.acquisition\.method', or_record.acquisition_method)
@@ -76,6 +77,8 @@
 #                                                               lido:term
 #   object_category                                                 pref: preferred                         Type                    term
 #                                                                   pref: alternate                         Type
+#                                                           type: collection
+#                                                               lido:term
 #                                                       lido:titleSet
 #   Title.title\.type                                       type
 #   Title.title                                                 pref: preferred                                                     titel
@@ -90,6 +93,7 @@
 #   administration_name                                     lido:repositoryName                             Instelling              naam bewaarinstelling
 #                                                           lido:workID
 #   object_number                                               type: object-number                         Inventarisnummer        waarde objectnummer
+#   Current_location                                        lido:repositoryLocation
 #   Description                                         lido:objectDescriptionSet                           Beschrijving            korte beschrijving
 #                                                       lido:objectMeasurementsSet
 #                                                           lido:measurementsSet
@@ -486,6 +490,275 @@
 
     end
 
+# LIDO classification [type="collection"]
+
+    unless is_array(or_record.object_number)
+        move_field(or_record.object_number, or_record.tmp)
+        set_array(or_record.object_number)
+        move_field(or_record.tmp, or_record.object_number.$append)
+    end
+
+    do list(path: or_record.object_number, var: c)
+
+        copy_field(c, or_record.collection)
+
+        if all_match(or_record.collection, '^([IVX]{1,6}|BM[GV]).*$')
+
+            replace_all(or_record.collection, '^([IVX]{1,6}|BM[GV]).*$', '$1')
+
+        else
+
+            if all_match(or_record.collection, '^.*([IVX]{1,6}|BM[GV])$')
+
+                replace_all(or_record.collection, '^.*([IVX]{1,6}|BM[GV])$', '$1')
+
+            else
+
+                if all_match(or_record.collection, '^.*([IVX]{1,6}|BM[GV])-BL$')
+
+                    replace_all(or_record.collection, '^.*([IVX]{1,6}|BM[GV])-BL$', '$1')
+
+                else
+
+                    if all_match(or_record.collection, '^.*([IVX]{1,6}|BM[GV])[a-z]$')
+
+                        replace_all(or_record.collection, '^.*([IVX]{1,6}|BM[GV])[a-z]$', '$1')
+
+                    else
+
+                        if all_match(or_record.collection, '^.*([IVX]{1,6}|BM[GV])[a-z]-[a-z]$')
+
+                            replace_all(or_record.collection, '^.*([IVX]{1,6}|BM[GV])[a-z]-[a-z]$', '$1')
+
+                        else
+
+                            if all_match(or_record.collection, '^.*([IVX]{1,6}|BM[GV]).[A-Z]$')
+
+                                replace_all(or_record.collection, '^.*([IVX]{1,6}|BM[GV]).[A-Z]$', '$1')
+
+                            else
+
+                                if all_match(or_record.collection, '^.*([IVX]{1,6}|BM[GV].[A-Z]-[A-Z])$')
+
+                                    replace_all(or_record.collection, '^.*([IVX]{1,6}|BM[GV].[A-Z]-[A-Z])$', '$1')
+
+                                end
+
+                            end
+
+                        end
+
+                    end
+
+                end
+
+            end
+
+        end
+
+        if all_match(or_record.collection, '^I$')
+
+            set_field(or_record.collection_name, 'Schilderijen')
+
+        end
+
+        if all_match(or_record.collection, '^II$')
+
+            set_field(or_record.collection_name, 'Tekeningen')
+
+        end
+
+        if all_match(or_record.collection, '^III$')
+
+            set_field(or_record.collection_name, 'Prenten')
+
+        end
+
+        if all_match(or_record.collection, '^V$')
+
+            set_field(or_record.collection_name, 'Houtsculptuur')
+
+        end
+
+        if all_match(or_record.collection, '^VI$')
+
+            set_field(or_record.collection_name, 'Steensculptuur')
+
+        end
+
+        if all_match(or_record.collection, '^VII$')
+
+            set_field(or_record.collection_name, 'Meubilair')
+
+        end
+
+        if all_match(or_record.collection, '^VIII$')
+
+            set_field(or_record.collection_name, 'Ivoor en parelmoer')
+
+        end
+
+        if all_match(or_record.collection, '^IX$')
+
+            set_field(or_record.collection_name, 'Juwelen en email')
+
+        end
+
+        if all_match(or_record.collection, '^X$')
+
+            set_field(or_record.collection_name, 'Zilver')
+
+        end
+
+        if all_match(or_record.collection, '^XI$')
+
+            set_field(or_record.collection_name, 'Koper en brons')
+
+        end
+
+        if all_match(or_record.collection, '^XII$')
+
+            set_field(or_record.collection_name, 'Tin')
+
+        end
+
+        if all_match(or_record.collection, '^XIII$')
+
+            set_field(or_record.collection_name, 'Blik en lood')
+
+        end
+
+        if all_match(or_record.collection, '^XIV$')
+
+            set_field(or_record.collection_name, 'Ijzer')
+
+        end
+
+        if all_match(or_record.collection, '^XV$')
+
+            set_field(or_record.collection_name, 'Kostuums')
+
+        end
+
+        if all_match(or_record.collection, '^XVI$')
+
+            set_field(or_record.collection_name, 'Weefsels en textiel')
+
+        end
+
+        if all_match(or_record.collection, '^XVII$')
+
+            set_field(or_record.collection_name, 'Wandtapijten')
+
+        end
+
+        if all_match(or_record.collection, '^XVIII$')
+
+            set_field(or_record.collection_name, 'Borduursels')
+
+        end
+
+        if all_match(or_record.collection, '^XIX$')
+
+            set_field(or_record.collection_name, 'Kant')
+
+        end
+
+        if all_match(or_record.collection, '^XX$')
+
+            set_field(or_record.collection_name, 'Leer en goudleer')
+
+        end
+
+        if all_match(or_record.collection, '^XXI$')
+
+            set_field(or_record.collection_name, 'Keramiek')
+
+        end
+
+        if all_match(or_record.collection, '^XXII$')
+
+            set_field(or_record.collection_name, 'Glas en kristal')
+
+        end
+
+        if all_match(or_record.collection, '^XXIII$')
+
+            set_field(or_record.collection_name, 'Numismatiek')
+
+        end
+
+        if all_match(or_record.collection, '^XXIV$')
+
+            set_field(or_record.collection_name, 'Sigillografie')
+
+        end
+
+        if all_match(or_record.collection, '^XXV$')
+
+            set_field(or_record.collection_name, 'Wapens')
+
+        end
+
+        if all_match(or_record.collection, '^XXVI$')
+
+            set_field(or_record.collection_name, 'Meetinstrumenten')
+
+        end
+
+        if all_match(or_record.collection, '^XXVII$')
+
+            set_field(or_record.collection_name, 'Werktuigen')
+
+        end
+
+        if all_match(or_record.collection, '^XXVIII$')
+
+            set_field(or_record.collection_name, 'Muziekinstrumenten')
+
+        end
+
+        if all_match(or_record.collection, '^XXIX$')
+
+            set_field(or_record.collection_name, 'Voertuigen')
+
+        end
+
+        if all_match(or_record.collection, '^XXX$')
+
+            set_field(or_record.collection_name, 'Varia')
+
+        end
+
+        if all_match(or_record.collection, '^XXXI$')
+
+            set_field(or_record.collection_name, 'Modern en hedendaags')
+
+        end
+
+        if all_match(or_record.collection, '^BMV$')
+
+            set_field(or_record.collection_name, 'Volkskunde')
+
+        end
+
+        if all_match(or_record.collection_name, '.*\S.*')
+
+            add_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append.type, "collection")
+
+            lido_term(
+                descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last,
+                or_record.collection_name,
+                -lang: nl
+            )
+
+        end
+
+    end
+
+    remove_field(or_record.collection)
+    remove_field(or_record.collection_name)
+
 
 ## LIDO objectIdentificationWrap
 
@@ -532,102 +805,6 @@
                 'c.title\.translation',
                 -value_pref: alternate
             )
-
-        end
-
-    end
-
-# LIDO repositoryName
-
-    do list(path: or_record.administration_name, var: c)
-
-        if all_match(c, '.*\S.*')
-
-            lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$append.repositoryName.legalBodyName,
-                c
-            )
-
-        end
-
-    end
-
-# LIDO workID
-
-    unless is_array(or_record.object_number)
-        move_field(or_record.object_number, or_record.tmp)
-        set_array(or_record.object_number)
-        move_field(or_record.tmp, or_record.object_number.$append)
-    end
-
-    do list(path: or_record.object_number, var: c)
-
-        if all_match(c, '.*\S.*')
-
-            lido_baseid(
-                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.workID,
-                c,
-                -type: object-number
-            )
-
-        end
-
-    end
-
-# LIDO objectDescriptionSet
-
-    unless is_array(or_record.description) 
-        move_field(or_record.description, or_record.tmp)
-        set_array(or_record.description)
-        move_field(or_record.tmp, or_record.description.$append)
-    end
-
-    do list(path: or_record.description, var: c)
-
-        if all_match(c.description, '.*\S.*')
-
-            lido_descriptivenote(
-                descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet,
-                c.description
-            )
-
-        end
-
-    end
-
-# LIDO objectMeasurementsWrap
-
-    unless is_array(or_record.dimensions) 
-        move_field(or_record.dimensions, or_record.tmp)
-        set_array(or_record.dimensions)
-        move_field(or_record.tmp, or_record.dimensions.$append)
-    end
-
-    do list(path:or_record.dimensions, var:c)
-
-        add_field(descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$append)
-
-        if all_match('c.dimension\.type', '.*\S.*')
-
-            copy_field('c.dimension\.type', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.measurementsSet.measurementType._)
-
-        end
-
-        if all_match('c.dimension\.unit', '.*\S.*')
-
-            copy_field('c.dimension\.unit', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.measurementsSet.measurementUnit._)
-
-        end
-
-        if all_match('c.dimension\.value', '.*\S.*')
-
-            copy_field('c.dimension\.value', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.measurementsSet.measurementValue._)
-
-        end
-
-        if all_match('c.dimension\.part', '.*\S.*')
-
-            copy_field('c.dimension\.part', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.extentMeasurements._)
 
         end
 
@@ -701,6 +878,117 @@
             copy_field('c.inscription\.method', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$append.descriptiveNoteValue._)
 
             add_field(descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionDescription.$last.type, "method")
+
+        end
+
+    end
+
+# LIDO repositoryName
+
+    do list(path: or_record.administration_name, var: c)
+
+        if all_match(c, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$append.repositoryName.legalBodyName,
+                c
+            )
+
+        end
+
+    end
+
+# LIDO workID
+
+    do list(path: or_record.object_number, var: c)
+
+        if all_match(c, '.*\S.*')
+
+            lido_baseid(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.workID,
+                c,
+                -type: object-number
+            )
+
+        end
+
+    end
+
+# LIDO repositoryLocation
+
+    unless is_array(or_record.current_location)
+        move_field(or_record.current_location, or_record.tmp)
+        set_array(or_record.current_location)
+        move_field(or_record.tmp, or_record.current_location.$append)
+    end
+
+    do list(path: or_record.current_location, var: c)
+
+        if all_match(c.current_location, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                c.current_location
+            )
+
+        end
+
+    end
+
+# LIDO objectDescriptionSet
+
+    unless is_array(or_record.description) 
+        move_field(or_record.description, or_record.tmp)
+        set_array(or_record.description)
+        move_field(or_record.tmp, or_record.description.$append)
+    end
+
+    do list(path: or_record.description, var: c)
+
+        if all_match(c.description, '.*\S.*')
+
+            lido_descriptivenote(
+                descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet,
+                c.description
+            )
+
+        end
+
+    end
+
+# LIDO objectMeasurementsWrap
+
+    unless is_array(or_record.dimensions) 
+        move_field(or_record.dimensions, or_record.tmp)
+        set_array(or_record.dimensions)
+        move_field(or_record.tmp, or_record.dimensions.$append)
+    end
+
+    do list(path:or_record.dimensions, var:c)
+
+        add_field(descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$append)
+
+        if all_match('c.dimension\.type', '.*\S.*')
+
+            copy_field('c.dimension\.type', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.measurementsSet.measurementType._)
+
+        end
+
+        if all_match('c.dimension\.unit', '.*\S.*')
+
+            copy_field('c.dimension\.unit', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.measurementsSet.measurementUnit._)
+
+        end
+
+        if all_match('c.dimension\.value', '.*\S.*')
+
+            copy_field('c.dimension\.value', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.measurementsSet.measurementValue._)
+
+        end
+
+        if all_match('c.dimension\.part', '.*\S.*')
+
+            copy_field('c.dimension\.part', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.extentMeasurements._)
 
         end
 
