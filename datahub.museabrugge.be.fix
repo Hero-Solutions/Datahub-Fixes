@@ -1369,6 +1369,12 @@
 
         end
 
+        if exists(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole)
+            unless exists(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$first.appellationValue.$first._)
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.appellationValue._, "")
+            end
+        end
+
     end
 
 # LIDO displayDate [eventType/term="production"]
