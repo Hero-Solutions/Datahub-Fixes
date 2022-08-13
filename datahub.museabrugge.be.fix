@@ -39,6 +39,9 @@
     copy_field('_metadata.content\.motif\.general\.lref', or_record.content_motif_general_id)
     copy_field(_metadata.Content_subject, or_record.depicted_subject)
     copy_field(_metadata.Content_person, or_record.depicted_person)
+    copy_field(_metadata.Parts, or_record.parts)
+    copy_field(_metadata.Part_of, or_record.part_of)
+    copy_field(_metadata.Related_object, or_record.related_object)
     copy_field(_metadata.priref, or_record.priref)
 
     # resourceWrap
@@ -183,6 +186,31 @@
 #                                                                   lido:subjectPlace
 #   Content_subject.content\.subject\.lref                              lido:placeID                                                identificatie afgebeelde locatie
 #   Content_subject.content\.subject                                    lido:namePlaceSet                                           naam afgebeelde locatie
+#                                                           lido:relatedWorksWrap
+#                                                               lido:relatedWorkSet
+#                                                                   lido:relatedWork
+#                                                                       lido:objectID
+#   Parts.parts_reference                                                   type: local
+#                                                                   lido:relatedWorkRelType
+#                                                                       lido:conceptID
+#                                                                           type: URI
+#                                                                       lido:term
+#                                                               lido:relatedWorkSet
+#                                                                   lido:relatedWork
+#                                                                       lido:objectID
+#   Part_of.part_of_reference                                               type: local
+#                                                                   lido:relatedWorkRelType
+#                                                                       lido:conceptID
+#                                                                           type: URI
+#                                                                       lido:term
+#                                                               lido:relatedWorkSet
+#                                                                   lido:relatedWork
+#                                                                       lido:objectID
+#   Related_object.related_object\.reference                                type: local
+#                                                                   lido:relatedWorkRelType
+#                                                                       lido:conceptID
+#                                                                           type: URI
+#   Related_object.related_object\.association                          lido:term
 #                                                       lido:rightsWorkWrap
 #                                                           lido:rightsType
 #                                                               lido:conceptID                                                      identificatie rechten werk
@@ -2022,6 +2050,125 @@
                 )
 
             end
+
+        end
+
+    end
+
+# LIDO relatedWorksWrap
+
+    unless is_array(or_record.parts)
+        move_field(or_record.parts, or_record.tmp)
+        set_array(or_record.parts)
+        move_field(or_record.tmp, or_record.parts.$append)
+    end
+
+    do list(path:or_record.parts, var:r)
+
+        if all_match(r.parts_reference, '.*\S.*')
+
+            add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+
+            lido_baseid(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                r.parts_reference,
+                -type: local
+            )
+
+            set_field(r.relationshipEn, 'Has Part')
+            set_field(r.relationshipURI, 'http://purl.org/dc/terms/hasPart')
+
+            lido_term(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWorkRelType,
+                r.relationshipEn,
+                -conceptid: r.relationshipURI,
+                -type: URI,
+                -pref: preferred,
+                -lang: en
+            )
+
+        end
+
+        remove_field(r.relationshipEn)
+        remove_field(r.relationshipURI)
+
+    end
+
+    unless is_array(or_record.part_of)
+        move_field(or_record.part_of, or_record.tmp)
+        set_array(or_record.part_of)
+        move_field(or_record.tmp, or_record.part_of.$append)
+    end
+
+    do list(path:or_record.part_of, var:r)
+
+        if all_match(r.part_of_reference, '.*\S.*')
+
+            add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+
+            lido_baseid(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                r.part_of_reference,
+                -type: local
+            )
+
+            set_field(r.relationshipEn, 'Is Part Of')
+            set_field(r.relationshipURI, 'http://purl.org/dc/terms/isPartOf')
+
+            lido_term(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWorkRelType,
+                r.relationshipEn,
+                -conceptid: r.relationshipURI,
+                -type: URI,
+                -pref: preferred,
+                -lang: en
+            )
+
+        end
+
+        remove_field(r.relationshipEn)
+        remove_field(r.relationshipURI)
+
+    end
+
+    unless is_array(or_record.related_object)
+        move_field(or_record.related_object, or_record.tmp)
+        set_array(or_record.related_object)
+        move_field(or_record.tmp, or_record.related_object.$append)
+    end
+
+    do list(path:or_record.related_object, var:r)
+
+        if all_match('r.related_object\.reference', '.*\S.*')
+
+            add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+
+        else
+
+            if all_match('r.related_object\.association', '.*\S.*')
+
+                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+
+            end
+
+        end
+
+        if all_match('r.related_object\.reference', '.*\S.*')
+
+            lido_baseid(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                'r.related_object\.reference',
+                -type: local
+            )
+
+        end
+
+        if all_match('r.related_object\.association', '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWorkRelType,
+                'r.related_object\.association'
+            )
 
         end
 
