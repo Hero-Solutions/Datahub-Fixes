@@ -2148,12 +2148,14 @@
         if all_match('r.related_object\.reference', '.*\S.*')
 
             add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+            set_field(r.relation_exists, 'true')
 
         else
 
             if all_match('r.related_object\.association', '.*\S.*')
 
                 add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+                set_field(r.relation_exists, 'true')
 
             end
 
@@ -2177,6 +2179,26 @@
             )
 
         end
+
+        if all_match(r.relation_exists, 'true')
+
+            set_field(r.relationshipEn, 'Relation')
+            set_field(r.relationshipURI, 'http://purl.org/dc/terms/relation')
+
+            lido_term(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWorkRelType,
+                r.relationshipEn,
+                -conceptid: r.relationshipURI,
+                -type: URI,
+                -pref: preferred,
+                -lang: en
+            )
+
+        end
+
+        remove_field(r.relation_exists)
+        remove_field(r.relationshipEn)
+        remove_field(r.relationshipURI)
 
     end
 
