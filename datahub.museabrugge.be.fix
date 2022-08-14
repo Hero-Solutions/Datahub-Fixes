@@ -2173,10 +2173,7 @@
 
         if all_match('r.related_object\.association', '.*\S.*')
 
-            lido_term(
-                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWorkRelType,
-                'r.related_object\.association'
-            )
+            copy_field('r.related_object\.association', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.displayRelatedWork.$append._)
 
         end
 
