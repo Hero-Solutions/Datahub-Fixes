@@ -2045,20 +2045,30 @@
 
     end
 
-    if all_match(or_record.legal_status, '.*\S.*')
+    unless all_match(or_record.legal_status, '.*\S.*')
 
-        lido_basevalue(
-            administrativeMetadata.rightsWorkWrap.rightsWorkSet.creditLine,
-            or_record.legal_status
-        )
+        set_field(or_record.legal_status, 'Auteursrechtelijke bescherming niet bepaald')
 
     end
+
+    lido_basevalue(
+        administrativeMetadata.rightsWorkWrap.rightsWorkSet.creditLine,
+        or_record.legal_status
+    )
 
     if all_match(or_record.creativeCommons, '.*\S.*')
 
         copy_field(or_record.creativeCommons, administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$append.conceptID._)
         set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.source, 'Creative Commons')
         set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.type, 'purl')
+
+    else
+
+        unless all_match(or_record.rightsStatements, '.*\S.*')
+
+            set_field(or_record.rightsStatements, 'http://rightsstatements.org/page/UND/1.0/')
+
+        end
 
     end
 
