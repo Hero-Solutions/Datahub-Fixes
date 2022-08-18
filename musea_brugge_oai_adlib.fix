@@ -19,7 +19,6 @@
     copy_field(_metadata.Title, or_record.title)
     copy_field(_metadata.Titel_translation, or_record.title_translation)
     copy_field('_metadata.institution\.name', or_record.institution)
-    copy_field(_metadata.administration_name, or_record.administration_name)
     copy_field(_metadata.object_number, or_record.object_number)
     copy_field(_metadata.Description, or_record.description)
     copy_field(_metadata.Dimension, or_record.dimensions)
@@ -74,7 +73,7 @@
 #   Title                                                   pref: preferred                                                         titel
 #   Titel_translation                                       pref: alternate
 #                                                       lido:repositorySet
-#   administration_name                                     lido:repositoryName                             Instelling              naam bewaarinstelling
+#   institution\.name                                       lido:repositoryName                             Instelling              naam bewaarinstelling
 #                                                           lido:workID
 #   object_number                                               type: object-number                         Inventarisnummer        waarde objectnummer
 #   Description                                         lido:objectDescriptionSet                           Beschrijving            korte beschrijving
@@ -180,7 +179,7 @@
 #                                                               lido:term
 #                                                           lido:recordSource
 #                                                               lido:legalBodyID                                                    identificatie data provider
-#   administration_name                                         lido:legalBodyName                                                  naam data provider
+#   institution\.name                                           lido:legalBodyName                                                  naam data provider
 #                                                               lido:legalBodyWeblink
 #                                                           lido:recordRights
 #                                                               lido:rightsType
@@ -213,13 +212,13 @@
         move_field(or_record.tmp, or_record.pids.$append)
     end
 
-    unless is_array(or_record.administration_name)
-        move_field(or_record.administration_name, or_record.tmp)
-        set_array(or_record.administration_name)
-        move_field(or_record.tmp, or_record.administration_name.$append)
+    unless is_array(or_record.institution)
+        move_field(or_record.institution, or_record.tmp)
+        set_array(or_record.institution)
+        move_field(or_record.tmp, or_record.institution.$append)
     end
 
-    do list(path: or_record.administration_name, var: c)
+    do list(path: or_record.institution, var: c)
 
         if all_match(c, '.*\S.*')
 
@@ -520,7 +519,7 @@
 
 # LIDO repositoryName
 
-    do list(path: or_record.administration_name, var: c)
+    do list(path: or_record.institution, var: c)
 
         if all_match(c, '.*\S.*')
 
@@ -1974,7 +1973,7 @@
 
 # LIDO recordSource
 
-    do list(path: or_record.administration_name, var: c)
+    do list(path: or_record.institution, var: c)
 
         if all_match(c, '.*\S.*')
 

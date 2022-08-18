@@ -20,7 +20,6 @@
     copy_field(_metadata.Titel_translation, or_record.title_translation)
     copy_field(_metadata.Inscription, or_record.inscription)
     copy_field('_metadata.institution\.name', or_record.institution)
-    copy_field(_metadata.administration_name, or_record.administration_name)
     copy_field(_metadata.object_number, or_record.object_number)
     copy_field(_metadata.Current_location, or_record.current_location)
     copy_field(_metadata.Description, or_record.description)
@@ -93,7 +92,7 @@
 #   Inscription.inscription\.position                           type: position
 #   Inscription.inscription\.method                             type: method
 #                                                       lido:repositorySet
-#   administration_name                                     lido:repositoryName                             Instelling              naam bewaarinstelling
+#   institution\.name                                       lido:repositoryName                             Instelling              naam bewaarinstelling
 #                                                           lido:workID
 #   object_number                                               type: object-number                         Inventarisnummer        waarde objectnummer
 #   Current_location                                        lido:repositoryLocation
@@ -191,6 +190,7 @@
 #                                                                   lido:relatedWork
 #                                                                       lido:objectID
 #   Parts.parts_reference                                                   type: local
+#                                                                           type: oai
 #                                                                   lido:relatedWorkRelType
 #                                                                       lido:conceptID
 #                                                                           type: URI
@@ -199,6 +199,7 @@
 #                                                                   lido:relatedWork
 #                                                                       lido:objectID
 #   Part_of.part_of_reference                                               type: local
+#                                                                           type: oai
 #                                                                   lido:relatedWorkRelType
 #                                                                       lido:conceptID
 #                                                                           type: URI
@@ -208,6 +209,7 @@
 #                                                                   lido:relatedWork
 #                                                                       lido:objectID
 #   Related_object.related_object\.reference                                type: local
+#                                                                           type: oai
 #                                                                   lido:relatedWorkRelType
 #                                                                       lido:conceptID
 #                                                                           type: URI
@@ -226,7 +228,7 @@
 #                                                               lido:term
 #                                                           lido:recordSource
 #                                                               lido:legalBodyID                                                    identificatie data provider
-#   administration_name                                         lido:legalBodyName                                                  naam data provider
+#   institution\.name                                           lido:legalBodyName                                                  naam data provider
 #                                                               lido:legalBodyWeblink
 #                                                           lido:recordRights
 #                                                               lido:rightsType
@@ -259,13 +261,13 @@
         move_field(or_record.tmp, or_record.pids.$append)
     end
 
-    unless is_array(or_record.administration_name)
-        move_field(or_record.administration_name, or_record.tmp)
-        set_array(or_record.administration_name)
-        move_field(or_record.tmp, or_record.administration_name.$append)
+    unless is_array(or_record.institution)
+        move_field(or_record.institution, or_record.tmp)
+        set_array(or_record.institution)
+        move_field(or_record.tmp, or_record.institution.$append)
     end
 
-    do list(path: or_record.administration_name, var: c)
+    do list(path: or_record.institution, var: c)
 
         if all_match(c, '.*\S.*')
 
@@ -914,7 +916,7 @@
 
 # LIDO repositoryName
 
-    do list(path: or_record.administration_name, var: c)
+    do list(path: or_record.institution, var: c)
 
         if all_match(c, '.*\S.*')
 
@@ -2082,6 +2084,20 @@
                 -type: local
             )
 
+            copy_field(r.parts_reference, r.object_number)
+
+            lookup_in_store(r.object_number, DBI, data_source: "dbi:SQLite:/tmp/import.datahub_record_ids.sqlite")
+
+            if all_match(r.object_number.record_id, '.*\S.*')
+
+                lido_baseid(
+                    descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                    r.object_number.record_id,
+                    -type: oai
+                )
+
+            end
+
             set_field(r.relationshipEn, 'Has Part')
             set_field(r.relationshipURI, 'http://purl.org/dc/terms/hasPart')
 
@@ -2096,6 +2112,7 @@
 
         end
 
+        remove_field(r.object_number)
         remove_field(r.relationshipEn)
         remove_field(r.relationshipURI)
 
@@ -2119,6 +2136,20 @@
                 -type: local
             )
 
+            copy_field(r.part_of_reference, r.object_number)
+
+            lookup_in_store(r.object_number, DBI, data_source: "dbi:SQLite:/tmp/import.datahub_record_ids.sqlite")
+
+            if all_match(r.object_number.record_id, '.*\S.*')
+
+                lido_baseid(
+                    descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                    r.object_number.record_id,
+                    -type: oai
+                )
+
+            end
+
             set_field(r.relationshipEn, 'Is Part Of')
             set_field(r.relationshipURI, 'http://purl.org/dc/terms/isPartOf')
 
@@ -2133,6 +2164,7 @@
 
         end
 
+        remove_field(r.object_number)
         remove_field(r.relationshipEn)
         remove_field(r.relationshipURI)
 
@@ -2172,6 +2204,20 @@
 
         end
 
+        copy_field('r.related_object\.reference', r.object_number)
+
+        lookup_in_store(r.object_number, DBI, data_source: "dbi:SQLite:/tmp/import.datahub_record_ids.sqlite")
+
+        if all_match(r.object_number.record_id, '.*\S.*')
+
+            lido_baseid(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                r.object_number.record_id,
+                -type: oai
+            )
+
+        end
+
         if all_match('r.related_object\.association', '.*\S.*')
 
             copy_field('r.related_object\.association', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.displayRelatedWork.$append._)
@@ -2195,6 +2241,7 @@
         end
 
         remove_field(r.relation_exists)
+        remove_field(r.object_number)
         remove_field(r.relationshipEn)
         remove_field(r.relationshipURI)
 
@@ -2527,7 +2574,7 @@
 
 # LIDO recordSource
 
-    do list(path: or_record.administration_name, var: c)
+    do list(path: or_record.institution, var: c)
 
         if all_match(c, '.*\S.*')
 
