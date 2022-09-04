@@ -55,7 +55,10 @@
     copy_field(_metadata.priref, or_record.priref)
 #    copy_field(_metadata.Rights, or_record.rights)
 
-    
+    # resourceWrap
+
+    copy_field(or_record.object_number, or_record.iiif_manifest)
+    lookup_in_store(or_record.iiif_manifest, DBI, data_source: 'dbi:SQLite:/tmp/import.iiif_manifests_muzee.sqlite')
  
 # Remove all Adlib fields, retaining only the fields to create the lido structure
 
@@ -2609,17 +2612,41 @@
 
 # LIDO resourceID & linkResource
 
+    # Add IIIF manifest from the ImageHub to LIDO resourceSet as LIDO resourceID
+
+    if all_match(or_record.iiif_manifest.manifest, '.*\S.*')
+
+        copy_field(or_record.iiif_manifest.manifest, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubMuzee")
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "IIIF Manifest")
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
+
+    end
+
+    # Add IIIF thumbnail from the ImageHub to LIDO resourceSet as LIDO resourceID
+
+    if all_match(or_record.iiif_manifest.thumbnail, '.*\S.*')
+
+        copy_field(or_record.iiif_manifest.thumbnail, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubMuzee")
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "thumbnail")
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
+
+    end
+
     do list(path:or_record.pids, var: c)
 
         if all_match('c.digital_reference\.description', 'representationpid')
 
             if all_match(c.digital_reference, '.*\S.*')
 
-                copy_field(c.digital_reference, administrativeMetadata.resourceWrap.resourceSet.resourceID._)
-                add_field(administrativeMetadata.resourceWrap.resourceSet.resourceID.type, "purl")
-                add_field(administrativeMetadata.resourceWrap.resourceSet.resourceID.label, "representationPID")
+                copy_field(c.digital_reference, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+                add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
+                add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.label, "representationPID")
 
-                copy_field(c.digital_reference, administrativeMetadata.resourceWrap.resourceSet.resourceRepresentation.linkResource._)
+                copy_field(c.digital_reference, administrativeMetadata.resourceWrap.resourceSet.$last.resourceRepresentation.linkResource._)
 
             end
 
