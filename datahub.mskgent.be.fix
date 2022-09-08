@@ -1223,18 +1223,26 @@
 
     do list(path: or_record.title, var: c)
 
-        if all_match(c.title, '.*\S.*')
+        unless all_match(or_record.dutch_title, 'true')
 
-            lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$append,
-                c.title,
-                -value_pref: preferred,
-                -value_lang: nl
-            )
+            if all_match(c.title, '.*\S.*')
+
+                set_field(or_record.dutch_title, 'true')
+
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$append,
+                    c.title,
+                    -value_pref: preferred,
+                    -value_lang: nl
+                )
+
+            end
 
         end
 
     end
+
+    remove_field(or_record.dutch_title)
 
     unless is_array(or_record.title_translation)
         move_field(or_record.title_translation, or_record.tmp)
@@ -4906,7 +4914,7 @@
 
                 add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'birth-date')
 
-                if all_match('c.creator.birth\.date\.precision', '.*\S.*')
+                if all_match('c.creator.birth\.date\.precision', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
                     copy_field('c.creator.birth\.date\.precision', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.earliestDate.type)
                 end
 
@@ -4917,7 +4925,7 @@
                     add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'birth-date')
                 end
 
-                if all_match('c.creator.birth\.date\.precision', '.*\S.*')
+                if all_match('c.creator.birth\.date\.precision', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
                     copy_field('c.creator.birth\.date\.precision', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.earliestDate.type)
                 end
 
@@ -4934,7 +4942,7 @@
 
                 add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'death-date')
 
-                if all_match('c.creator.death\.date\.precision', '.*\S.*')
+                if all_match('c.creator.death\.date\.precision', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
                     copy_field('c.creator.death\.date\.precision', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.earliestDate.type)
                 end
 
@@ -4945,7 +4953,7 @@
                     add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'death-date')
                 end
 
-                if all_match('c.creator.death\.date\.precision', '.*\S.*')
+                if all_match('c.creator.death\.date\.precision', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
                     copy_field('c.creator.death\.date\.precision', descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.earliestDate.type)
                 end
 
@@ -5886,7 +5894,7 @@
 
                 else
 
-                    if all_match('d.production\.date\.end\.prec', '.*\S.*')
+                    if all_match('d.production\.date\.end\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
 
                         paste(or_record.date_end, 'd.production\.date\.end\.prec', 'd.production\.date\.end')
 
@@ -5906,7 +5914,7 @@
 
             end
 
-            if all_match('d.production\.date\.start\.prec', '.*\S.*')
+            if all_match('d.production\.date\.start\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
 
                 paste(or_record.displayDate, 'd.production\.date\.start\.prec', or_record.displayDate)
 
@@ -5918,7 +5926,7 @@
 
                 copy_field('d.production\.date\.end', or_record.displayDate)
 
-                if all_match('d.production\.date\.end\.prec', '.*\S.*')
+                if all_match('d.production\.date\.end\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
 
                     paste(or_record.displayDate, 'd.production\.date\.end\.prec', or_record.displayDate)
 
@@ -5954,7 +5962,7 @@
 
             prepend('d.production\.date\.start', '#date#')
 
-            if all_match('d.production\.date\.start\.prec', '.*\S.*')
+            if all_match('d.production\.date\.start\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
 
                 prepend('d.production\.date\.start\.prec', '#prec#')
                 paste('d.production\.date\.start','d.production\.date\.start','d.production\.date\.start\.prec',join_char:"")
@@ -5969,7 +5977,7 @@
 
             prepend('d.production\.date\.end', '#date#')
 
-            if all_match('d.production\.date\.end\.prec', '.*\S.*')
+            if all_match('d.production\.date\.end\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
 
                 prepend('d.production\.date\.end\.prec', '#prec#')
                 paste('d.production\.date\.end','d.production\.date\.end','d.production\.date\.end\.prec',join_char:"")
@@ -6102,13 +6110,13 @@
 
         else
 
-            if all_match('d.production\.date\.start\.prec', '.*\S.*')
+            if all_match('d.production\.date\.start\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
 
                 copy_field('d.production\.date\.start\.prec', descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.date.earliestDate.type)
 
             end
 
-            if all_match('d.production\.date\.end\.prec', '.*\S.*')
+            if all_match('d.production\.date\.end\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
 
                 copy_field('d.production\.date\.end\.prec', descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.date.latestDate.type)
 
