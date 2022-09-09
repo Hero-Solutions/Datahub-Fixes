@@ -54,7 +54,7 @@
     # resourceWrap
 
     copy_field(or_record.object_number, or_record.iiif_manifest)
-    lookup_in_store(or_record.iiif_manifest, DBI, data_source: 'dbi:SQLite:/tmp/import.iiif_manifests_musea_brugge.sqlite')
+    lookup_in_store(or_record.iiif_manifest, DBI, data_source: 'dbi:SQLite:/tmp/import.iiif_manifests.sqlite')
 
 # Remove all Adlib fields, retaining only the fields to create the lido structure
 
