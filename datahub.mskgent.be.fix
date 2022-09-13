@@ -1939,10 +1939,62 @@
 
         if all_match(c.name, '.*\S.*')
 
+            add_field(descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$append)
+
+        else
+
+            if all_match(c.language_script.0, '.*\S.*')
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$append)
+
+            else
+
+                if all_match(c.language_script, '.*\S.*')
+
+                    add_field(descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$append)
+
+                end
+
+            end
+
+        end
+
+        if all_match(c.name, '.*\S.*')
+
             lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$append.repositoryName.legalBodyName,
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName,
                 c.name,
                 -value_lang: nl
+            )
+
+        end
+
+        if all_match(c.language_script, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName,
+                c.language_script,
+                -value_lang: fr
+            )
+
+        end
+
+        if all_match(c.language_script.0, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName,
+                c.language_script.0,
+                -value_lang: fr
+            )
+
+        end
+
+        if all_match(c.language_script.1, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName,
+                c.language_script.1,
+                -value_lang: en
             )
 
         end
@@ -2870,7 +2922,7 @@
 
                     else
 
-                        add_field(or_record.acquisition_place.$first.source.$append.id '')
+                        add_field(or_record.acquisition_place.$first.source.$append.id, '')
 
                     end
 
@@ -4124,7 +4176,7 @@
 
                     else
 
-                        add_field(or_record.acquisition_place.$first.source.$append.id '')
+                        add_field(or_record.acquisition_place.$first.source.$append.id, '')
 
                     end
 
@@ -8851,6 +8903,36 @@
                 administrativeMetadata.recordWrap.recordSource.legalBodyName,
                 c.name,
                 -value_lang: nl
+            )
+
+        end
+
+        if all_match(c.language_script, '.*\S.*')
+
+            lido_basenameset(
+                administrativeMetadata.recordWrap.recordSource.legalBodyName,
+                c.language_script,
+                -value_lang: fr
+            )
+
+        end
+
+        if all_match(c.language_script.0, '.*\S.*')
+
+            lido_basenameset(
+                administrativeMetadata.recordWrap.recordSource.legalBodyName,
+                c.language_script.0,
+                -value_lang: fr
+            )
+
+        end
+
+        if all_match(c.language_script.1, '.*\S.*')
+
+            lido_basenameset(
+                administrativeMetadata.recordWrap.recordSource.legalBodyName,
+                c.language_script.1,
+                -value_lang: en
             )
 
         end
