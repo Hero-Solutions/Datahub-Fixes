@@ -631,11 +631,53 @@
             move_field(or_record.tmp, 'c.object_name.term\.number.$append')
         end
 
+        unless is_array('c.object_name.term\.code')
+            move_field('c.object_name.term\.code', or_record.tmp)
+            set_array('c.object_name.term\.code')
+            move_field(or_record.tmp, 'c.object_name.term\.code.$append')
+        end
+
         do list (path:'c.object_name.term\.number', var: n)
 
-            copy_field(n, c.object_name.source.$append.id)
-
             if all_match(n, '.*\S.*')
+
+                copy_field(n, c.object_name.source.$append.id)
+
+            else
+
+                do list (path:'c.object_name.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.object_name.source.$append.id)
+
+                    else
+
+                        add_field(c.object_name.source.$append.id, '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.object_name.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, c.object_name.source.$append.id)
+
+                else
+
+                    add_field(c.object_name.source.$append.id, '')
+
+                end
 
                 set_field(or_record.code, 'true')
 
@@ -643,19 +685,9 @@
 
         end
 
-        unless is_array('c.object_name.term\.code')
-            move_field('c.object_name.term\.code', or_record.tmp)
-            set_array('c.object_name.term\.code')
-            move_field(or_record.tmp, 'c.object_name.term\.code.$append')
-        end
-
         unless all_match(or_record.code, 'true')
 
-            do list (path:'c.object_name.term\.code', var: t)
-
-                copy_field(t, c.object_name.source.$append.id)
-
-            end
+            add_field(c.object_name.source.$append.id, '')
 
         end
 
@@ -879,11 +911,53 @@
             move_field(or_record.tmp, 'c.term\.number.$append')
         end
 
+        unless is_array('c.term\.code')
+            move_field('c.term\.code', or_record.tmp)
+            set_array('c.term\.code')
+            move_field(or_record.tmp, 'c.term\.code.$append')
+        end
+
         do list (path:'c.term\.number', var: n)
 
-            copy_field(n, c.source.$append.id)
-
             if all_match(n, '.*\S.*')
+
+                copy_field(n, c.source.$append.id)
+
+            else
+
+                do list (path:'c.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.source.$append.id)
+
+                    else
+
+                        add_field(c.source.$append.id, '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, c.source.$append.id)
+
+                else
+
+                    add_field(c.source.$append.id, '')
+
+                end
 
                 set_field(or_record.code, 'true')
 
@@ -891,19 +965,9 @@
 
         end
 
-        unless is_array('c.term\.code')
-            move_field('c.term\.code', or_record.tmp)
-            set_array('c.term\.code')
-            move_field(or_record.tmp, 'c.term\.code.$append')
-        end
-
         unless all_match(or_record.code, 'true')
 
-            do list (path:'c.term\.code', var: t)
-
-                copy_field(t, c.source.$append.id)
-
-            end
+            add_field(c.source.$append.id, '')
 
         end
 
@@ -1145,11 +1209,53 @@
             move_field(or_record.tmp, 'c.term\.number.$append')
         end
 
+        unless is_array('c.term\.code')
+            move_field('c.term\.code', or_record.tmp)
+            set_array('c.term\.code')
+            move_field(or_record.tmp, 'c.term\.code.$append')
+        end
+
         do list (path:'c.term\.number', var: n)
 
-            copy_field(n, c.source.$append.id)
-
             if all_match(n, '.*\S.*')
+
+                copy_field(n, c.source.$append.id)
+
+            else
+
+                do list (path:'c.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.source.$append.id)
+
+                    else
+
+                        add_field(c.source.$append.id, '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, c.source.$append.id)
+
+                else
+
+                    add_field(c.source.$append.id, '')
+
+                end
 
                 set_field(or_record.code, 'true')
 
@@ -1157,19 +1263,9 @@
 
         end
 
-        unless is_array('c.term\.code')
-            move_field('c.term\.code', or_record.tmp)
-            set_array('c.term\.code')
-            move_field(or_record.tmp, 'c.term\.code.$append')
-        end
-
         unless all_match(or_record.code, 'true')
 
-            do list (path:'c.term\.code', var: t)
-
-                copy_field(t, c.source.$append.id)
-
-            end
+            add_field(c.source.$append.id, '')
 
         end
 
@@ -1541,11 +1637,53 @@
             move_field(or_record.tmp, 'c.inscription\.type.term\.number.$append')
         end
 
+        unless is_array('c.inscription\.type.term\.code')
+            move_field('c.inscription\.type.term\.code', or_record.tmp)
+            set_array('c.inscription\.type.term\.code')
+            move_field(or_record.tmp, 'c.inscription\.type.term\.code.$append')
+        end
+
         do list (path:'c.inscription\.type.term\.number', var: n)
 
-            copy_field(n, 'c.inscription\.type.source.$append.id')
-
             if all_match(n, '.*\S.*')
+
+                copy_field(n, 'c.inscription\.type.source.$append.id')
+
+            else
+
+                do list (path:'c.inscription\.type.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, 'c.inscription\.type.source.$append.id')
+
+                    else
+
+                        add_field('c.inscription\.type.source.$append.id', '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.inscription\.type.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, 'c.inscription\.type.source.$append.id')
+
+                else
+
+                    add_field('c.inscription\.type.source.$append.id', '')
+
+                end
 
                 set_field(or_record.code, 'true')
 
@@ -1553,19 +1691,9 @@
 
         end
 
-        unless is_array('c.inscription\.type.term\.code')
-            move_field('c.inscription\.type.term\.code', or_record.tmp)
-            set_array('c.inscription\.type.term\.code')
-            move_field(or_record.tmp, 'c.inscription\.type.term\.code.$append')
-        end
-
         unless all_match(or_record.code, 'true')
 
-            do list (path:'c.inscription\.type.term\.code', var: t)
-
-                copy_field(t, 'c.inscription\.type.source.$append.id')
-
-            end
+            add_field('c.inscription\.type.source.$append.id', '')
 
         end
 
@@ -2390,11 +2518,53 @@
                 move_field(or_record.tmp, 'or_record.acquisition_method.$first.term\.number.$append')
             end
 
+            unless is_array('or_record.acquisition_method.$first.term\.code')
+                move_field('or_record.acquisition_method.$first.term\.code', or_record.tmp)
+                set_array('or_record.acquisition_method.$first.term\.code')
+                move_field(or_record.tmp, 'or_record.acquisition_method.$first.term\.code.$append')
+            end
+
             do list (path:'or_record.acquisition_method.$first.term\.number', var: n)
 
-                copy_field(n, 'or_record.acquisition_method.$first.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, or_record.acquisition_method.$first.source.$append.id)
+
+                else
+
+                    do list (path:'or_record.acquisition_method.$first.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, or_record.acquisition_method.$first.source.$append.id)
+
+                        else
+
+                            add_field(or_record.acquisition_method.$first.source.$append.id, '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'or_record.acquisition_method.$first.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, or_record.acquisition_method.$first.source.$append.id)
+
+                    else
+
+                        add_field(or_record.acquisition_method.$first.source.$append.id, '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -2402,19 +2572,9 @@
 
             end
 
-            unless is_array('or_record.acquisition_method.$first.term\.code')
-                move_field('or_record.acquisition_method.$first.term\.code', or_record.tmp)
-                set_array('or_record.acquisition_method.$first.term\.code')
-                move_field(or_record.tmp, 'or_record.acquisition_method.$first.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'or_record.acquisition_method.$first.term\.code', var: t)
-
-                    copy_field(t, 'or_record.acquisition_method.$first.source.$append.id')
-
-                end
+                add_field(or_record.acquisition_method.$first.source.$append.id, '')
 
             end
 
@@ -2666,11 +2826,53 @@
                 move_field(or_record.tmp, 'or_record.acquisition_place.$first.term\.number.$append')
             end
 
+            unless is_array('or_record.acquisition_place.$first.term\.code')
+                move_field('or_record.acquisition_place.$first.term\.code', or_record.tmp)
+                set_array('or_record.acquisition_place.$first.term\.code')
+                move_field(or_record.tmp, 'or_record.acquisition_place.$first.term\.code.$append')
+            end
+
             do list (path:'or_record.acquisition_place.$first.term\.number', var: n)
 
-                copy_field(n, 'or_record.acquisition_place.$first.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, or_record.acquisition_place.$first.source.$append.id)
+
+                else
+
+                    do list (path:'or_record.acquisition_place.$first.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, or_record.acquisition_place.$first.source.$append.id)
+
+                        else
+
+                            add_field(or_record.acquisition_place.$first.source.$append.id, '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'or_record.acquisition_place.$first.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, or_record.acquisition_place.$first.source.$append.id)
+
+                    else
+
+                        add_field(or_record.acquisition_place.$first.source.$append.id '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -2678,19 +2880,9 @@
 
             end
 
-            unless is_array('or_record.acquisition_place.$first.term\.code')
-                move_field('or_record.acquisition_place.$first.term\.code', or_record.tmp)
-                set_array('or_record.acquisition_place.$first.term\.code')
-                move_field(or_record.tmp, 'or_record.acquisition_place.$first.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'or_record.acquisition_place.$first.term\.code', var: t)
-
-                    copy_field(t, 'or_record.acquisition_place.$first.source.$append.id')
-
-                end
+                add_field(or_record.acquisition_place.$first.source.$append.id, '')
 
             end
 
@@ -2952,11 +3144,53 @@
                 move_field(or_record.tmp, 'c.term\.number.$append')
             end
 
+            unless is_array('c.term\.code')
+                move_field('c.term\.code', or_record.tmp)
+                set_array('c.term\.code')
+                move_field(or_record.tmp, 'c.term\.code.$append')
+            end
+
             do list (path:'c.term\.number', var: n)
 
-                copy_field(n, c.source.$append.id)
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, c.source.$append.id)
+
+                else
+
+                    do list (path:'c.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, c.source.$append.id)
+
+                        else
+
+                            add_field(c.source.$append.id, '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'c.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.source.$append.id)
+
+                    else
+
+                        add_field(c.source.$append.id, '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -2964,19 +3198,9 @@
 
             end
 
-            unless is_array('c.term\.code')
-                move_field('c.term\.code', or_record.tmp)
-                set_array('c.term\.code')
-                move_field(or_record.tmp, 'c.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'c.term\.code', var: t)
-
-                    copy_field(t, c.source.$append.id)
-
-                end
+                add_field(c.source.$append.id, '')
 
             end
 
@@ -3228,11 +3452,53 @@
                 move_field(or_record.tmp, 'or_record.acquisition_place.$first.term\.number.$append')
             end
 
+            unless is_array('or_record.acquisition_place.$first.term\.code')
+                move_field('or_record.acquisition_place.$first.term\.code', or_record.tmp)
+                set_array('or_record.acquisition_place.$first.term\.code')
+                move_field(or_record.tmp, 'or_record.acquisition_place.$first.term\.code.$append')
+            end
+
             do list (path:'or_record.acquisition_place.$first.term\.number', var: n)
 
-                copy_field(n, 'or_record.acquisition_place.$first.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, or_record.acquisition_place.$first.source.$append.id)
+
+                else
+
+                    do list (path:'or_record.acquisition_place.$first.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, or_record.acquisition_place.$first.source.$append.id)
+
+                        else
+
+                            add_field(or_record.acquisition_place.$first.source.$append.id, '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'or_record.acquisition_place.$first.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, or_record.acquisition_place.$first.source.$append.id)
+
+                    else
+
+                        add_field(or_record.acquisition_place.$first.source.$append.id, '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -3240,19 +3506,9 @@
 
             end
 
-            unless is_array('or_record.acquisition_place.$first.term\.code')
-                move_field('or_record.acquisition_place.$first.term\.code', or_record.tmp)
-                set_array('or_record.acquisition_place.$first.term\.code')
-                move_field(or_record.tmp, 'or_record.acquisition_place.$first.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'or_record.acquisition_place.$first.term\.code', var: t)
-
-                    copy_field(t, 'or_record.acquisition_place.$first.source.$append.id')
-
-                end
+                add_field(or_record.acquisition_place.$first.source.$append.id, '')
 
             end
 
@@ -3514,11 +3770,53 @@
                 move_field(or_record.tmp, 'or_record.acquisition_method.$first.term\.number.$append')
             end
 
+            unless is_array('or_record.acquisition_method.$first.term\.code')
+                move_field('or_record.acquisition_method.$first.term\.code', or_record.tmp)
+                set_array('or_record.acquisition_method.$first.term\.code')
+                move_field(or_record.tmp, 'or_record.acquisition_method.$first.term\.code.$append')
+            end
+
             do list (path:'or_record.acquisition_method.$first.term\.number', var: n)
 
-                copy_field(n, 'or_record.acquisition_method.$first.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, or_record.acquisition_method.$first.source.$append.id)
+
+                else
+
+                    do list (path:'or_record.acquisition_method.$first.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, or_record.acquisition_method.$first.source.$append.id)
+
+                        else
+
+                            add_field(or_record.acquisition_method.$first.source.$append.id, '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'or_record.acquisition_method.$first.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, or_record.acquisition_method.$first.source.$append.id)
+
+                    else
+
+                        add_field(or_record.acquisition_method.$first.source.$append.id, '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -3526,19 +3824,9 @@
 
             end
 
-            unless is_array('or_record.acquisition_method.$first.term\.code')
-                move_field('or_record.acquisition_method.$first.term\.code', or_record.tmp)
-                set_array('or_record.acquisition_method.$first.term\.code')
-                move_field(or_record.tmp, 'or_record.acquisition_method.$first.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'or_record.acquisition_method.$first.term\.code', var: t)
-
-                    copy_field(t, 'or_record.acquisition_method.$first.source.$append.id')
-
-                end
+                add_field(or_record.acquisition_method.$first.source.$append.id, '')
 
             end
 
@@ -3792,11 +4080,53 @@
                 move_field(or_record.tmp, 'or_record.acquisition_place.$first.term\.number.$append')
             end
 
+            unless is_array('or_record.acquisition_place.$first.term\.code')
+                move_field('or_record.acquisition_place.$first.term\.code', or_record.tmp)
+                set_array('or_record.acquisition_place.$first.term\.code')
+                move_field(or_record.tmp, 'or_record.acquisition_place.$first.term\.code.$append')
+            end
+
             do list (path:'or_record.acquisition_place.$first.term\.number', var: n)
 
-                copy_field(n, 'or_record.acquisition_place.$first.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, or_record.acquisition_place.$first.source.$append.id)
+
+                else
+
+                    do list (path:'or_record.acquisition_place.$first.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, or_record.acquisition_place.$first.source.$append.id)
+
+                        else
+
+                            add_field(or_record.acquisition_place.$first.source.$append.id, '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'or_record.acquisition_place.$first.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, or_record.acquisition_place.$first.source.$append.id)
+
+                    else
+
+                        add_field(or_record.acquisition_place.$first.source.$append.id '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -3804,19 +4134,9 @@
 
             end
 
-            unless is_array('or_record.acquisition_place.$first.term\.code')
-                move_field('or_record.acquisition_place.$first.term\.code', or_record.tmp)
-                set_array('or_record.acquisition_place.$first.term\.code')
-                move_field(or_record.tmp, 'or_record.acquisition_place.$first.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'or_record.acquisition_place.$first.term\.code', var: t)
-
-                    copy_field(t, 'or_record.acquisition_place.$first.source.$append.id')
-
-                end
+                add_field(or_record.acquisition_place.$first.source.$append.id, '')
 
             end
 
@@ -4083,11 +4403,53 @@
                 move_field(or_record.tmp, 'or_record.acquisition_method.$first.term\.number.$append')
             end
 
+            unless is_array('or_record.acquisition_method.$first.term\.code')
+                move_field('or_record.acquisition_method.$first.term\.code', or_record.tmp)
+                set_array('or_record.acquisition_method.$first.term\.code')
+                move_field(or_record.tmp, 'or_record.acquisition_method.$first.term\.code.$append')
+            end
+
             do list (path:'or_record.acquisition_method.$first.term\.number', var: n)
 
-                copy_field(n, 'or_record.acquisition_method.$first.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, or_record.acquisition_method.$first.source.$append.id)
+
+                else
+
+                    do list (path:'or_record.acquisition_method.$first.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, or_record.acquisition_method.$first.source.$append.id)
+
+                        else
+
+                            add_field(or_record.acquisition_method.$first.source.$append.id, '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'or_record.acquisition_method.$first.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, or_record.acquisition_method.$first.source.$append.id)
+
+                    else
+
+                        add_field(or_record.acquisition_method.$first.source.$append.id, '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -4095,19 +4457,9 @@
 
             end
 
-            unless is_array('or_record.acquisition_method.$first.term\.code')
-                move_field('or_record.acquisition_method.$first.term\.code', or_record.tmp)
-                set_array('or_record.acquisition_method.$first.term\.code')
-                move_field(or_record.tmp, 'or_record.acquisition_method.$first.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'or_record.acquisition_method.$first.term\.code', var: t)
-
-                    copy_field(t, 'or_record.acquisition_method.$first.source.$append.id')
-
-                end
+                add_field(or_record.acquisition_method.$first.source.$append.id, '')
 
             end
 
@@ -4361,11 +4713,53 @@
                 move_field(or_record.tmp, 'c.term\.number.$append')
             end
 
+            unless is_array('c.term\.code')
+                move_field('c.term\.code', or_record.tmp)
+                set_array('c.term\.code')
+                move_field(or_record.tmp, 'c.term\.code.$append')
+            end
+
             do list (path:'c.term\.number', var: n)
 
-                copy_field(n, c.source.$append.id)
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, c.source.$append.id)
+
+                else
+
+                    do list (path:'c.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, c.source.$append.id)
+
+                        else
+
+                            add_field(c.source.$append.id, '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'c.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.source.$append.id)
+
+                    else
+
+                        add_field(c.source.$append.id, '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -4373,19 +4767,9 @@
 
             end
 
-            unless is_array('c.term\.code')
-                move_field('c.term\.code', or_record.tmp)
-                set_array('c.term\.code')
-                move_field(or_record.tmp, 'c.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'c.term\.code', var: t)
-
-                    copy_field(t, c.source.$append.id)
-
-                end
+                add_field(c.source.$append.id, '')
 
             end
 
@@ -5086,11 +5470,53 @@
                 move_field(or_record.tmp, 'c.creator.birth\.place.term\.number.$append')
             end
 
+            unless is_array('c.creator.birth\.place.term\.code')
+                move_field('c.creator.birth\.place.term\.code', or_record.tmp)
+                set_array('c.creator.birth\.place.term\.code')
+                move_field(or_record.tmp, 'c.creator.birth\.place.term\.code.$append')
+            end
+
             do list (path:'c.creator.birth\.place.term\.number', var: n)
 
-                copy_field(n, 'c.creator.birth\.place.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, 'c.creator.birth\.place.source.$append.id')
+
+                else
+
+                    do list (path:'c.creator.birth\.place.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, 'c.creator.birth\.place.source.$append.id')
+
+                        else
+
+                            add_field('c.creator.birth\.place.source.$append.id', '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'c.creator.birth\.place.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t,'c.creator.birth\.place.source.$append.id')
+
+                    else
+
+                        add_field('c.creator.birth\.place.source.$append.id', '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -5098,19 +5524,9 @@
 
             end
 
-            unless is_array('c.creator.birth\.place.term\.code')
-                move_field('c.creator.birth\.place.term\.code', or_record.tmp)
-                set_array('c.creator.birth\.place.term\.code')
-                move_field(or_record.tmp, 'c.creator.birth\.place.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'c.creator.birth\.place.term\.code', var: t)
-
-                    copy_field(t, 'c.creator.birth\.place.source.$append.id')
-
-                end
+                add_field('c.creator.birth\.place.source.$append.id', '')
 
             end
 
@@ -5276,11 +5692,53 @@
                 move_field(or_record.tmp, 'c.creator.death\.place.term\.number.$append')
             end
 
+            unless is_array('c.creator.death\.place.term\.code')
+                move_field('c.creator.death\.place.term\.code', or_record.tmp)
+                set_array('c.creator.death\.place.term\.code')
+                move_field(or_record.tmp, 'c.creator.death\.place.term\.code.$append')
+            end
+
             do list (path:'c.creator.death\.place.term\.number', var: n)
 
-                copy_field(n, 'c.creator.death\.place.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, 'c.creator.death\.place.source.$append.id')
+
+                else
+
+                    do list (path:'c.creator.death\.place.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, 'c.creator.death\.place.source.$append.id')
+
+                        else
+
+                            add_field('c.creator.death\.place.source.$append.id', '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'c.creator.death\.place.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, 'c.creator.death\.place.source.$append.id')
+
+                    else
+
+                        add_field('c.creator.death\.place.source.$append.id', '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -5288,19 +5746,9 @@
 
             end
 
-            unless is_array('c.creator.death\.place.term\.code')
-                move_field('c.creator.death\.place.term\.code', or_record.tmp)
-                set_array('c.creator.death\.place.term\.code')
-                move_field(or_record.tmp, 'c.creator.death\.place.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'c.creator.death\.place.term\.code', var: t)
-
-                    copy_field(t, 'c.creator.death\.place.source.$append.id')
-
-                end
+                add_field('c.creator.death\.place.source.$append.id', '')
 
             end
 
@@ -5470,11 +5918,53 @@
                 move_field(or_record.tmp, 'c.production\.place.term\.number.$append')
             end
 
+            unless is_array('c.production\.place.term\.code')
+                move_field('c.production\.place.term\.code', or_record.tmp)
+                set_array('c.production\.place.term\.code')
+                move_field(or_record.tmp, 'c.production\.place.term\.code.$append')
+            end
+
             do list (path:'c.production\.place.term\.number', var: n)
 
-                copy_field(n, 'c.production\.place.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, 'c.production\.place.source.$append.id')
+
+                else
+
+                    do list (path:'c.production\.place.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, 'c.production\.place.source.$append.id')
+
+                        else
+
+                            add_field('c.production\.place.source.$append.id', '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'c.production\.place.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, 'c.production\.place.source.$append.id')
+
+                    else
+
+                        add_field('c.production\.place.source.$append.id', '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -5482,19 +5972,9 @@
 
             end
 
-            unless is_array('c.production\.place.term\.code')
-                move_field('c.production\.place.term\.code', or_record.tmp)
-                set_array('c.production\.place.term\.code')
-                move_field(or_record.tmp, 'c.production\.place.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'c.production\.place.term\.code', var: t)
-
-                    copy_field(t, 'c.production\.place.source.$append.id')
-
-                end
+                add_field('c.production\.place.source.$append.id', '')
 
             end
 
@@ -5592,11 +6072,53 @@
                 move_field(or_record.tmp, 'c.creator\.role.term\.number.$append')
             end
 
+            unless is_array('c.creator\.role.term\.code')
+                move_field('c.creator\.role.term\.code', or_record.tmp)
+                set_array('c.creator\.role.term\.code')
+                move_field(or_record.tmp, 'c.creator\.role.term\.code.$append')
+            end
+
             do list (path:'c.creator\.role.term\.number', var: n)
 
-                copy_field(n, 'c.creator\.role.source.$append.id')
-
                 if all_match(n, '.*\S.*')
+
+                    copy_field(n, 'c.creator\.role.source.$append.id')
+
+                else
+
+                    do list (path:'c.creator\.role.term\.code', var: t)
+
+                        if all_match(t, '.*\S.*')
+
+                            copy_field(t, 'c.creator\.role.source.$append.id')
+
+                        else
+
+                            add_field('c.creator\.role.source.$append.id', '')
+
+                        end
+
+                    end
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+            unless all_match(or_record.code, 'true')
+
+                do list (path:'c.creator\.role.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, 'c.creator\.role.source.$append.id')
+
+                    else
+
+                        add_field('c.creator\.role.source.$append.id', '')
+
+                    end
 
                     set_field(or_record.code, 'true')
 
@@ -5604,19 +6126,9 @@
 
             end
 
-            unless is_array('c.creator\.role.term\.code')
-                move_field('c.creator\.role.term\.code', or_record.tmp)
-                set_array('c.creator\.role.term\.code')
-                move_field(or_record.tmp, 'c.creator\.role.term\.code.$append')
-            end
-
             unless all_match(or_record.code, 'true')
 
-                do list (path:'c.creator\.role.term\.code', var: t)
-
-                    copy_field(t, 'c.creator\.role.source.$append.id')
-
-                end
+                add_field('c.creator\.role.source.$append.id', '')
 
             end
 
@@ -6337,11 +6849,53 @@
             move_field(or_record.tmp, 'c.term\.number.$append')
         end
 
+        unless is_array('c.term\.code')
+            move_field('c.term\.code', or_record.tmp)
+            set_array('c.term\.code')
+            move_field(or_record.tmp, 'c.term\.code.$append')
+        end
+
         do list (path:'c.term\.number', var: n)
 
-            copy_field(n, c.source.$append.id)
-
             if all_match(n, '.*\S.*')
+
+                copy_field(n, c.source.$append.id)
+
+            else
+
+                do list (path:'c.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.source.$append.id)
+
+                    else
+
+                        add_field(c.source.$append.id, '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, c.source.$append.id)
+
+                else
+
+                    add_field(c.source.$append.id, '')
+
+                end
 
                 set_field(or_record.code, 'true')
 
@@ -6349,19 +6903,9 @@
 
         end
 
-        unless is_array('c.term\.code')
-            move_field('c.term\.code', or_record.tmp)
-            set_array('c.term\.code')
-            move_field(or_record.tmp, 'c.term\.code.$append')
-        end
-
         unless all_match(or_record.code, 'true')
 
-            do list (path:'c.term\.code', var: t)
-
-                copy_field(t, c.source.$append.id)
-
-            end
+            add_field(c.source.$append.id, '')
 
         end
 
@@ -6583,11 +7127,53 @@
             move_field(or_record.tmp, 'c.material.term\.number.$append')
         end
 
+        unless is_array('c.material.term\.code')
+            move_field('c.material.term\.code', or_record.tmp)
+            set_array('c.material.term\.code')
+            move_field(or_record.tmp, 'c.material.term\.code.$append')
+        end
+
         do list (path:'c.material.term\.number', var: n)
 
-            copy_field(n, c.material.source.$append.id)
-
             if all_match(n, '.*\S.*')
+
+                copy_field(n, c.material.source.$append.id)
+
+            else
+
+                do list (path:'c.material.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.material.source.$append.id)
+
+                    else
+
+                        add_field(c.material.source.$append.id, '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.material.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, c.material.source.$append.id)
+
+                else
+
+                    add_field(c.material.source.$append.id, '')
+
+                end
 
                 set_field(or_record.code, 'true')
 
@@ -6595,19 +7181,9 @@
 
         end
 
-        unless is_array('c.material.term\.code')
-            move_field('c.material.term\.code', or_record.tmp)
-            set_array('c.material.term\.code')
-            move_field(or_record.tmp, 'c.material.term\.code.$append')
-        end
-
         unless all_match(or_record.code, 'true')
 
-            do list (path:'c.material.term\.code', var: t)
-
-                copy_field(t, c.material.source.$append.id)
-
-            end
+            add_field(c.material.source.$append.id, '')
 
         end
 
@@ -6827,11 +7403,53 @@
             move_field(or_record.tmp, 'c.technique.term\.number.$append')
         end
 
+        unless is_array('c.technique.term\.code')
+            move_field('c.technique.term\.code', or_record.tmp)
+            set_array('c.technique.term\.code')
+            move_field(or_record.tmp, 'c.technique.term\.code.$append')
+        end
+
         do list (path:'c.technique.term\.number', var: n)
 
-            copy_field(n, c.technique.source.$append.id)
-
             if all_match(n, '.*\S.*')
+
+                copy_field(n, c.technique.source.$append.id)
+
+            else
+
+                do list (path:'c.technique.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.technique.source.$append.id)
+
+                    else
+
+                        add_field(c.technique.source.$append.id, '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.technique.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, c.technique.source.$append.id)
+
+                else
+
+                    add_field(c.technique.source.$append.id, '')
+
+                end
 
                 set_field(or_record.code, 'true')
 
@@ -6839,19 +7457,9 @@
 
         end
 
-        unless is_array('c.technique.term\.code')
-            move_field('c.technique.term\.code', or_record.tmp)
-            set_array('c.technique.term\.code')
-            move_field(or_record.tmp, 'c.technique.term\.code.$append')
-        end
-
         unless all_match(or_record.code, 'true')
 
-            do list (path:'c.technique.term\.code', var: t)
-
-                copy_field(t, c.technique.source.$append.id)
-
-            end
+            add_field(c.technique.source.$append.id, '')
 
         end
 
@@ -7064,11 +7672,53 @@
             move_field(or_record.tmp, 'c.term\.number.$append')
         end
 
+        unless is_array('c.term\.code')
+            move_field('c.term\.code', or_record.tmp)
+            set_array('c.term\.code')
+            move_field(or_record.tmp, 'c.term\.code.$append')
+        end
+
         do list (path:'c.term\.number', var: n)
 
-            copy_field(n, c.source.$append.id)
-
             if all_match(n, '.*\S.*')
+
+                copy_field(n, c.source.$append.id)
+
+            else
+
+                do list (path:'c.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.source.$append.id)
+
+                    else
+
+                        add_field(c.source.$append.id, '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, c.source.$append.id)
+
+                else
+
+                    add_field(c.source.$append.id, '')
+
+                end
 
                 set_field(or_record.code, 'true')
 
@@ -7076,19 +7726,9 @@
 
         end
 
-        unless is_array('c.term\.code')
-            move_field('c.term\.code', or_record.tmp)
-            set_array('c.term\.code')
-            move_field(or_record.tmp, 'c.term\.code.$append')
-        end
-
         unless all_match(or_record.code, 'true')
 
-            do list (path:'c.term\.code', var: t)
-
-                copy_field(t, c.source.$append.id)
-
-            end
+            add_field(c.source.$append.id, '')
 
         end
 
@@ -7310,11 +7950,53 @@
             move_field(or_record.tmp, 'c.term\.number.$append')
         end
 
+        unless is_array('c.term\.code')
+            move_field('c.term\.code', or_record.tmp)
+            set_array('c.term\.code')
+            move_field(or_record.tmp, 'c.term\.code.$append')
+        end
+
         do list (path:'c.term\.number', var: n)
 
-            copy_field(n, c.source.$append.id)
-
             if all_match(n, '.*\S.*')
+
+                copy_field(n, c.source.$append.id)
+
+            else
+
+                do list (path:'c.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.source.$append.id)
+
+                    else
+
+                        add_field(c.source.$append.id, '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, c.source.$append.id)
+
+                else
+
+                    add_field(c.source.$append.id, '')
+
+                end
 
                 set_field(or_record.code, 'true')
 
@@ -7322,19 +8004,9 @@
 
         end
 
-        unless is_array('c.term\.code')
-            move_field('c.term\.code', or_record.tmp)
-            set_array('c.term\.code')
-            move_field(or_record.tmp, 'c.term\.code.$append')
-        end
-
         unless all_match(or_record.code, 'true')
 
-            do list (path:'c.term\.code', var: t)
-
-                copy_field(t, c.source.$append.id)
-
-            end
+            add_field(c.source.$append.id, '')
 
         end
 
