@@ -6494,67 +6494,85 @@
 
     do list(path:or_record.production_date, var:d)
 
-        if all_match('d.production\.date\.start', '.*\S.*')
+        if all_match('d.production\.date\.start\.prec', '.*[0-9]{4}.*')
 
-            if all_match('d.production\.date\.end', '.*\S.*')
+            copy_field('d.production\.date\.start\.prec', 'd.production\.date\.start')
+            set_field('d.production\.date\.start\.prec', '')
 
-                if in('d.production\.date\.start', 'd.production\.date\.end')
+        end
 
-                    copy_field('d.production\.date\.start', or_record.displayDate)
+        if all_match('d.production\.date\.end\.prec', '.*[0-9]{4}.*')
 
-                else
+            copy_field('d.production\.date\.end\.prec', 'd.production\.date\.end')
+            set_field('d.production\.date\.end\.prec', '')
 
-                    if all_match('d.production\.date\.end\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
+        end
 
-                        paste(or_record.date_end, 'd.production\.date\.end\.prec', 'd.production\.date\.end')
+        unless all_match('d.production\.date\.start', '.*[0-9]{4}.*')
 
-                        paste(or_record.displayDate, 'd.production\.date\.start', or_record.date_end, join_char:' - ')
+            set_field('d.production\.date\.start', '')
 
-                    else
+        end
 
-                        paste(or_record.displayDate, 'd.production\.date\.start', 'd.production\.date\.end', join_char:' - ')
+        unless all_match('d.production\.date\.end', '.*[0-9]{4}.*')
 
-                    end
+            set_field('d.production\.date\.end', '')
 
-                end
+        end
 
-            else
+        unless all_match('d.production\.date\.start\.prec', '.*\S.*')
 
-                copy_field('d.production\.date\.start', or_record.displayDate)
+            set_field('d.production\.date\.start\.prec', '')
 
-            end
+        end
 
-            if all_match('d.production\.date\.start\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
+        unless all_match('d.production\.date\.end\.prec', '.*\S.*')
 
-                paste(or_record.displayDate, 'd.production\.date\.start\.prec', or_record.displayDate)
+            set_field('d.production\.date\.end\.prec', '')
 
-            end
+        end
 
-        else
+        if all_match('d.production\.date\.start\.prec', '.*\S.*')
 
-            if all_match('d.production\.date\.end', '.*\S.*')
+            unless all_match('d.production\.date\.start', '.*[0-9]{4}.*')
 
-                copy_field('d.production\.date\.end', or_record.displayDate)
-
-                if all_match('d.production\.date\.end\.prec', '^[\t ]*(?![0-9]{4})\S((?![0-9]{4}).)*$')
-
-                    paste(or_record.displayDate, 'd.production\.date\.end\.prec', or_record.displayDate)
-
-                end
-
-            else
-
-                add_field(or_record.displayDate, "incorrect date format")
+                set_field('d.production\.date\.start', '')
+                set_field('d.production\.date\.start\.prec', '')
 
             end
 
         end
 
-        unless all_match(or_record.displayDate, "incorrect date format")
+        if all_match('d.production\.date\.end\.prec', '.*\S.*')
+
+            unless all_match('d.production\.date\.end', '.*[0-9]{4}.*')
+
+                set_field('d.production\.date\.end', '')
+                set_field('d.production\.date\.end\.prec', '')
+
+            end
+
+        end
+
+        paste(or_record.display_date, 'd.production\.date\.start\.prec', 'd.production\.date\.start', join_char:'#split#')
+        paste(or_record.display_date, or_record.display_date, 'd.production\.date\.end\.prec', join_char:'#split#')
+        paste(or_record.display_date, or_record.display_date, 'd.production\.date\.end', join_char:'#split#')
+
+        replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#$', '$1')
+        replace_all(or_record.display_date, '^#split##split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1')
+        replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#\1(?:-[0-9][0-9])*$', '$1')
+        replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 - $2')
+        replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split#\1?#split#\2(?:-[0-9][0-9])*$', '$1 $2')
+        replace_all(or_record.display_date, '^#split##split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2')
+        replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2 - $3 $4')
+        replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 - $2 $3')
+        replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2 - $3')
+
+        unless all_match(or_record.display_date, '#split##split##split#')
 
             lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate,
-                or_record.displayDate
+                or_record.display_date
             )
 
         end
