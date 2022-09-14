@@ -5413,6 +5413,92 @@
 
             end
 
+            copy_field('c.creator.birth\.date\.precision', 'c.creator.birth\.date\.end\.precision')
+
+            if all_match('c.creator.birth\.date\.precision', '.*[0-9]{4}.*')
+
+                copy_field('c.creator.birth\.date\.precision', 'c.creator.birth\.date\.start')
+                set_field('c.creator.birth\.date\.precision', '')
+
+            end
+
+            if all_match('c.creator.birth\.date\.end\.precision', '.*[0-9]{4}.*')
+
+                copy_field('c.creator.birth\.date\.end\.precision', 'c.creator.birth\.date\.end')
+                set_field('c.creator.birth\.date\.end\.precision', '')
+
+            end
+
+            unless all_match('c.creator.birth\.date\.start', '.*[0-9]{4}.*')
+
+                set_field('c.creator.birth\.date\.start', '')
+
+            end
+
+            unless all_match('c.creator.birth\.date\.end', '.*[0-9]{4}.*')
+
+                set_field('c.creator.birth\.date\.end', '')
+
+            end
+
+            unless all_match('c.creator.birth\.date\.precision', '.*\S.*')
+
+                set_field('c.creator.birth\.date\.precision', '')
+
+            end
+
+            unless all_match('c.creator.birth\.date\.end\.precision', '.*\S.*')
+
+                set_field('c.creator.birth\.date\.end\.precision', '')
+
+            end
+
+            if all_match('c.creator.birth\.date\.precision', '.*\S.*')
+
+                unless all_match('c.creator.birth\.date\.start', '.*[0-9]{4}.*')
+
+                    set_field('c.creator.birth\.date\.start', '')
+                    set_field('c.creator.birth\.date\.precision', '')
+
+                end
+
+            end
+
+            if all_match('c.creator.birth\.date\.end\.precision', '.*\S.*')
+
+                unless all_match('c.creator.birth\.date\.end', '.*[0-9]{4}.*')
+
+                    set_field('c.creator.birth\.date\.end', '')
+                    set_field('c.creator.birth\.date\.end\.precision', '')
+
+                end
+
+            end
+
+            paste(or_record.display_date, 'c.creator.birth\.date\.precision', 'c.creator.birth\.date\.start', join_char:'#split#')
+            paste(or_record.display_date, or_record.display_date, 'c.creator.birth\.date\.end\.precision', join_char:'#split#')
+            paste(or_record.display_date, or_record.display_date, 'c.creator.birth\.date\.end', join_char:'#split#')
+
+            replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#$', '$1')
+            replace_all(or_record.display_date, '^#split##split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1')
+            replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#\1(?:-[0-9][0-9])*$', '$1')
+            replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 - $2')
+            replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#$', '$1 $2')
+            replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split#\1?#split#\2(?:-[0-9][0-9])*$', '$1 $2')
+            replace_all(or_record.display_date, '^#split##split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2')
+            replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2 - $3 $4')
+            replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 - $2 $3')
+            replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2 - $3')
+
+            unless all_match(or_record.display_date, '.*#split#.*')
+
+                copy_field(or_record.display_date, descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$append.earliestDate._)
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'display-birth-date')
+
+            end
+
+            remove_field(or_record.display_date)
+
             if all_match('c.creator.death\.date\.start', '.*\S.*')
 
                 if all_match('c.creator.death\.date\.end', '.*\S.*')
@@ -5440,6 +5526,92 @@
                 end
 
             end
+
+            copy_field('c.creator.death\.date\.precision', 'c.creator.death\.date\.end\.precision')
+
+            if all_match('c.creator.death\.date\.precision', '.*[0-9]{4}.*')
+
+                copy_field('c.creator.death\.date\.precision', 'c.creator.death\.date\.start')
+                set_field('c.creator.death\.date\.precision', '')
+
+            end
+
+            if all_match('c.creator.death\.date\.end\.precision', '.*[0-9]{4}.*')
+
+                copy_field('c.creator.death\.date\.end\.precision', 'c.creator.death\.date\.end')
+                set_field('c.creator.death\.date\.end\.precision', '')
+
+            end
+
+            unless all_match('c.creator.death\.date\.start', '.*[0-9]{4}.*')
+
+                set_field('c.creator.death\.date\.start', '')
+
+            end
+
+            unless all_match('c.creator.death\.date\.end', '.*[0-9]{4}.*')
+
+                set_field('c.creator.death\.date\.end', '')
+
+            end
+
+            unless all_match('c.creator.death\.date\.precision', '.*\S.*')
+
+                set_field('c.creator.death\.date\.precision', '')
+
+            end
+
+            unless all_match('c.creator.death\.date\.end\.precision', '.*\S.*')
+
+                set_field('c.creator.death\.date\.end\.precision', '')
+
+            end
+
+            if all_match('c.creator.death\.date\.precision', '.*\S.*')
+
+                unless all_match('c.creator.death\.date\.start', '.*[0-9]{4}.*')
+
+                    set_field('c.creator.death\.date\.start', '')
+                    set_field('c.creator.death\.date\.precision', '')
+
+                end
+
+            end
+
+            if all_match('c.creator.death\.date\.end\.precision', '.*\S.*')
+
+                unless all_match('c.creator.death\.date\.end', '.*[0-9]{4}.*')
+
+                    set_field('c.creator.death\.date\.end', '')
+                    set_field('c.creator.death\.date\.end\.precision', '')
+
+                end
+
+            end
+
+            paste(or_record.display_date, 'c.creator.death\.date\.precision', 'c.creator.death\.date\.start', join_char:'#split#')
+            paste(or_record.display_date, or_record.display_date, 'c.creator.death\.date\.end\.precision', join_char:'#split#')
+            paste(or_record.display_date, or_record.display_date, 'c.creator.death\.date\.end', join_char:'#split#')
+
+            replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#$', '$1')
+            replace_all(or_record.display_date, '^#split##split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1')
+            replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#\1(?:-[0-9][0-9])*$', '$1')
+            replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 - $2')
+            replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#$', '$1 $2')
+            replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split#\1?#split#\2(?:-[0-9][0-9])*$', '$1 $2')
+            replace_all(or_record.display_date, '^#split##split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2')
+            replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2 - $3 $4')
+            replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 - $2 $3')
+            replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2 - $3')
+
+            unless all_match(or_record.display_date, '.*#split#.*')
+
+                copy_field(or_record.display_date, descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$append.earliestDate._)
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalDatesActor.$last.type, 'display-death-date')
+
+            end
+
+            remove_field(or_record.display_date)
 
             if all_match('c.creator.birth\.place.term', '.*\S.*')
 
@@ -6562,13 +6734,14 @@
         replace_all(or_record.display_date, '^#split##split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1')
         replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#\1(?:-[0-9][0-9])*$', '$1')
         replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 - $2')
+        replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#$', '$1 $2')
         replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split#\1?#split#\2(?:-[0-9][0-9])*$', '$1 $2')
         replace_all(or_record.display_date, '^#split##split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2')
         replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2 - $3 $4')
         replace_all(or_record.display_date, '^#split#([0-9]{4})(?:-[0-9][0-9])*#split#(.+)#split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 - $2 $3')
         replace_all(or_record.display_date, '^(.+)#split#([0-9]{4})(?:-[0-9][0-9])*#split##split#([0-9]{4})(?:-[0-9][0-9])*$', '$1 $2 - $3')
 
-        unless all_match(or_record.display_date, '#split##split##split#')
+        unless all_match(or_record.display_date, '.*#split#.*')
 
             lido_basevalue(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate,
@@ -6576,6 +6749,8 @@
             )
 
         end
+
+        remove_field(or_record.display_date)
 
     end
 
