@@ -2033,16 +2033,24 @@
 
     do list(path: or_record.current_location, var: c)
 
-        if all_match(c.current_location, '.*\S.*')
+        unless all_match(or_record.first_current_location, 'true')
 
-            lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
-                c.current_location
-            )
+            if all_match(c.current_location, '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                    c.current_location
+                )
+
+                set_field(or_record.first_current_location, 'true')
+
+            end
 
         end
 
     end
+
+    remove_field(or_record.first_current_location)
 
 # LIDO objectDescriptionSet
 
@@ -5344,6 +5352,39 @@
                 -name_pref: preferred
             )
 
+            if all_match(c.creator.language_script, '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                    c.creator.language_script,
+                    -value_pref: preferred,
+                    -value_lang: fr
+                )
+
+            end
+
+            if all_match(c.creator.language_script.0, '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                    c.creator.language_script.0,
+                    -value_pref: preferred,
+                    -value_lang: fr
+                )
+
+            end
+
+            if all_match(c.creator.language_script.1, '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                    c.creator.language_script.1,
+                    -value_pref: preferred,
+                    -value_lang: en
+                )
+
+            end
+
             if all_match('c.creator.birth\.date\.start', '.*\S.*')
 
                 if all_match('c.creator.birth\.date\.end', '.*\S.*')
@@ -8432,57 +8473,65 @@
 
     do list(path:or_record.documentation, var:c)
 
-        if all_match('c.documentation\.author', '.*\S.*')
+        if all_match('c.documentation\.title.title', '.*\S.*')
 
             add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
 
         else
 
-            if all_match('c.documentation\.title', '.*\S.*')
+            if all_match('c.documentation\.title.Author.author\.name', '.*\S.*')
 
                 add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
 
             else
 
-                if all_match('c.documentation\.page_reference', '.*\S.*')
+                if all_match('c.documentation\.title.Author.0.author\.name', '.*\S.*')
 
                     add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
 
                 else
 
-                    if all_match(c.Publisher.place_of_publication, '.*\S.*')
+                    if all_match('c.documentation\.title.Publisher.place_of_publication', '.*\S.*')
 
                         add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
 
                     else
 
-                        if all_match(c.Publisher.0.place_of_publication, '.*\S.*')
+                        if all_match('c.documentation\.title.Publisher.0.place_of_publication', '.*\S.*')
 
                             add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
 
                         else
 
-                            if all_match(c.Publisher.publisher, '.*\S.*')
+                            if all_match('c.documentation\.title.Publisher.publisher', '.*\S.*')
 
                                 add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
 
                             else
 
-                                if all_match(c.Publisher.0.publisher, '.*\S.*')
+                                if all_match('c.documentation\.title.Publisher.0.publisher', '.*\S.*')
 
                                     add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
 
                                 else
 
-                                    if all_match(c.Publisher.year_of_publication, '.*\S.*')
+                                    if all_match('c.documentation\.title.Publisher.year_of_publication', '.*\S.*')
 
                                         add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
 
                                     else
 
-                                        if all_match(c.Publisher.0.year_of_publication, '.*\S.*')
+                                        if all_match('c.documentation\.title.Publisher.0.year_of_publication', '.*\S.*')
 
                                             add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+
+                                        else
+
+                                            if all_match('c.documentation\.page_reference', '.*\S.*')
+
+                                                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+
+                                            end
 
                                         end
 
@@ -8502,36 +8551,313 @@
 
         end
 
-        if all_match('c.documentation\.author', '.*\S.*')
+        if all_match('c.documentation\.title.title', '.*\S.*')
 
-            copy_field('c.documentation\.author', or_record.bibliography_display)
-            append(or_record.bibliography_display, '.')
+            if all_match('c.documentation\.title.title', '.*\.$')
+
+                replace_all('c.documentation\.title.title', '(.*)\.$', '$1')
+
+            end
+
+            copy_field('c.documentation\.title.title', or_record.bibliography_display)
 
         end
 
-        if all_match('c.documentation\.title', '.*\S.*')
+        unless is_array('c.documentation\.title.Author')
+            move_field('c.documentation\.title.Author', or_record.tmp)
+            set_array('c.documentation\.title.Author')
+            move_field(or_record.tmp, 'c.documentation\.title.Author.$append')
+        end
 
-            if exists(or_record.bibliography_display)
+        set_field(or_record.count, '0')
 
-                paste(or_record.bibliography_display, or_record.bibliography_display, 'c.documentation\.title', join_char:'- ')
+        do list(path:'c.documentation\.title.Author', var:a)
+
+            if all_match('a.author\.name', '.*\S.*')
+
+                move_field('a.author\.name', or_record.author)
+
+                split_field(or_record.author, ', ')
+                paste('a.author\.name', or_record.author.1, or_record.author.0, join_char:' ')
+
+                remove_field(or_record.author)
+
+            end
+
+            if all_match(or_record.count, '0')
+
+                if all_match('a.author\.name', '.*\S.*')
+
+                    set_field(or_record.count, '1')
+
+                    if exists(or_record.bibliography_display)
+
+                        paste(or_record.bibliography_display, or_record.bibliography_display, 'a.author\.name', join_char:' / ')
+
+                    else
+
+                        copy_field('a.author\.name', or_record.bibliography_display)
+
+                    end
+
+                end
 
             else
 
-                copy_field('c.documentation\.title', or_record.bibliography_display)
+                if all_match('a.author\.name', '.*\S.*')
+
+                    paste(or_record.bibliography_display, or_record.bibliography_display, 'a.author\.name', join_char:', ')
+
+                end
 
             end
 
         end
 
+        remove_field(or_record.count)
 
+        unless exists('c.documentation\.title.Publisher')
 
+            if exists(or_record.bibliography_display)
 
+                set_field(or_record.no_publisher, '. - [s.l.] : [s.n.], [s.a.]')
 
+                paste(or_record.bibliography_display, or_record.bibliography_display, or_record.no_publisher, join_char:'')
 
+            else
 
+                set_field(or_record.no_publisher, '[s.l.] : [s.n.], [s.a.]')
 
+                copy_field(or_record.no_publisher, or_record.bibliography_display)
 
+            end
 
+            remove_field(or_record.no_publisher)
+
+        end
+
+        unless is_array('c.documentation\.title.Publisher')
+            move_field('c.documentation\.title.Publisher', or_record.tmp)
+            set_array('c.documentation\.title.Publisher')
+            move_field(or_record.tmp, 'c.documentation\.title.Publisher.$append')
+        end
+
+        set_field(or_record.count, '0')
+
+        do list(path:'c.documentation\.title.Publisher', var:p)
+
+            if all_match(or_record.count, '0')
+
+                if all_match(p.place_of_publication, '.*\S.*')
+
+                    set_field(or_record.count, '1')
+
+                    if exists(or_record.bibliography_display)
+
+                        paste(or_record.bibliography_display, or_record.bibliography_display, p.place_of_publication, join_char:'. - ')
+
+                    else
+
+                        copy_field(p.place_of_publication, or_record.bibliography_display)
+
+                    end
+
+                else
+
+                    set_field(or_record.sine_loco, '[s.l.]')
+
+                    if exists(or_record.bibliography_display)
+
+                        paste(or_record.bibliography_display, or_record.bibliography_display, or_record.sine_loco, join_char:'. - ')
+
+                    else
+
+                        copy_field(or_record.sine_loco, or_record.bibliography_display)
+
+                    end
+
+                    remove_field(or_record.sine_loco)
+
+                end
+
+                if all_match(p.publisher, '.*\S.*')
+
+                    set_field(or_record.count, '1')
+
+                    if exists(or_record.bibliography_display)
+
+                        if all_match(p.place_of_publication, '.*\S.*')
+
+                            paste(or_record.bibliography_display, or_record.bibliography_display, p.publisher, join_char:' : ')
+
+                        else
+
+                            paste(or_record.bibliography_display, or_record.bibliography_display, p.publisher, join_char:'. - ')
+
+                        end
+
+                    else
+
+                        copy_field(p.publisher, or_record.bibliography_display)
+
+                    end
+
+                else
+
+                    set_field(or_record.sine_nomine, '[s.n.]')
+
+                    if exists(or_record.bibliography_display)
+
+                        if all_match(p.place_of_publication, '.*\S.*')
+
+                            paste(or_record.bibliography_display, or_record.bibliography_display, or_record.sine_nomine, join_char:' : ')
+
+                        else
+
+                            paste(or_record.bibliography_display, or_record.bibliography_display, or_record.sine_nomine, join_char:'. - ')
+
+                        end
+
+                    else
+
+                        copy_field(or_record.sine_nomine, or_record.bibliography_display)
+
+                    end
+
+                    remove_field(or_record.sine_nomine)
+
+                end
+
+                if all_match(p.year_of_publication, '.*\S.*')
+
+                    set_field(or_record.count, '1')
+
+                    if exists(or_record.bibliography_display)
+
+                        if all_match(p.publisher, '.*\S.*')
+
+                            paste(or_record.bibliography_display, or_record.bibliography_display, p.year_of_publication, join_char:', ')
+
+                        else
+
+                            if all_match(p.place_of_publication, '.*\S.*')
+
+                                paste(or_record.bibliography_display, or_record.bibliography_display, p.year_of_publication, join_char:' : ')
+
+                            else
+
+                                paste(or_record.bibliography_display, or_record.bibliography_display, p.year_of_publication, join_char:'. - ')
+
+                            end
+
+                        end
+
+                    else
+
+                        copy_field(p.year_of_publication, or_record.bibliography_display)
+
+                    end
+
+                else
+
+                    set_field(or_record.sine_anno, '[s.a.]')
+
+                    if exists(or_record.bibliography_display)
+
+                        if all_match(p.publisher, '.*\S.*')
+
+                            paste(or_record.bibliography_display, or_record.bibliography_display, sine_anno, join_char:', ')
+
+                        else
+
+                            if all_match(p.place_of_publication, '.*\S.*')
+
+                                paste(or_record.bibliography_display, or_record.bibliography_display, sine_anno, join_char:' : ')
+
+                            else
+
+                                paste(or_record.bibliography_display, or_record.bibliography_display, sine_anno, join_char:'. - ')
+
+                            end
+
+                        end
+
+                    else
+
+                        copy_field(or_record.sine_anno, or_record.bibliography_display)
+
+                    end
+
+                    remove_field(or_record.sine_anno)
+
+                end
+
+            else
+
+                if all_match(p.place_of_publication, '.*\S.*')
+
+                    paste(or_record.bibliography_display, or_record.bibliography_display, p.place_of_publication, join_char:' ; ')
+
+                end
+
+                if all_match(p.publisher, '.*\S.*')
+
+                    if all_match(p.place_of_publication, '.*\S.*')
+
+                        paste(or_record.bibliography_display, or_record.bibliography_display, p.publisher, join_char:' : ')
+
+                    else
+
+                        paste(or_record.bibliography_display, or_record.bibliography_display, p.publisher, join_char:' ; ')
+
+                    end
+
+                end
+
+                if all_match(p.year_of_publication, '.*\S.*')
+
+                    if all_match(p.publisher, '.*\S.*')
+
+                        paste(or_record.bibliography_display, or_record.bibliography_display, p.year_of_publication, join_char:', ')
+
+                    else
+
+                        if all_match(p.place_of_publication, '.*\S.*')
+
+                            paste(or_record.bibliography_display, or_record.bibliography_display, p.year_of_publication, join_char:' : ')
+
+                        else
+
+                            paste(or_record.bibliography_display, or_record.bibliography_display, p.year_of_publication, join_char:' ; ')
+
+                        end
+
+                    end
+
+                end
+
+            end
+
+        end
+
+        remove_field(or_record.count)
+
+        if all_match('c.documentation\.page_reference', '.*\S.*')
+
+            prepend('c.documentation\.page_reference', '(')
+            append('c.documentation\.page_reference', ')')
+
+            if exists(or_record.bibliography_display)
+
+                paste(or_record.bibliography_display, or_record.bibliography_display, 'c.documentation\.page_reference', join_char:' ')
+
+            else
+
+                copy_field('c.documentation\.page_reference', or_record.bibliography_display)
+
+            end
+
+        end
 
         if all_match(or_record.bibliography_display, '.*\S.*')
 
