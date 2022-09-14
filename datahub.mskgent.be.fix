@@ -120,7 +120,10 @@
 #   Inscription.inscription\.position.notes                             lang: fr
 #   Inscription.inscription\.position.notes                             lang: en
 #                                                       lido:repositorySet
-#   institution\.name.name                                  lido:repositoryName                             Instelling              naam bewaarinstelling
+#                                                           lido:repositoryName
+#   institution\.name.name                                      lang: nl                                    Instelling              naam bewaarinstelling
+#   institution\.name.language_script                           lang: fr
+#   institution\.name.language_script                           lang: en
 #                                                           lido:workID
 #   object_number                                               type: object-number                         Inventarisnummer        waarde objectnummer
 #   Current_location                                        lido:repositoryLocation
@@ -173,16 +176,23 @@
 #                                                                       lido:actorID
 #   Production.creator\.lref                                                type: local
 #   Production.creator.Source                                               type: purl                                              identificatie vervaardiger
-#   Production.creator.name                                             lido:nameActorSet
-#                                                                           pref: preferred                 Vervaardiger            naam vervaardiger
+#                                                                       lido:nameActorSet
+#                                                                           pref: preferred
+#   Production.creator.name                                                 lang: nl                        Vervaardiger            naam vervaardiger
+#   Production.creator.language_script                                      lang: fr
+#   Production.creator.language_script                                      lang: en
 #                                                                           pref: alternate
 #                                                                       lido:vitalDatesActor
 #                                                                           type: birth-date
 #   Production.creator.birth\.date\.start                                       lido:earliestDate
 #   Production.creator.birth\.date\.end                                         lido:latestDate
+#                                                                           type: display-birth-date
+#                                                                               lido:earliestDate
 #                                                                           type: death-date
 #   Production.creator.death\.date\.start                                       lido:earliestDate
 #   Production.creator.death\.date\.end                                         lido:latestDate
+#                                                                           type: display-death-date
+#                                                                               lido:earliestDate
 #                                                                       lido:vitalPlaceActor
 #                                                                           type: birth-place
 #   Production.creator.birth\.place.source + term\.number                       lido:placeID
@@ -327,7 +337,10 @@
 #                                                               lido:term
 #                                                           lido:recordSource
 #                                                               lido:legalBodyID                                                    identificatie data provider
-#   institution\.name.name                                      lido:legalBodyName                                                  naam data provider
+#                                                               lido:legalBodyName
+#   institution\.name.name                                          lang: nl                                                        naam data provider
+#   institution\.name.language_script                               lang: fr
+#   institution\.name.language_script                               lang: en
 #                                                               lido:legalBodyWeblink
 #                                                           lido:recordRights
 #                                                               lido:rightsType
@@ -8746,6 +8759,12 @@
 
         if all_match('c.documentation\.title.title', '.*\S.*')
 
+            if all_match('c.documentation\.title\.lead_word', '.*\S.*')
+
+                paste('c.documentation\.title.title', 'c.documentation\.title\.lead_word', 'c.documentation\.title.title', join_char:' ')
+
+            end
+
             if all_match('c.documentation\.title.title', '.*\.$')
 
                 replace_all('c.documentation\.title.title', '(.*)\.$', '$1')
@@ -8959,17 +8978,17 @@
 
                         if all_match(p.publisher, '.*\S.*')
 
-                            paste(or_record.bibliography_display, or_record.bibliography_display, sine_anno, join_char:', ')
+                            paste(or_record.bibliography_display, or_record.bibliography_display, or_record.sine_anno, join_char:', ')
 
                         else
 
                             if all_match(p.place_of_publication, '.*\S.*')
 
-                                paste(or_record.bibliography_display, or_record.bibliography_display, sine_anno, join_char:' : ')
+                                paste(or_record.bibliography_display, or_record.bibliography_display, or_record.sine_anno, join_char:' : ')
 
                             else
 
-                                paste(or_record.bibliography_display, or_record.bibliography_display, sine_anno, join_char:'. - ')
+                                paste(or_record.bibliography_display, or_record.bibliography_display, or_record.sine_anno, join_char:'. - ')
 
                             end
 
