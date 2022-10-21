@@ -3398,6 +3398,15 @@
 
     end
 
+    # Add file checksum from DAM to LIDO resourceSet as LIDO resourceDescription
+
+    if all_match(or_record.iiif_manifest.checksum, '.*\S.*')
+
+        copy_field(or_record.iiif_manifest.checksum, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription._)
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.type, "file-checksum")
+
+    end
+
     # Add representationpid from TMS (if present) to LIDO resourceSet as LIDO resourceID and as LIDO linkResource
 
     if all_match(or_record.object_number.pid.representationPid, '.*\S.*')

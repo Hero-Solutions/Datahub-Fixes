@@ -9563,6 +9563,17 @@
 
     end
 
+    # Add file checksum from DAM to LIDO resourceSet as LIDO resourceDescription
+
+    if all_match(or_record.iiif_manifest.checksum, '.*\S.*')
+
+        copy_field(or_record.iiif_manifest.checksum, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription._)
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.type, "file-checksum")
+
+    end
+
+    # Add representationpid from Adlib (if present) to LIDO resourceSet as LIDO resourceID and as LIDO linkResource
+
 #    do list(path:or_record.pids, var: c)
 
 #        if all_match('c.digital_reference\.description', 'representationpid')
