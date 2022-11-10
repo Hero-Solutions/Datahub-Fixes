@@ -126,7 +126,10 @@
 #   institution\.name.language_script                           lang: en
 #                                                           lido:workID
 #   object_number                                               type: object-number                         Inventarisnummer        waarde objectnummer
-#   Current_location                                        lido:repositoryLocation
+#                                                           lido:repositoryLocation
+#   Current_location.current_location.op                        lang: nl
+#   Current_location.current_location.op                        lang: fr
+#   Current_location.current_location.op                        lang: en
 #                                                       lido:objectDescriptionSet
 #   Description.description                                 lang: nl                                        Beschrijving            korte beschrijving
 #   Description.description                                 lang: fr
@@ -2046,25 +2049,47 @@
 
     do list(path: or_record.current_location, var: c)
 
-        unless all_match(or_record.first_current_location, 'true')
+        if all_match(c.current_location.op, '.*\S.*')
 
-            if all_match(c.current_location, '.*\S.*')
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                c.current_location.op,
+                -value_lang: nl
+            )
 
-                lido_basenameset(
-                    descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
-                    c.current_location,
-                    -value_lang: nl
-                )
+        end
 
-                set_field(or_record.first_current_location, 'true')
+        if all_match(c.current_location.op.0, '.*\S.*')
 
-            end
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                c.current_location.op.0,
+                -value_lang: nl
+            )
+
+        end
+
+        if all_match(c.current_location.op.1, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                c.current_location.op.1,
+                -value_lang: fr
+            )
+
+        end
+
+        if all_match(c.current_location.op.2, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                c.current_location.op.2,
+                -value_lang: en
+            )
 
         end
 
     end
-
-    remove_field(or_record.first_current_location)
 
 # LIDO objectDescriptionSet
 
