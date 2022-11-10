@@ -2051,8 +2051,22 @@
 
         if all_match(c.current_location.op, '.*\S.*')
 
+            add_field(descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append)
+
+        else
+
+            if all_match(c.current_location.op.0, '.*\S.*')
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append)
+
+            end
+
+        end
+
+        if all_match(c.current_location.op, '.*\S.*')
+
             lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$last,
                 c.current_location.op,
                 -value_lang: nl
             )
@@ -2062,7 +2076,7 @@
         if all_match(c.current_location.op.0, '.*\S.*')
 
             lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$last,
                 c.current_location.op.0,
                 -value_lang: nl
             )
@@ -2072,7 +2086,7 @@
         if all_match(c.current_location.op.1, '.*\S.*')
 
             lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$last,
                 c.current_location.op.1,
                 -value_lang: fr
             )
@@ -2082,7 +2096,7 @@
         if all_match(c.current_location.op.2, '.*\S.*')
 
             lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$last,
                 c.current_location.op.2,
                 -value_lang: en
             )
