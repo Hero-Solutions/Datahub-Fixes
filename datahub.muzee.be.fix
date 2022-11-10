@@ -103,7 +103,7 @@
 #   institution\.name                                       lido:repositoryName                             Instelling              naam bewaarinstelling
 #                                                           lido:workID
 #   object_number                                               type: object-number                         Inventarisnummer        waarde objectnummer
-#   Current_location.current_location                       lido:repositoryLocation
+#   Current_location.current_location.name                  lido:repositoryLocation
 #                                                       lido:displayStateEditionWrap
 #   print_state                                             lido:displayState
 #                                                           lido:displayEdition
@@ -630,7 +630,7 @@
 
     do list(path: or_record.current_location, var: c)
 
-        copy_field(c.current_location, c.current_location_lookup)
+        copy_field(c.current_location.name, c.current_location_lookup)
 
         lookup_in_store(c.current_location_lookup, DBI, data_source: "dbi:SQLite:/tmp/import.CURRENT_LOCATIONS_UTF8.sqlite")
 
