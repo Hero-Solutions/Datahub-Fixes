@@ -95,7 +95,7 @@
 #   institution\.name                                       lido:repositoryName                             Instelling              naam bewaarinstelling
 #                                                           lido:workID
 #   object_number                                               type: object-number                         Inventarisnummer        waarde objectnummer
-#   Current_location                                        lido:repositoryLocation
+#   Current_location.current_location.op                    lido:repositoryLocation
 #   Description                                         lido:objectDescriptionSet                           Beschrijving            korte beschrijving
 #                                                       lido:objectMeasurementsSet
 #                                                           lido:measurementsSet
@@ -955,12 +955,23 @@
 
     do list(path: or_record.current_location, var: c)
 
-        if all_match(c.current_location, '.*\S.*')
+        if all_match(c.current_location.op, '.*\S.*')
 
             lido_basenameset(
                 descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
-                c.current_location
+                c.current_location.op
             )
+
+        else
+
+            if all_match(c.current_location.op.0, '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                    c.current_location.op.0
+                )
+
+            end
 
         end
 
