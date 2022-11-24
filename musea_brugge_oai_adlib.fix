@@ -1720,7 +1720,7 @@
             if all_match(or_record.production_period_id.$first, '.*\S.*')
 
                 lido_term(
-                    descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append,
                     c.term,
                     -conceptid: or_record.production_period_id.$first,
                     -type: local,
@@ -1734,7 +1734,7 @@
             else
 
                 lido_term(
-                    descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append,
                     c.term,
                     -pref: preferred,
                     -lang: nl
