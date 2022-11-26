@@ -99,7 +99,6 @@
 #   Dimension.dimension\.value                                      lido:measurementValue                                           waarde afmeting
 #   Dimension.dimension\.part                                   lido:extentMeasurements                                             onderdeel afmeting
 #                                                           lido:displayObjectMeasurements                  Dimensies
-#                                                       lido:displayEvent
 #                                                       lido:eventType
 #                                                           lido:term
 #                                                               acquisition
@@ -1918,7 +1917,7 @@
 
 # LIDO subjectConcept / subjectEvent / subjectPlace
 
-    # Content motif general
+    # Content motif general / Iconclass
 
     unless is_array(or_record.content_motif_general)
         move_field(or_record.content_motif_general, or_record.tmp)
@@ -2059,6 +2058,7 @@
 
             remove_field(or_record.term_array)
             remove_field(or_record.content_motif_general_id.$first)
+            remove_field(or_record.general_motif)
 
         end
 
