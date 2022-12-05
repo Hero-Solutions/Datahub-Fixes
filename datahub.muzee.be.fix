@@ -103,7 +103,7 @@
 #   institution\.name                                       lido:repositoryName                             Instelling              naam bewaarinstelling
 #                                                           lido:workID
 #   object_number                                               type: object-number                         Inventarisnummer        waarde objectnummer
-#   Current_location.current_location.name                  lido:repositoryLocation
+#   Current_location.current_location.op                    lido:repositoryLocation
 #                                                       lido:displayStateEditionWrap
 #   print_state                                             lido:displayState
 #                                                           lido:displayEdition
@@ -630,16 +630,23 @@
 
     do list(path: or_record.current_location, var: c)
 
-        copy_field(c.current_location.name, c.current_location_lookup)
-
-        lookup_in_store(c.current_location_lookup, DBI, data_source: "dbi:SQLite:/tmp/import.CURRENT_LOCATIONS_UTF8.sqlite")
-
-        if all_match(c.current_location_lookup.display_name, '.*\S.*')
+        if all_match(c.current_location.op, '.*\S.*')
 
             lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$append.repositoryLocation.namePlaceSet,
-                c.current_location_lookup.display_name
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                c.current_location.op
             )
+
+        else
+
+            if all_match(c.current_location.op.0, '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                    c.current_location.op.0
+                )
+
+            end
 
         end
 
