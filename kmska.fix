@@ -67,11 +67,15 @@
     copy_field(ObjectNumber, or_record.titleWrap.db)
     lookup_in_store(or_record.titleWrap.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.objtitles.sqlite')
 
-    # description
+    # location
 
-    copy_field(ObjectID, or_record.description.db)
-    lookup_in_store(or_record.description.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.descriptions.sqlite')
-    trim(or_record.description.db.description)
+    copy_field(ObjectID, or_record.location.db)
+    lookup_in_store(or_record.location.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.locations.sqlite')
+
+    # textEntries
+
+    copy_field(ObjectID, or_record.textEntries.db)
+    lookup_in_store(or_record.textEntries.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.textentries.sqlite')
 
     # objectMeasurements
 
@@ -120,6 +124,10 @@
     copy_field(ObjectID, or_record.relationWrap.db)
     lookup_in_store(or_record.relationWrap.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.relations.sqlite')
 
+    # linkLibrary
+
+    copy_field(UserNumber1, or_record.linkLibrary)
+
     # recordSource
 
     copy_field(ObjectID, or_record.department.db)
@@ -138,6 +146,12 @@
         lookup_in_store(or_record.iiif_manifest, DBI, data_source: 'dbi:SQLite:/tmp/import.iiif_manifests.sqlite')
 
     end
+
+    # translations
+
+    copy_field(ObjectID, or_record.translations.db)
+    lookup_in_store(or_record.translations.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.translations.sqlite')
+
 
 # Remove all fields from CITvgsrpObjTombstoneD_RO, retaining only the ones necessary to create the LIDO structure
 
@@ -162,7 +176,8 @@
 #   vobjects.TermID                                  pref: preferred
 #                                                    pref: alternate                                                      identificatie objectnaam
 #                                                 lido:term
-#   vobjects.object                                  pref: preferred                              Subtype                 term objectnaam
+#                                                    pref: preferred
+#   vobjects.object                                      lang: nl                                 Subtype                 term objectnaam
 #                                                    pref: alternate                              Subtype
 #                                             lido:classification
 #                                                 type: object-category
@@ -170,8 +185,10 @@
 #   vclassifications.ClassificationID                     pref: preferred
 #                                                         pref: alternate                                                 identificatie
 #                                                    lido:term
-#   vclassifications.Classification                       pref: preferred                         Type                    term
-#                                                         pref: alternate                         Type
+#   vclassifications.classification_nl                    pref: preferred / lang: nl              Type                    term
+#                                                         pref: alternate / lang: nl              Type
+#   vclassifications.classification_en                    lang: en
+#   vclassifications.classification_fr                    lang: fr
 #                                             lido:titleSet
 #                                                 lido:appellationValue
 #   vobjtitles.title                                  lang: en                                                            titel
@@ -182,10 +199,17 @@
 #                                             lido:repositorySet
 #                                                 lido:repositoryName
 #   vdepartments.DepartmentID                         lido:legalBodyID
-#   vdepartments.department                           lido:legalBodyName                          Instelling              naam bewaarinstelling
+#                                                     lido:legalBodyName
+#   vdepartments.department                               lang: nl                                Instelling              naam bewaarinstelling
 #                                                 lido:workID
 #   CITvgsrpObjTombstoneD_RO.ObjectNumber             type: object-number                         Inventarisnummer        waarde objectnummer
-#   vdescriptions.description                 lido:objectDescriptionSet                           Beschrijving            korte beschrijving
+#                                                 lido:repositoryLocation
+#   vlocations.room_nl                                lang: nl
+#                                                     lang: en
+#                                             lido:objectDescriptionSet
+#                                                     lido:descriptiveNoteValue
+#   vtextentries.textEntry                                lang: nl                                Beschrijving            korte beschrijving
+#   vtextentries.textEntry                                lang: en
 #                                             lido:objectMeasurementsSet
 #   vdimensions.display                           lido:displayObjectMeasurements
 #                                                 lido:objectMeasurements
@@ -207,15 +231,24 @@
 #                                                             lido:vitalDatesActor
 #   vconstituents.BeginDateISO                                    lido:earliestDate
 #   vconstituents.EndDateISO                                      lido:latestDate
-#   vconstituents.Role                                        lido:roleActor                      Vervaardiger            rol vervaardiger
-#   vconstituents.Role                                        lido:attributionQualifierActor      Vervaardiger            kwalificatie vervaardiger
+#                                                             lido:roleActor
+#   vconstituents.role_nl                                         lang: nl                        Vervaardiger            rol vervaardiger
+#   vconstituents.role_en                                         lang: en
+#   vconstituents.role_fr                                         lang: fr
+#                                                             lido:attributionQualifierActor
+#   vconstituents.role_nl                                         lang: nl                        Vervaardiger            kwalificatie vervaardiger
+#   vconstituents.role_en                                         lang: en
+#   vconstituents.role_fr                                         lang: fr
 #                                                         lido:eventDate
 #   CITvgsrpObjTombstoneD_RO.Dated                            lido:displayDate                    Datering
 #                                                             lido:date
 #   CITvgsrpObjTombstoneD_RO.DateBegin                            lido:earliestDate                                       begindatum
 #   CITvgsrpObjTombstoneD_RO.DateEnd                              lido:latestDate                                         einddatum
 #                                                         lido:periodName
-#   vperiods.term                                             lido:term
+#                                                             lido:term
+#   vperiods.term                                                 lang: nl
+#   vtranslations.textEntry                                       lang: en
+#   vtranslations.textEntry                                       lang: fr
 #                                                         lido:eventMaterialsTech
 #                                                             lido:termMaterialsTech
 #                                                                 type: material
@@ -230,7 +263,10 @@
 #   vtechniques.TermID                                                    pref: preferred
 #                                                                     lido:term
 #   vtechniques.technique                                                 pref: preferred
-#   CITvgsrpObjTombstoneD_RO.Medium                           lido:displayMaterialsTech
+#                                                             lido:displayMaterialsTech
+#   Objects.Medium                                                lang: nl
+#   vtranslations.textEntry                                       lang: en
+#   vtranslations.textEntry                                       lang: fr
 #                                             lido:objectRelationWrap
 #                                                 lido:subject
 #                                                     type: content-motif-general
@@ -239,8 +275,10 @@
 #   vsubjects.TermID                                              pref: preferred
 #                                                                 pref: alternate                                         identificatie hoofdmotief
 #                                                             lido:term
-#   vsubjects.subject                                             pref: preferred                 Onderwerp               term hoofdmotief
+#                                                                 pref: preferred
+#   vsubjects.subject                                                 lang: nl                    Onderwerp               term hoofdmotief
 #                                                                 pref: alternate                 Onderwerp
+#                                                     type: content-motif-specific
 #                                                     source: Iconclass
 #                                                         lido:subjectConcept
 #   viconclass                                                lido:conceptID                                              identificatie afgebeeld concept
@@ -248,14 +286,18 @@
 #                                             lido:relatedWorksWrap
 #                                                 lido:relatedWorkSet
 #   vrelations.numbering                              sortorder
-#                                                         lido:objectID
-#   vrelations.relatedObjectNumber                            type: local
-#                                                             type: oai
-#                                                 lido:relatedWorkRelType
-#   vrelations.relationshipID1(2)                     lido:conceptID
-#                                                         type: local
-#                                                         type: URI
-#   vrelations.relationship                           lido:term
+#                                                         lido:relatedWork
+#                                                             lido:objectID
+#   vrelations.relatedObjectNumber                                type: local
+#                                                                 type: oai
+#                                                         lido:relatedWorkRelType
+#   vrelations.relationshipID1(2)                             lido:conceptID
+#                                                                 type: local
+#                                                                 type: URI
+#   vrelations.relationship                                   lido:term
+#                                                     no sortorder
+#                                                         lido:relatedWork
+#   Objects.UserNumber1                                       lido:objectWebResource
 #                                             lido:rightsWorkWrap
 #                                                 lido:rightsType
 #                                                     lido:conceptID                                                      identificatie rechten werk
@@ -382,6 +424,25 @@
             -lang: nl
         )
 
+        # Add the translation for the object term from the translations vocabulary, this is not (yet) retrievable via TMS
+
+        copy_field(o.object, o.object_name_translation)
+
+        lookup_in_store(o.object_name_translation, DBI, data_source: "dbi:SQLite:/tmp/import.Translations.sqlite")
+
+        if all_match(o.object_name_translation._id, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last,
+                o.object_name_translation.translation,
+                -pref: alternate,
+                -lang: en
+            )
+
+        end
+
+        remove_field(o.object_name_translation)
+
         # Retrieve the corresponding term and URI from the AAT vocabulary, these are not (yet) retrievable via TMS
 
         copy_field(o.object, o.object_aat)
@@ -420,23 +481,31 @@
 
 # LIDO classification [type="object-category"]
 
-    # We'll have multiple terms for the type "object-category": the corresponding value from the AAT vocabulary (type:alternate) and the value from TMS (type:preferred)
+    # We'll have multiple terms for the type "object-category": the corresponding value from the AAT vocabulary (pref:alternate) and the value from TMS (pref:preferred)
 
     # Loop over the different classification terms from TMS
 
     do list(path:or_record.classificationWrap.db.classifications, var:c)
 
-        # Add each classification term from TMS to LIDO classification as LIDO term (type:preferred) along with the classificationID from TMS as LIDO conceptID (type:preferred)
+        # Add each classification term from TMS to LIDO classification as LIDO term (pref:preferred) along with the classificationID from TMS as LIDO conceptID (pref:preferred)
 
         lido_term(
             descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
-            c.Classification,
+            c.classification_nl,
             -conceptid: c.ClassificationID,
             -type: local,
             -source: TMS,
             -pref: preferred,
             -lang: nl
         )
+
+        copy_field(c.classification_en, descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$append._)
+        add_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$last.pref, "preferred")
+        add_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$last.lang, "en")
+
+        copy_field(c.classification_fr, descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$append._)
+        add_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$last.pref, "preferred")
+        add_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$last.lang, "fr")
 
         # Add type of LIDO classification
 
@@ -527,8 +596,23 @@
 
     lido_basenameset(
         descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName,
-        or_record.department.db.department
+        or_record.department.db.department,
+        value_lang: nl
     )
+
+    if all_match(or_record.department.db.department, 'Koninklijk Museum voor Schone Kunsten Antwerpen')
+
+        set_field(or_record.institution_translation, 'Royal Museum of Fine Arts Antwerp')
+
+        lido_basenameset(
+            descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName,
+            or_record.institution_translation,
+            value_lang: en
+        )
+
+        remove_field(or_record.institution_translation)
+
+    end
 
     if all_match(or_record.legalBodyName, '.*\S.*')
 
@@ -549,17 +633,105 @@
         -type: object-number
     )
 
+# LIDO repositoryLocation
+
+    # Add "Currently on display" to LIDO repositoryLocation as LIDO namePlaceSet if location is present in TMS
+
+    if all_match(or_record.location.db.room_nl, '.*\S.*')
+
+        set_field(or_record.current_location, 'Te zien op zaal')
+
+        lido_basenameset(
+            descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+            or_record.current_location,
+            -value_lang: nl
+        )
+
+        set_field(or_record.current_location, 'Currently on display')
+
+        lido_basenameset(
+            descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$last,
+            or_record.current_location,
+            -value_lang: en
+        )
+
+    else
+
+        set_field(or_record.current_location, 'In depot / in bruikleen')
+
+        lido_basenameset(
+            descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+            or_record.current_location,
+            -value_lang: nl
+        )
+
+        set_field(or_record.current_location, 'In depot / on loan')
+
+        lido_basenameset(
+            descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$last,
+            or_record.current_location,
+            -value_lang: en
+        )
+
+    end
+
+    remove_field(or_record.current_location)
+
 # LIDO objectDescriptionSet
 
-    # Add description from TMS (if present) as LIDO descriptiveNoteValue
+    # Loop over the different text entries from TMS
 
-    if all_match(or_record.description.db.description, '.*\S.*')
+    do list(path:or_record.textEntries.db.textentries, var:t)
 
-        lido_descriptivenote(
-            descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet,
-            or_record.description.db.description,
-            -lang: 'nl'
-        )
+        # Only retain text type ID 107
+
+        if all_match(t.textTypeID, '107')
+
+            # Add each text entry from TMS (if present) to LIDO objectDescriptionSet as LIDO descriptiveNoteValue
+
+            if all_match(t.textEntry, '.*\S.*')
+
+                # Add a new, empty LIDO objectDescriptionSet field
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
+
+                # Remove unnecessary whitespaces
+
+                trim(t.textEntry)
+
+                # Add the Dutch text entry to last created LIDO objectDescriptionSet
+
+                if all_match(t.languageid, 2)
+
+                    copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                    set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'nl')
+
+                end
+
+                # Add the English text entry to last created LIDO objectDescriptionSet
+
+                if all_match(t.languageid, 1)
+
+                    copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                    set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'en')
+
+                end
+
+                # Add the French text entry to last created LIDO objectDescriptionSet
+
+                if all_match(t.languageid, 3)
+
+                    copy_field(t.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                    set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.lang, 'fr')
+
+                end
+
+            end
+
+        end
 
     end
 
@@ -620,7 +792,7 @@
 
 ## LIDO eventWrap
 
-# LIDO eventType
+# LIDO eventType [eventType/term="production"]
 
     # Create event_type
 
@@ -633,13 +805,15 @@
         or_record.event_type
     )
 
-# LIDO eventActor
+# LIDO eventActor [eventType/term="production"]
 
     # We'll have multiple appellationValues and actorIDs for the same actor: the corresponding values from the creators vocabulary and the values from TMS
 
     # Determine which roles from TMS should be added as qualifier
 
-    set_array(qualifiers, "atelier van", "kopie naar", "navolger van", "omgeving van", "school van", "toegeschreven aan", "vroegere toeschrijving", "x")
+    set_array(qualifiers, "atelier van", "kopie naar", "navolger van", "omgeving van", "school van", "toegeschreven aan", "x")
+    set_array(qualifiers_en, "workshop of", "copy after", "follower of", "circle of", "school of", "attributed to")
+    set_array(qualifiers_fr, "atelier de", "copie d'après", "disciple de", "cercle de", "école de", "attribué à")
 
     # Loop over the different constituents from TMS
 
@@ -649,43 +823,80 @@
 
         trim(c.BeginDateISO)
         trim(c.EndDateISO)
+        trim(c.role_nl)
+        trim(c.role_en)
+        trim(c.role_fr)
 
-        # Add the display name of each constituent from TMS to LIDO eventActor as LIDO appellationValue (type:preferred)
+        # Add the display name of each constituent from TMS to LIDO eventActor as LIDO appellationValue (pref:preferred)
         # along with the constituentID from TMS as LIDO actorID (source:TMS),
         # the BeginDateISO from TMS as LIDO earliestDate,
         # the EndDateISO from TMS as LIDO latestDate and,
-        # if determined before as qualifier, add the Role from TMS as LIDO attributionQualifierActor
-        # else, add the Role from TMS as LIDO roleActor
+        # if determined before as qualifier, add the role from TMS as LIDO attributionQualifierActor
+        # else, add the role from TMS as LIDO roleActor
 
-        if in(c.Role, qualifiers)
-            lido_actor(
-                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append,
-                c.ConstituentID,
-                c.DisplayName,
-                -id_source: TMS,
-                -id_type: local,
-                -qualifier: c.Role,
-                -name_pref: preferred
-            )
-        else
-            lido_actor(
-                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append,
-                c.ConstituentID,
-                c.DisplayName,
-                -id_source: TMS,
-                -id_type: local,
-                -birthdate: c.BeginDateISO,
-                -deathdate: c.EndDateISO,
-                -role: c.Role,
-                -name_pref: preferred
-            )
+        unless all_match(c.role_nl, 'vroegere toeschrijving')
+
+            if in(c.role_nl, qualifiers)
+                lido_actor(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append,
+                    c.ConstituentID,
+                    c.DisplayName,
+                    -name_lang: nl,
+                    -id_source: TMS,
+                    -id_type: local,
+                    -qualifier: c.role_nl,
+                    -name_pref: preferred
+                )
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.attributionQualifierActor.$last.lang, "nl")
+            else
+                lido_actor(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append,
+                    c.ConstituentID,
+                    c.DisplayName,
+                    -name_lang: nl,
+                    -id_source: TMS,
+                    -id_type: local,
+                    -birthdate: c.BeginDateISO,
+                    -deathdate: c.EndDateISO,
+                    -role: c.role_nl,
+                    -name_pref: preferred
+                )
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.term.$last.lang, "nl")
+            end
+
         end
 
-        # Retrieve the corresponding values from the creators vocabulary, these are not (yet) retrievable via TMS
+        unless all_match(c.role_en, "formerly attributed to")
 
-        copy_field(c.DisplayName, c.creator.pid)
-        downcase(c.creator.pid)
-        lookup_in_store(c.creator.pid, DBI, data_source: "dbi:SQLite:/tmp/import.CREATORS_UTF8.sqlite")
+            if in(c.role_en, qualifiers_en)
+                copy_field(c.role_en, descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.attributionQualifierActor.$append._)
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.attributionQualifierActor.$last.lang, "en")
+            else
+                copy_field(c.role_en, descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.term.$append._)
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.term.$last.lang, "en")
+            end
+
+        end
+
+        unless all_match(c.role_fr, "Ancienne attribution à")
+
+            if in(c.role_fr, qualifiers_fr)
+                copy_field(c.role_fr, descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.attributionQualifierActor.$append._)
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.attributionQualifierActor.$last.lang, "fr")
+            else
+                copy_field(c.role_fr, descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.term.$append._)
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.term.$last.lang, "fr")
+            end
+
+        end
+
+        # Retrieve the corresponding values from the creators vocabulary
+
+        unless all_match(c.role_nl, 'vroegere toeschrijving')
+            copy_field(c.DisplayName, c.creator.pid)
+            downcase(c.creator.pid)
+            lookup_in_store(c.creator.pid, DBI, data_source: "dbi:SQLite:/tmp/import.CREATORS_UTF8.sqlite")
+        end
 
         # Add the corresponding display name from the creators vocabulary (if present) to LIDO eventActor as LIDO appellationValue (type:alternate)
 
@@ -694,6 +905,7 @@
             lido_basenameset(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
                 c.creator.pid.display_name,
+                -value_lang: nl,
                 -value_pref: alternate
             )
 
@@ -743,8 +955,10 @@
     # Remove the created field qualifiers
 
     remove_field(qualifiers)
+    remove_field(qualifiers_en)
+    remove_field(qualifiers_fr)
 
-# LIDO displayDate
+# LIDO displayDate [eventType/term="production"]
 
     # Add display date from TMS (if present) as LIDO displayDate
 
@@ -757,7 +971,7 @@
 
     end
 
-# LIDO date
+# LIDO date [eventType/term="production"]
 
     # Add begin end end date from TMS (if present) as respectively LIDO earliestDate and LIDO latestDate
 
@@ -793,21 +1007,103 @@
 
     end
 
-# LIDO periodName
+# LIDO periodName [eventType/term="production"]
 
     # Add period from TMS as LIDO periodName
 
     lido_term(
-        descriptiveMetadata.eventWrap.eventSet.$last.event.periodName,
+        descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$append,
         or_record.periodName.term,
+        -pref: preferred,
         -lang: nl
     )
 
-# LIDO namePlaceSet
+    do list(path:or_record.translations.db.translations, var:t)
+
+        if all_match(t.textTypeID, '124')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -pref: preferred,
+                -lang: en
+            )
+
+        end
+
+        if all_match(t.textTypeID, '118')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -pref: preferred,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(t.textTypeID, '144')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -pref: preferred,
+                -lang: de
+            )
+
+        end
+
+        if all_match(t.textTypeID, '145')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -pref: preferred,
+                -lang: es
+            )
+
+        end
+
+        if all_match(t.textTypeID, '146')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -pref: preferred,
+                -lang: it
+            )
+
+        end
+
+        if all_match(t.textTypeID, '147')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -pref: preferred,
+                -lang: ru
+            )
+
+        end
+
+        if all_match(t.textTypeID, '148')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
+                t.textEntry,
+                -pref: preferred,
+                -lang: zh
+            )
+
+        end
+
+    end
+
+# LIDO namePlaceSet [eventType/term="production"]
 
     # Not yet added
 
-# LIDO termMaterialsTech
+# LIDO termMaterialsTech [eventType/term="production"]
 
     # We'll have multiple terms: the corresponding value from the AAT vocabulary (type:alternate) and the value from TMS (type:preferred)
 
@@ -921,7 +1217,7 @@
 
     end
 
-# LIDO displayMaterialsTech
+# LIDO displayMaterialsTech [eventType/term="production"]
 
     # Add medium from TMS as LIDO displayMaterialsTech
 
@@ -929,8 +1225,83 @@
 
         lido_basevalue(
             descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.displayMaterialsTech,
-            or_record.eventMaterialsTech.display
+            or_record.eventMaterialsTech.display,
+            -lang: nl
         )
+
+    end
+
+    do list(path:or_record.translations.db.translations, var:t)
+
+        if all_match(t.textTypeID, '127')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: en
+            )
+
+        end
+
+        if all_match(t.textTypeID, '128')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(t.textTypeID, '139')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: de
+            )
+
+        end
+
+        if all_match(t.textTypeID, '140')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: es
+            )
+
+        end
+
+        if all_match(t.textTypeID, '141')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: it
+            )
+
+        end
+
+        if all_match(t.textTypeID, '142')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: ru
+            )
+
+        end
+
+        if all_match(t.textTypeID, '143')
+
+            lido_basevalue(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.displayMaterialsTech,
+                t.textEntry,
+                -lang: zh
+            )
+
+        end
 
     end
 
@@ -962,6 +1333,34 @@
             -pref: preferred,
             -lang: nl
         )
+
+        copy_field(s.subject, s.content_motif_general)
+
+        downcase(s.content_motif_general)
+
+        lido_term(
+            descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last,
+            s.content_motif_general,
+            -pref: alternate,
+            -lang: nl
+        )
+
+        # Add the translation for the subject term from the translations vocabulary, this is not (yet) retrievable via TMS
+
+        lookup_in_store(s.content_motif_general, DBI, data_source: "dbi:SQLite:/tmp/import.Translations.sqlite")
+
+        if all_match(s.content_motif_general._id, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last,
+                s.content_motif_general.translation,
+                -pref: alternate,
+                -lang: en
+            )
+
+        end
+
+        remove_field(s.content_motif_general)
 
         # Retrieve the corresponding term and URI from the AAT vocabulary, these are not (yet) retrievable via TMS
 
@@ -1020,8 +1419,11 @@
             -conceptid: or_record.iconclassId,
             -type: purl,
             -source: Iconclass,
+            -pref: preferred,
             -lang: nl
         )
+
+        set_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.type, 'content-motif-specific')
 
         # Prevent reusing the same values in the next iteration
 
@@ -1031,7 +1433,7 @@
 
         copy_field(ic.SourceTermID, ic.english_term)
 
-        lookup_in_store(ic.english_term, DBI, data_source: "dbi:SQLite:/tmp/import.iconclass.sqlite")
+        lookup_in_store(ic.english_term, DBI, data_source: "dbi:SQLite:/tmp/import.iconclass_en.sqlite")
 
         unless all_match(ic.english_term.t, '.*\S.*')
 
@@ -1039,7 +1441,7 @@
 
                 replace_all(ic.english_term, '^(\d(?:\d(?:([A-Z])(?:\2)?\d*)?)?\()[^\+][^\)]*(\)\d*(?:\(\+\d+\))?.*)', '$1...$3')
 
-                lookup_in_store(ic.english_term, DBI, data_source: "dbi:SQLite:/tmp/import.iconclass.sqlite")
+                lookup_in_store(ic.english_term, DBI, data_source: "dbi:SQLite:/tmp/import.iconclass_en.sqlite")
 
                 if all_match(ic.english_term.t, '.*\(with [^\(]*[A-Z][A-Z]+[^\(]*\).*')
 
@@ -1060,6 +1462,7 @@
             lido_term(
                 descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last,
                 ic.english_term.t,
+                -pref: preferred,
                 -lang: en
             )
 
@@ -1193,6 +1596,28 @@
             )
 
         end
+
+    end
+
+    # Add each library link from TMS (if present) to LIDO relatedWorkSet as LIDO objectWebResource
+
+    if all_match('or_record.linkLibrary', '.*\S.*')
+
+        # Add a new, empty LIDO relationWorkSet field
+
+        add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+
+        # Create library link
+
+        prepend(or_record.linkLibrary, 'http://anet.be/record/opackmska/')
+
+        # Add the created library link to last created LIDO relatedWorkSet
+
+        lido_basevalue(
+            descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectWebResource,
+            or_record.linkLibrary,
+            -label: link-library
+        )
 
     end
 
@@ -1344,7 +1769,7 @@
 
         copy_field(or_record.iiif_manifest.manifest, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
-        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubKMSKA")
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "Imagehub")
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "IIIF Manifest")
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
 
@@ -1356,7 +1781,7 @@
 
         copy_field(or_record.iiif_manifest.thumbnail, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
-        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubKMSKA")
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "Imagehub")
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "thumbnail")
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
 

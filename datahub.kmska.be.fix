@@ -179,7 +179,7 @@
     # subjectConcept
 
     copy_field(ObjectID, or_record.iconclass.db)
-    lookup_in_store(or_record.iconclass.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.iconclass.sqlite')
+    lookup_in_store(or_record.iconclass.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.iconclass_en.sqlite')
 
     # relatedWorksWrap
 
