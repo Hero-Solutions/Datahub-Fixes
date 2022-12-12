@@ -145,7 +145,13 @@
 #                                                       lido:eventType
 #                                                           lido:term
 #                                                               acquisition
-#   owner_hist\.acquired_from                                       lido:eventActor                                                 naam verwervingsbron
+#                                                                   lido:eventActor
+#                                                                       lido:actorID
+#   owner_hist\.acquired_from.Source                                        type: purl
+#                                                                       lido:nameActorSet
+#   owner_hist\.acquired_from.name                                          lang: nl                                                naam verwervingsbron
+#   owner_hist\.acquired_from.language_script                               lang: fr
+#   owner_hist\.acquired_from.language_script                               lang: en
 #                                                                   lido:eventDate
 #   owner_hist\.date\.start                                             lido:earliestDate                                           waarde verwervingdatum
 #                                                                   lido:eventMethod
@@ -2738,8 +2744,183 @@
 
                 lido_basenameset(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet,
-                    c.name
+                    c.name,
+                    -value_lang: nl
                 )
+
+                if all_match(c.language_script, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        c.language_script,
+                        -value_lang: fr
+                    )
+
+                end
+
+                if all_match(c.language_script.0, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        c.language_script.0,
+                        -value_lang: fr
+                    )
+
+                end
+
+                if all_match(c.language_script.1, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        c.language_script.1,
+                        -value_lang: en
+                    )
+
+                end
+
+                copy_field(c.Source, c.acquired_from_source)
+
+                unless is_array(c.acquired_from_source)
+                    move_field(c.acquired_from_source, or_record.tmp)
+                    set_array(c.acquired_from_source)
+                    move_field(or_record.tmp, c.acquired_from_source.$append)
+                end
+
+                do list (path: c.acquired_from_source, var: s)
+
+                    if all_match(s.source, 'VIAF')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(c.acquired_from_source_viaf, 'https://viaf.org/viaf/')
+
+                            paste(c.creator_viaf, c.acquired_from_source_viaf, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                c.creator_viaf,
+                                -source: VIAF,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://viaf.org/viaf/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, c.acquired_from_source_viaf)
+
+                                paste(c.creator_viaf, c.acquired_from_source_viaf, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    c.creator_viaf,
+                                    -source: VIAF,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                    if all_match(s.source, 'RKDartists&')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(c.acquired_from_source_rkd, 'https://rkd.nl/explore/artists/')
+
+                            paste(c.creator_rkd, c.acquired_from_source_rkd, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                c.creator_rkd,
+                                -source: RKD,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://rkd.nl/explore/artists/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, c.acquired_from_source_rkd)
+
+                                paste(c.creator_rkd, c.acquired_from_source_rkd, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    c.creator_rkd,
+                                    -source: RKD,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                    if all_match(s.source, 'Wikidata')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(c.acquired_from_source_wikidata, 'https://www.wikidata.org/wiki/')
+
+                            paste(c.creator_wikidata, c.acquired_from_source_wikidata, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                c.creator_wikidata,
+                                -source: Wikidata,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://www.wikidata.org/wiki/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, c.acquired_from_source_wikidata)
+
+                                paste(c.creator_wikidata, c.acquired_from_source_wikidata, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    c.creator_wikidata,
+                                    -source: Wikidata,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                end
 
                 if exists(or_record.acquisition_display)
 
@@ -3362,8 +3543,183 @@
 
                 lido_basenameset(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet,
-                    or_record.acquired_from.$first.name
+                    or_record.acquired_from.$first.name,
+                    -value_lang: nl
                 )
+
+                if all_match(or_record.acquired_from.$first.language_script, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        or_record.acquired_from.$first.language_script,
+                        -value_lang: fr
+                    )
+
+                end
+
+                if all_match(or_record.acquired_from.$first.language_script.0, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        or_record.acquired_from.$first.language_script.0,
+                        -value_lang: fr
+                    )
+
+                end
+
+                if all_match(or_record.acquired_from.$first.language_script.1, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        or_record.acquired_from.$first.language_script.1,
+                        -value_lang: en
+                    )
+
+                end
+
+                copy_field(or_record.acquired_from.$first.Source, or_record.acquired_from.$first.acquired_from_source)
+
+                unless is_array(or_record.acquired_from.$first.acquired_from_source)
+                    move_field(or_record.acquired_from.$first.acquired_from_source, or_record.tmp)
+                    set_array(or_record.acquired_from.$first.acquired_from_source)
+                    move_field(or_record.tmp, or_record.acquired_from.$first.acquired_from_source.$append)
+                end
+
+                do list (path: or_record.acquired_from.$first.acquired_from_source, var: s)
+
+                    if all_match(s.source, 'VIAF')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(or_record.acquired_from.$first.acquired_from_source_viaf, 'https://viaf.org/viaf/')
+
+                            paste(or_record.acquired_from.$first.creator_viaf, or_record.acquired_from.$first.acquired_from_source_viaf, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                or_record.acquired_from.$first.creator_viaf,
+                                -source: VIAF,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://viaf.org/viaf/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, or_record.acquired_from.$first.acquired_from_source_viaf)
+
+                                paste(or_record.acquired_from.$first.creator_viaf, or_record.acquired_from.$first.acquired_from_source_viaf, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    or_record.acquired_from.$first.creator_viaf,
+                                    -source: VIAF,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                    if all_match(s.source, 'RKDartists&')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(or_record.acquired_from.$first.acquired_from_source_rkd, 'https://rkd.nl/explore/artists/')
+
+                            paste(or_record.acquired_from.$first.creator_rkd, or_record.acquired_from.$first.acquired_from_source_rkd, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                or_record.acquired_from.$first.creator_rkd,
+                                -source: RKD,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://rkd.nl/explore/artists/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, or_record.acquired_from.$first.acquired_from_source_rkd)
+
+                                paste(or_record.acquired_from.$first.creator_rkd, or_record.acquired_from.$first.acquired_from_source_rkd, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    or_record.acquired_from.$first.creator_rkd,
+                                    -source: RKD,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                    if all_match(s.source, 'Wikidata')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(or_record.acquired_from.$first.acquired_from_source_wikidata, 'https://www.wikidata.org/wiki/')
+
+                            paste(or_record.acquired_from.$first.creator_wikidata, or_record.acquired_from.$first.acquired_from_source_wikidata, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                or_record.acquired_from.$first.creator_wikidata,
+                                -source: Wikidata,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://www.wikidata.org/wiki/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, or_record.acquired_from.$first.acquired_from_source_wikidata)
+
+                                paste(or_record.acquired_from.$first.creator_wikidata, or_record.acquired_from.$first.acquired_from_source_wikidata, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    or_record.acquired_from.$first.creator_wikidata,
+                                    -source: Wikidata,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                end
 
                 if exists(or_record.acquisition_display)
 
@@ -3990,8 +4346,183 @@
 
                 lido_basenameset(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet,
-                    or_record.acquired_from.$first.name
+                    or_record.acquired_from.$first.name,
+                    -value_lang: nl
                 )
+
+                if all_match(or_record.acquired_from.$first.language_script, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        or_record.acquired_from.$first.language_script,
+                        -value_lang: fr
+                    )
+
+                end
+
+                if all_match(or_record.acquired_from.$first.language_script.0, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        or_record.acquired_from.$first.language_script.0,
+                        -value_lang: fr
+                    )
+
+                end
+
+                if all_match(or_record.acquired_from.$first.language_script.1, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        or_record.acquired_from.$first.language_script.1,
+                        -value_lang: en
+                    )
+
+                end
+
+                copy_field(or_record.acquired_from.$first.Source, or_record.acquired_from.$first.acquired_from_source)
+
+                unless is_array(or_record.acquired_from.$first.acquired_from_source)
+                    move_field(or_record.acquired_from.$first.acquired_from_source, or_record.tmp)
+                    set_array(or_record.acquired_from.$first.acquired_from_source)
+                    move_field(or_record.tmp, or_record.acquired_from.$first.acquired_from_source.$append)
+                end
+
+                do list (path: or_record.acquired_from.$first.acquired_from_source, var: s)
+
+                    if all_match(s.source, 'VIAF')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(or_record.acquired_from.$first.acquired_from_source_viaf, 'https://viaf.org/viaf/')
+
+                            paste(or_record.acquired_from.$first.creator_viaf, or_record.acquired_from.$first.acquired_from_source_viaf, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                or_record.acquired_from.$first.creator_viaf,
+                                -source: VIAF,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://viaf.org/viaf/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, or_record.acquired_from.$first.acquired_from_source_viaf)
+
+                                paste(or_record.acquired_from.$first.creator_viaf, or_record.acquired_from.$first.acquired_from_source_viaf, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    or_record.acquired_from.$first.creator_viaf,
+                                    -source: VIAF,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                    if all_match(s.source, 'RKDartists&')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(or_record.acquired_from.$first.acquired_from_source_rkd, 'https://rkd.nl/explore/artists/')
+
+                            paste(or_record.acquired_from.$first.creator_rkd, or_record.acquired_from.$first.acquired_from_source_rkd, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                or_record.acquired_from.$first.creator_rkd,
+                                -source: RKD,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://rkd.nl/explore/artists/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, or_record.acquired_from.$first.acquired_from_source_rkd)
+
+                                paste(or_record.acquired_from.$first.creator_rkd, or_record.acquired_from.$first.acquired_from_source_rkd, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    or_record.acquired_from.$first.creator_rkd,
+                                    -source: RKD,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                    if all_match(s.source, 'Wikidata')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(or_record.acquired_from.$first.acquired_from_source_wikidata, 'https://www.wikidata.org/wiki/')
+
+                            paste(or_record.acquired_from.$first.creator_wikidata, or_record.acquired_from.$first.acquired_from_source_wikidata, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                or_record.acquired_from.$first.creator_wikidata,
+                                -source: Wikidata,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://www.wikidata.org/wiki/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, or_record.acquired_from.$first.acquired_from_source_wikidata)
+
+                                paste(or_record.acquired_from.$first.creator_wikidata, or_record.acquired_from.$first.acquired_from_source_wikidata, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    or_record.acquired_from.$first.creator_wikidata,
+                                    -source: Wikidata,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                end
 
                 if exists(or_record.acquisition_display)
 
@@ -4623,8 +5154,183 @@
 
                 lido_basenameset(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet,
-                    or_record.acquired_from.$first.name
+                    or_record.acquired_from.$first.name,
+                    -value_lang: nl
                 )
+
+                if all_match(or_record.acquired_from.$first.language_script, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        or_record.acquired_from.$first.language_script,
+                        -value_lang: fr
+                    )
+
+                end
+
+                if all_match(or_record.acquired_from.$first.language_script.0, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        or_record.acquired_from.$first.language_script.0,
+                        -value_lang: fr
+                    )
+
+                end
+
+                if all_match(or_record.acquired_from.$first.language_script.1, '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        or_record.acquired_from.$first.language_script.1,
+                        -value_lang: en
+                    )
+
+                end
+
+                copy_field(or_record.acquired_from.$first.Source, or_record.acquired_from.$first.acquired_from_source)
+
+                unless is_array(or_record.acquired_from.$first.acquired_from_source)
+                    move_field(or_record.acquired_from.$first.acquired_from_source, or_record.tmp)
+                    set_array(or_record.acquired_from.$first.acquired_from_source)
+                    move_field(or_record.tmp, or_record.acquired_from.$first.acquired_from_source.$append)
+                end
+
+                do list (path: or_record.acquired_from.$first.acquired_from_source, var: s)
+
+                    if all_match(s.source, 'VIAF')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(or_record.acquired_from.$first.acquired_from_source_viaf, 'https://viaf.org/viaf/')
+
+                            paste(or_record.acquired_from.$first.creator_viaf, or_record.acquired_from.$first.acquired_from_source_viaf, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                or_record.acquired_from.$first.creator_viaf,
+                                -source: VIAF,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://viaf.org/viaf/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, or_record.acquired_from.$first.acquired_from_source_viaf)
+
+                                paste(or_record.acquired_from.$first.creator_viaf, or_record.acquired_from.$first.acquired_from_source_viaf, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    or_record.acquired_from.$first.creator_viaf,
+                                    -source: VIAF,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                    if all_match(s.source, 'RKDartists&')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(or_record.acquired_from.$first.acquired_from_source_rkd, 'https://rkd.nl/explore/artists/')
+
+                            paste(or_record.acquired_from.$first.creator_rkd, or_record.acquired_from.$first.acquired_from_source_rkd, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                or_record.acquired_from.$first.creator_rkd,
+                                -source: RKD,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://rkd.nl/explore/artists/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, or_record.acquired_from.$first.acquired_from_source_rkd)
+
+                                paste(or_record.acquired_from.$first.creator_rkd, or_record.acquired_from.$first.acquired_from_source_rkd, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    or_record.acquired_from.$first.creator_rkd,
+                                    -source: RKD,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                    if all_match(s.source, 'Wikidata')
+
+                        if all_match('s.source\.number', '.*\S.*')
+
+                            set_field(or_record.acquired_from.$first.acquired_from_source_wikidata, 'https://www.wikidata.org/wiki/')
+
+                            paste(or_record.acquired_from.$first.creator_wikidata, or_record.acquired_from.$first.acquired_from_source_wikidata, 's.source\.number', join_char:'')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                or_record.acquired_from.$first.creator_wikidata,
+                                -source: Wikidata,
+                                -type: purl
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    else
+
+                        if all_match(s.source, 'https?://www.wikidata.org/wiki/')
+
+                            if all_match('s.source\.number', '.*\S.*')
+
+                                copy_field(s.source, or_record.acquired_from.$first.acquired_from_source_wikidata)
+
+                                paste(or_record.acquired_from.$first.creator_wikidata, or_record.acquired_from.$first.acquired_from_source_wikidata, 's.source\.number', join_char:'')
+
+                                lido_baseid(
+                                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                    or_record.acquired_from.$first.creator_wikidata,
+                                    -source: Wikidata,
+                                    -type: purl
+                                )
+
+                                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                            end
+
+                        end
+
+                    end
+
+                end
 
                 if exists(or_record.acquisition_display)
 
@@ -5466,8 +6172,6 @@
 
             end
 
-            copy_field('c.creator.birth\.date\.precision', 'c.creator.birth\.date\.end\.precision')
-
             if all_match('c.creator.birth\.date\.precision', '.*[0-9]{4}.*')
 
                 copy_field('c.creator.birth\.date\.precision', 'c.creator.birth\.date\.start')
@@ -5579,8 +6283,6 @@
                 end
 
             end
-
-            copy_field('c.creator.death\.date\.precision', 'c.creator.death\.date\.end\.precision')
 
             if all_match('c.creator.death\.date\.precision', '.*[0-9]{4}.*')
 
