@@ -2743,7 +2743,7 @@
             if all_match(c.name, '.*\S.*')
 
                 lido_basenameset(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet,
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append,
                     c.name,
                     -value_lang: nl
                 )
@@ -3542,7 +3542,7 @@
             if all_match(or_record.acquired_from.$first.name, '.*\S.*')
 
                 lido_basenameset(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet,
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append,
                     or_record.acquired_from.$first.name,
                     -value_lang: nl
                 )
@@ -4345,7 +4345,7 @@
             if all_match(or_record.acquired_from.$first.name, '.*\S.*')
 
                 lido_basenameset(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet,
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append,
                     or_record.acquired_from.$first.name,
                     -value_lang: nl
                 )
@@ -5153,7 +5153,7 @@
             if all_match(or_record.acquired_from.$first.name, '.*\S.*')
 
                 lido_basenameset(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet,
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append,
                     or_record.acquired_from.$first.name,
                     -value_lang: nl
                 )
