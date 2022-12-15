@@ -2229,6 +2229,12 @@
 
             end
 
+            if all_match(i.value, 'Iconclass')
+
+                set_field(i.value, 'https://iconclass.org/')
+
+            end
+
             if all_match(i.value, 'https?://iconclass.org/')
 
                 if all_match(or_record.content_specific_motif_source, '.*\S.*')
