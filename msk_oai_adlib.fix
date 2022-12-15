@@ -2393,6 +2393,7 @@
             lido_term(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
                 c.term,
+                -pref: preferred,
                 -lang: nl
             )
 
@@ -2403,6 +2404,7 @@
             lido_term(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
                 c.notes,
+                -pref: preferred,
                 -lang: fr
             )
 
@@ -2413,6 +2415,7 @@
             lido_term(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
                 c.notes.0,
+                -pref: preferred,
                 -lang: fr
             )
 
@@ -2423,6 +2426,7 @@
             lido_term(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.periodName.$last,
                 c.notes.1,
+                -pref: preferred,
                 -lang: en
             )
 
