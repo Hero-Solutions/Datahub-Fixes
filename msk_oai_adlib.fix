@@ -37,6 +37,7 @@
     copy_field(_metadata.Content_subject, or_record.depicted_subject)
     copy_field(_metadata.Content_person, or_record.depicted_person)
     copy_field(_metadata.priref, or_record.priref)
+    copy_field(_metadata.Rights, or_record.rights)
 
     # resourceWrap
 
@@ -215,7 +216,7 @@
 #                                                           lido:rightsType
 #                                                               lido:conceptID                                                      identificatie rechten werk
 #                                                               lido:term                                                           term rechten werk
-#                                                           lido:creditLine
+#   Rights.rights\.notes                                    lido:creditLine
 #                                                       lido:recordWrap
 #                                                           lido:recordID
 #   Digital_reference.digital_reference                         type: global                                Data PURL               waarde databanknummer
@@ -3351,19 +3352,96 @@
 
 # LIDO creditLine
 
-    set_array(creator_roles, 'architect', 'auteur', 'beeldhouwer', 'boekverluchter', 'cartograaf', 'etser', 'fotograaf', 'fotograveur', 'glazenier', 'graveur', 'houtsnijder', 'illustrator', 'kunstenaar', 'lithograaf', 'medailleur', 'ontwerper', 'ontwerper en uitgever', 'prentmaker', 'prentmaker en uitgever', 'schilder', 'schrijver', 'steenhouwer', 'tekenaar', 'tweede vervaardiger', 'vervaardiger')
+    unless is_array(or_record.rights)
+        move_field(or_record.rights, or_record.tmp)
+        set_array(or_record.rights)
+        move_field(or_record.tmp, or_record.rights.$append)
+    end
 
-    do list (path: or_record.production, var: c)
+    do list(path: or_record.rights, var: c)
 
-        copy_field(c.creator.name, or_record.creator_name)
+        if all_match('c.rights\.notes', '.*\S.*')
 
-        if all_match(or_record.creator_name, '.*\S.*')
+            lido_basevalue(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$append.creditLine,
+                'c.rights\.notes'
+            )
 
-            lookup_in_store(or_record.creator_name, DBI, data_source: 'dbi:SQLite:/tmp/import.Copyrights.sqlite')
+            set_field(or_record.copyright, 'true')
 
-            if all_match('c.creator\.qualifier', '.*\S.*')
+        end
 
-                unless in('c.creator\.qualifier', creator_roles)
+    end
+
+    unless all_match(or_record.copyright, 'true')
+
+        set_array(creator_roles, 'architect', 'auteur', 'beeldhouwer', 'boekverluchter', 'cartograaf', 'etser', 'fotograaf', 'fotograveur', 'glazenier', 'graveur', 'houtsnijder', 'illustrator', 'kunstenaar', 'lithograaf', 'medailleur', 'ontwerper', 'ontwerper en uitgever', 'prentmaker', 'prentmaker en uitgever', 'schilder', 'schrijver', 'steenhouwer', 'tekenaar', 'tweede vervaardiger', 'vervaardiger')
+
+        do list (path: or_record.production, var: c)
+
+            copy_field(c.creator.name, or_record.creator_name)
+
+            if all_match(or_record.creator_name, '.*\S.*')
+
+                lookup_in_store(or_record.creator_name, DBI, data_source: 'dbi:SQLite:/tmp/import.Copyrights.sqlite')
+
+                if all_match('c.creator\.qualifier', '.*\S.*')
+
+                    unless in('c.creator\.qualifier', creator_roles)
+
+                        set_field(or_record.no_copyright, 'true')
+
+                        if exists(or_record.legal_status)
+
+                            remove_field(or_record.legal_status)
+
+                        end
+
+                        if exists(or_record.creativeCommons)
+
+                            remove_field(or_record.creativeCommons)
+
+                        end
+
+                        if exists(or_record.rightsStatements)
+
+                            remove_field(or_record.rightsStatements)
+
+                        end
+
+                    end
+
+                end
+
+                if all_match('c.creator\.role', '.*\S.*')
+
+                    unless in('c.creator\.role', creator_roles)
+
+                        set_field(or_record.no_copyright, 'true')
+
+                        if exists(or_record.legal_status)
+
+                            remove_field(or_record.legal_status)
+
+                        end
+
+                        if exists(or_record.creativeCommons)
+
+                            remove_field(or_record.creativeCommons)
+
+                        end
+
+                        if exists(or_record.rightsStatements)
+
+                            remove_field(or_record.rightsStatements)
+
+                        end
+
+                    end
+
+                end
+
+                unless exists(or_record.creator_name.legalStatus)
 
                     set_field(or_record.no_copyright, 'true')
 
@@ -3387,125 +3465,37 @@
 
                 end
 
-            end
+                if exists(or_record.creator_name.legalStatus)
 
-            if all_match('c.creator\.role', '.*\S.*')
+                    unless all_match(or_record.creator_name.legalStatus, '.*\S.*')
 
-                unless in('c.creator\.role', creator_roles)
+                        set_field(or_record.no_copyright, 'true')
 
-                    set_field(or_record.no_copyright, 'true')
+                        if exists(or_record.legal_status)
 
-                    if exists(or_record.legal_status)
+                            remove_field(or_record.legal_status)
 
-                        remove_field(or_record.legal_status)
+                        end
 
-                    end
+                        if exists(or_record.creativeCommons)
 
-                    if exists(or_record.creativeCommons)
+                            remove_field(or_record.creativeCommons)
 
-                        remove_field(or_record.creativeCommons)
+                        end
 
-                    end
+                        if exists(or_record.rightsStatements)
 
-                    if exists(or_record.rightsStatements)
+                            remove_field(or_record.rightsStatements)
 
-                        remove_field(or_record.rightsStatements)
-
-                    end
-
-                end
-
-            end
-
-            unless exists(or_record.creator_name.legalStatus)
-
-                set_field(or_record.no_copyright, 'true')
-
-                if exists(or_record.legal_status)
-
-                    remove_field(or_record.legal_status)
-
-                end
-
-                if exists(or_record.creativeCommons)
-
-                    remove_field(or_record.creativeCommons)
-
-                end
-
-                if exists(or_record.rightsStatements)
-
-                    remove_field(or_record.rightsStatements)
-
-                end
-
-            end
-
-            if exists(or_record.creator_name.legalStatus)
-
-                unless all_match(or_record.creator_name.legalStatus, '.*\S.*')
-
-                    set_field(or_record.no_copyright, 'true')
-
-                    if exists(or_record.legal_status)
-
-                        remove_field(or_record.legal_status)
+                        end
 
                     end
 
-                    if exists(or_record.creativeCommons)
+                    if all_match(or_record.creator_name.legalStatus, '.*\S.*')
 
-                        remove_field(or_record.creativeCommons)
+                        unless exists(or_record.no_copyright)
 
-                    end
-
-                    if exists(or_record.rightsStatements)
-
-                        remove_field(or_record.rightsStatements)
-
-                    end
-
-                end
-
-                if all_match(or_record.creator_name.legalStatus, '.*\S.*')
-
-                    unless exists(or_record.no_copyright)
-
-                        if all_match(or_record.creator_name.legalStatus, 'Auteursrechtplichtig.*')
-
-                            copy_field(or_record.creator_name.legalStatus, or_record.legal_status)
-
-                            if all_match(or_record.creator_name.creativeCommons, '.*\S.*')
-
-                                copy_field(or_record.creator_name.creativeCommons, or_record.creativeCommons)
-
-                            else
-
-                                if exists(or_record.creativeCommons)
-
-                                    remove_field(or_record.creativeCommons)
-
-                                end
-
-                            end
-
-                            if all_match(or_record.creator_name.rightsStatements, '.*\S.*')
-
-                                copy_field(or_record.creator_name.rightsStatements, or_record.rightsStatements)
-
-                            else
-
-                                if exists(or_record.rightsStatements)
-
-                                    remove_field(or_record.rightsStatements)
-
-                                end
-
-                            end
-
-                        else
-
-                            unless exists(or_record.legal_status)
+                            if all_match(or_record.creator_name.legalStatus, 'Auteursrechtplichtig.*')
 
                                 copy_field(or_record.creator_name.legalStatus, or_record.legal_status)
 
@@ -3537,6 +3527,42 @@
 
                                 end
 
+                            else
+
+                                unless exists(or_record.legal_status)
+
+                                    copy_field(or_record.creator_name.legalStatus, or_record.legal_status)
+
+                                    if all_match(or_record.creator_name.creativeCommons, '.*\S.*')
+
+                                        copy_field(or_record.creator_name.creativeCommons, or_record.creativeCommons)
+
+                                    else
+
+                                        if exists(or_record.creativeCommons)
+
+                                            remove_field(or_record.creativeCommons)
+
+                                        end
+
+                                    end
+
+                                    if all_match(or_record.creator_name.rightsStatements, '.*\S.*')
+
+                                        copy_field(or_record.creator_name.rightsStatements, or_record.rightsStatements)
+
+                                    else
+
+                                        if exists(or_record.rightsStatements)
+
+                                            remove_field(or_record.rightsStatements)
+
+                                        end
+
+                                    end
+
+                                end
+
                             end
 
                         end
@@ -3547,52 +3573,54 @@
 
             end
 
-        end
-
-        remove_field(or_record.creator_name)
-
-    end
-
-    unless all_match(or_record.legal_status, '.*\S.*')
-
-        set_field(or_record.legal_status, 'Auteursrechtelijke bescherming niet bepaald')
-
-    end
-
-    lido_basevalue(
-        administrativeMetadata.rightsWorkWrap.rightsWorkSet.creditLine,
-        or_record.legal_status
-    )
-
-    if all_match(or_record.creativeCommons, '.*\S.*')
-
-        copy_field(or_record.creativeCommons, administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$append.conceptID._)
-        set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.source, 'Creative Commons')
-        set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.type, 'purl')
-
-    else
-
-        unless all_match(or_record.rightsStatements, '.*\S.*')
-
-            set_field(or_record.rightsStatements, 'http://rightsstatements.org/page/UND/1.0/')
+            remove_field(or_record.creator_name)
 
         end
 
+        unless all_match(or_record.legal_status, '.*\S.*')
+
+            set_field(or_record.legal_status, 'Auteursrechtelijke bescherming niet bepaald')
+
+        end
+
+        lido_basevalue(
+            administrativeMetadata.rightsWorkWrap.rightsWorkSet.creditLine,
+            or_record.legal_status
+        )
+
+        if all_match(or_record.creativeCommons, '.*\S.*')
+
+            copy_field(or_record.creativeCommons, administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$append.conceptID._)
+            set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.source, 'Creative Commons')
+            set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.type, 'purl')
+
+        else
+
+            unless all_match(or_record.rightsStatements, '.*\S.*')
+
+                set_field(or_record.rightsStatements, 'http://rightsstatements.org/page/UND/1.0/')
+
+            end
+
+        end
+
+        if all_match(or_record.rightsStatements, '.*\S.*')
+
+            copy_field(or_record.rightsStatements, administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$append.conceptID._)
+            set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.source, 'Rights Statements')
+            set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.type, 'purl')
+
+        end
+
+        remove_field(or_record.no_copyright)
+        remove_field(or_record.legal_status)
+        remove_field(or_record.creativeCommons)
+        remove_field(or_record.rightsStatements)
+        remove_field(creator_roles)
+
     end
 
-    if all_match(or_record.rightsStatements, '.*\S.*')
-
-        copy_field(or_record.rightsStatements, administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$append.conceptID._)
-        set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.source, 'Rights Statements')
-        set_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.rightsType.$last.conceptID.type, 'purl')
-
-    end
-
-    remove_field(or_record.no_copyright)
-    remove_field(or_record.legal_status)
-    remove_field(or_record.creativeCommons)
-    remove_field(or_record.rightsStatements)
-    remove_field(creator_roles)
+    remove_field(or_record.copyright)
 
 
 ## LIDO recordWrap
