@@ -10314,42 +10314,44 @@
         move_field(or_record.tmp, or_record.iiif_manifest.$append)
     end
 
-    do list(path: or_record.iiif_manifest, var: c)
+    copy_field(or_record.iiif_manifest, x)
+
+#    do list(path: or_record.iiif_manifest, var: c)
 
         # Add IIIF manifest from the ImageHub to LIDO resourceSet as LIDO resourceID
 
-        if all_match(c.manifest, '.*\S.*')
+#        if all_match(c.manifest, '.*\S.*')
 
-            copy_field(c.manifest, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
-            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
-            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubMSKGent")
-            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "IIIF Manifest")
-            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
+#            copy_field(c.manifest, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+#            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
+#            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubMSKGent")
+#            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "IIIF Manifest")
+#            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
 
-        end
+#        end
 
         # Add IIIF thumbnail from the ImageHub to LIDO resourceSet as LIDO resourceID
 
-        if all_match(c.thumbnail, '.*\S.*')
+#        if all_match(c.thumbnail, '.*\S.*')
 
-            copy_field(c.thumbnail, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
-            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
-            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubMSKGent")
-            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "thumbnail")
-            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
+#            copy_field(c.thumbnail, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+#            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
+#            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubMSKGent")
+#            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "thumbnail")
+#            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
 
-        end
+#        end
 
         # Add file checksum from DAM to LIDO resourceSet as LIDO resourceDescription
 
-        if all_match(c.checksum, '.*\S.*')
+#        if all_match(c.checksum, '.*\S.*')
 
-            copy_field(c.checksum, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription._)
-            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.type, "file-checksum")
+#            copy_field(c.checksum, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription._)
+#            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.type, "file-checksum")
 
-        end
+#        end
 
-    end
+#    end
 
     # Add representationpid from Adlib (if present) to LIDO resourceSet as LIDO resourceID and as LIDO linkResource
 
