@@ -1125,6 +1125,23 @@
             -lang: nl
         )
 
+        copy_field(m.material, m.material_translation)
+
+        lookup_in_store(m.material_translation, DBI, data_source: "dbi:SQLite:/tmp/import.Translations.sqlite")
+
+        if all_match(m.material_translation._id, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
+                m.material_translation.translation,
+                -pref: alternate,
+                -lang: en
+            )
+
+        end
+
+        remove_field(m.material_translation)
+
         # Retrieve the corresponding term and URI from the AAT vocabulary, these are not (yet) retrievable via TMS
 
         copy_field(m.subject, m.material_aat)

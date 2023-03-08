@@ -1968,6 +1968,23 @@
 
             end
 
+            copy_field(c.material, c.material_translation)
+
+            lookup_in_store(c.material_translation, DBI, data_source: "dbi:SQLite:/tmp/import.Translations.sqlite")
+
+            if all_match(c.material_translation._id, '.*\S.*')
+
+                lido_term(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
+                    c.material_translation.translation,
+                    -pref: alternate,
+                    -lang: en
+                )
+
+            end
+
+            remove_field(c.material_translation)
+
         end
 
         # Corresponding value in AAT, not (yet) retrievable via API
