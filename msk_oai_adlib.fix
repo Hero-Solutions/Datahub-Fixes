@@ -164,10 +164,13 @@
 #                                                                   lido:termMaterialsTech
 #                                                                       type: material
 #                                                                           lido:conceptID
-#   Material.material\.lref                                                     pref: preferred
+#   Material.material.source + term\.number                                     pref: preferred
 #                                                                               pref: alternate                                     identificatie materiaal
 #                                                                           lido:term
-#   Material.material                                                           pref: preferred             Materiaal               term materiaal
+#                                                                               pref: preferred
+#   Material.material.term                                                          lang: nl                Materiaal               term materiaal
+#   Material.material.notes                                                         lang: fr
+#   Material.material.notes                                                         lang: en
 #                                                                               pref: alternate
 #                                                                   lido:displayMaterialsTech
 #   physical_description                                                lang: nl
@@ -2477,69 +2480,271 @@
         move_field(or_record.tmp, or_record.materials.$append)
     end
 
-    # We'll have multiple terms: the corresponding value in AAT (type:alternate) and the value from the Adlib field material itself (type:preferred)
+    # We'll have multiple terms: the corresponding value in AAT from Flemish Art Collection concordance database (type:alternate) and the value from Adlib (type:preferred)
 
     do list(path: or_record.materials, var: c)
 
         # Value in Adlib
 
-        if all_match(c.material, '.*\S.*')
+        if all_match(c.material.term, '.*\S.*')
 
-            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, "material")
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, 'material')
 
-            if all_match('c.material\.lref', '.*\S.*')
+        else
 
-                lido_term(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
-                    c.material,
-                    -conceptid: 'c.material\.lref',
-                    -type: local,
-                    -source: Adlib,
-                    -pref: preferred,
-                    -lang: nl
-                )
+            if all_match(c.material.notes.0, '.*\S.*')
+
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, 'material')
 
             else
 
-                lido_term(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
-                    c.material,
-                    -pref: preferred,
-                    -lang: nl
-                )
+                if all_match(c.material.notes, '.*\S.*')
+
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, 'material')
+
+                else
+
+                    if all_match(c.material.source, '.*\S.*')
+
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, 'material')
+
+                    else
+
+                        if all_match(c.material.source.0, '.*\S.*')
+
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, 'material')
+
+                        else
+
+                            if all_match('c.material.term\.number', '.*\S.*')
+
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, 'material')
+
+                            else
+
+                                if all_match('c.material.term\.number.0', '.*\S.*')
+
+                                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, 'material')
+
+                                else
+
+                                    if all_match('c.material.term\.code', '.*\S.*')
+
+                                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, 'material')
+
+                                    else
+
+                                        if all_match('c.material.term\.code.0', '.*\S.*')
+
+                                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$append.materialsTech.termMaterialsTech.$append.type, 'material')
+
+                                        end
+
+                                    end
+
+                                end
+
+                            end
+
+                        end
+
+                    end
+
+                end
 
             end
 
         end
 
-        # Corresponding value in AAT, not (yet) retrievable via API
+        if all_match(c.material.term, '.*\S.*')
 
-        copy_field(c.material, c.material_aat)
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
+                c.material.term,
+                -pref: preferred,
+                -lang: nl
+            )
 
-        lookup_in_store(c.material_aat, DBI, data_source: "dbi:SQLite:/tmp/import.AAT_UTF8.sqlite")
+        end
 
-        if all_match(c.material_aat._id, '.*\S.*')
+        if all_match(c.material.notes, '.*\S.*')
 
-            if all_match(c.material_aat.aaturi, '.*\S.*')
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
+                c.material.notes,
+                -pref: preferred,
+                -lang: fr
+            )
 
-                lido_term(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
-                    c.material_aat.aatterm,
-                    -conceptid: c.material_aat.aaturi,
-                    -type: purl,
-                    -source: AAT,
-                    -pref: alternate,
-                    -lang: nl
-                )
+        end
+
+        if all_match(c.material.notes.0, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
+                c.material.notes.0,
+                -pref: preferred,
+                -lang: fr
+            )
+
+        end
+
+        if all_match(c.material.notes.1, '.*\S.*')
+
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
+                c.material.notes.1,
+                -pref: preferred,
+                -lang: en
+            )
+
+        end
+
+        unless is_array(c.material.source)
+            move_field(c.material.source, or_record.tmp)
+            set_array(c.material.source)
+            move_field(or_record.tmp, c.material.source.$append)
+        end
+
+        unless is_array('c.material.term\.number')
+            move_field('c.material.term\.number', or_record.tmp)
+            set_array('c.material.term\.number')
+            move_field(or_record.tmp, 'c.material.term\.number.$append')
+        end
+
+        unless is_array('c.material.term\.code')
+            move_field('c.material.term\.code', or_record.tmp)
+            set_array('c.material.term\.code')
+            move_field(or_record.tmp, 'c.material.term\.code.$append')
+        end
+
+        do list (path:'c.material.term\.number', var: n)
+
+            if all_match(n, '.*\S.*')
+
+                copy_field(n, c.material.source.$append.id)
 
             else
 
-                lido_term(
-                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
-                    c.material_aat.aatterm,
-                    -pref: alternate,
-                    -lang: nl
-                )
+                do list (path:'c.material.term\.code', var: t)
+
+                    if all_match(t, '.*\S.*')
+
+                        copy_field(t, c.material.source.$append.id)
+
+                    else
+
+                        add_field(c.material.source.$append.id, '')
+
+                    end
+
+                end
+
+            end
+
+            set_field(or_record.code, 'true')
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            do list (path:'c.material.term\.code', var: t)
+
+                if all_match(t, '.*\S.*')
+
+                    copy_field(t, c.material.source.$append.id)
+
+                else
+
+                    add_field(c.material.source.$append.id, '')
+
+                end
+
+                set_field(or_record.code, 'true')
+
+            end
+
+        end
+
+        unless all_match(or_record.code, 'true')
+
+            add_field(c.material.source.$append.id, '')
+
+        end
+
+        remove_field(or_record.code)
+
+        assoc(or_record.material_s, c.material.source.*.id, c.material.source.*)
+
+        do each (path: or_record.material_s, var: i)
+
+            if all_match(i.value, '.*\S.*')
+
+                copy_field(i.value, or_record.material_source)
+
+            end
+
+            if all_match(i.key, '.*\S.*')
+
+                paste(or_record.material_source, or_record.material_source, i.key, join_char:'')
+
+            end
+
+            if all_match(i.value, 'https?://vocab.getty.edu/page/aat/')
+
+                if all_match(or_record.material_source, '.*\S.*')
+
+                    lido_baseid(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last.conceptID,
+                        or_record.material_source,
+                        -type: purl,
+                        -pref: preferred
+                    )
+
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last.conceptID.$last.source, 'AAT')
+
+                end
+
+            end
+
+            remove_field(or_record.material_source)
+
+        end
+
+        remove_field(or_record.material_s)
+
+        # Corresponding value in AAT from Flemish Art Collection concordance database
+
+        if all_match(c.material.term, '.*\S.*')
+
+            copy_field(c.material.term, c.material_aat)
+
+            lookup_in_store(c.material_aat, DBI, data_source: "dbi:SQLite:/tmp/import.AAT_UTF8.sqlite")
+
+            if all_match(c.material_aat.aatterm, '.*\S.*')
+
+                if all_match(c.material_aat.aaturi, '.*\S.*')
+
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
+                        c.material_aat.aatterm,
+                        -conceptid: c.material_aat.aaturi,
+                        -type: purl,
+                        -source: AAT,
+                        -pref: alternate,
+                        -lang: nl
+                    )
+
+                else
+
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.termMaterialsTech.$last,
+                        c.material_aat.aatterm,
+                        -pref: alternate,
+                        -lang: nl
+                    )
+
+                end
 
             end
 
