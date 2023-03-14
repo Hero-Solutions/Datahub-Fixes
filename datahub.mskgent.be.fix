@@ -2461,19 +2461,19 @@
 
     do list(path: or_record.acquisition_source, var: c)
 
-        if all_match(c.acquisition\.source.name, '.*\S.*')
+        if all_match('c.acquisition\.source.name', '.*\S.*')
 
             add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
 
         else
 
-            if all_match(c.acquisition\.source.language_script.0, '.*\S.*')
+            if all_match('c.acquisition\.source.language_script.0', '.*\S.*')
 
                 add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
 
             else
 
-                if all_match(c.acquisition\.source.language_script, '.*\S.*')
+                if all_match('c.acquisition\.source.language_script', '.*\S.*')
 
                     add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
 
@@ -2483,41 +2483,41 @@
 
         end
 
-        if all_match(c.acquisition\.source.name, '.*\S.*')
+        if all_match('c.acquisition\.source.name', '.*\S.*')
 
             lido_basenameset(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$last,
-                c.acquisition\.source.name,
+                'c.acquisition\.source.name',
                 -value_lang: nl
             )
 
         end
 
-        if all_match(c.acquisition\.source.language_script, '.*\S.*')
+        if all_match('c.acquisition\.source.language_script', '.*\S.*')
 
             lido_basenameset(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$last,
-                c.acquisition\.source.language_script,
+                'c.acquisition\.source.language_script',
                 -value_lang: fr
             )
 
         end
 
-        if all_match(c.acquisition\.source.language_script.0, '.*\S.*')
+        if all_match('c.acquisition\.source.language_script.0', '.*\S.*')
 
             lido_basenameset(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$last,
-                c.acquisition\.source.language_script.0,
+                'c.acquisition\.source.language_script.0',
                 -value_lang: fr
             )
 
         end
 
-        if all_match(c.acquisition\.source.language_script.1, '.*\S.*')
+        if all_match('c.acquisition\.source.language_script.1', '.*\S.*')
 
             lido_basenameset(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$last,
-                c.acquisition\.source.language_script.1,
+                'c.acquisition\.source.language_script.1',
                 -value_lang: en
             )
 
