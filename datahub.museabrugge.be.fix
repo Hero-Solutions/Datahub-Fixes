@@ -817,6 +817,41 @@
 
     end
 
+# LIDO classification [type="collection presentation"]
+
+    unless is_array(or_record.part_of)
+        move_field(or_record.part_of, or_record.tmp)
+        set_array(or_record.part_of)
+        move_field(or_record.tmp, or_record.part_of.$append)
+    end
+
+    add_field(or_record.nonsearchable)
+
+    do list(path:or_record.part_of, var:r)
+
+        if all_match(r.part_of\.notes, 'nonsearchable')
+
+            set_field(or_record.nonsearchable, 'true')
+
+        end
+
+    end
+
+    unless all_match(or_record.nonsearchable, 'true')
+
+        set_field(or_record.collectionPresentation_term, "collection presentation")
+
+        lido_term(
+            descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+            or_record.collectionPresentation_term
+        )
+
+        remove_field(or_record.collectionPresentation_term)
+
+    end
+
+    remove_field(or_record.nonsearchable)
+
 
 ## LIDO objectIdentificationWrap
 
