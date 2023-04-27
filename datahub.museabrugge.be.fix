@@ -829,7 +829,7 @@
 
     do list(path:or_record.part_of, var:r)
 
-        if all_match(r.part_of\.notes, 'nonsearchable')
+        if all_match('r.part_of\.notes', 'nonsearchable')
 
             set_field(or_record.nonsearchable, 'true')
 
