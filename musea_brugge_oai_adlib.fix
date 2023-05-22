@@ -1453,7 +1453,7 @@
 
         end
 
-        add_field(escriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last.appellationValue.$last.label, "name-without-comma")
+        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last.appellationValue.$last.label, "name-without-comma")
 
     end
 
