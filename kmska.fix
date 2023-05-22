@@ -228,6 +228,7 @@
 #                                                             lido:nameActorSet
 #   vconstituents.DisplayName                                     pref: preferred                 Vervaardiger            naam vervaardiger
 #                                                                 pref: alternate
+#                                                                 label: name-without-comma
 #                                                             lido:vitalDatesActor
 #   vconstituents.BeginDateISO                                    lido:earliestDate
 #   vconstituents.EndDateISO                                      lido:latestDate
@@ -947,6 +948,25 @@
                 -source: Wikidata,
                 -type: purl
             )
+
+        end
+
+        # Creator name notation: first name followed by last name
+
+        unless all_match(c.role_nl, 'vroegere toeschrijving')
+
+            if all_match(c.DisplayName, '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                    c.DisplayName,
+                    -value_pref: alternate,
+                    -value_lang: nl
+                )
+
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last.appellationValue.$last.label, "name-without-comma")
+
+            end
 
         end
 
