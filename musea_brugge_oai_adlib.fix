@@ -1426,34 +1426,38 @@
 
         # Creator name notation: first name followed by last name
 
-        if all_match(c.creator.name, '.*,.*')
+        if all_match(c.creator.name, '.*\S.*')
 
-            split_field(c.creator.name, ',')
+            if all_match(c.creator.name, '.*,.*')
 
-            trim(c.creator.name.0)
-            trim(c.creator.name.1)
+                split_field(c.creator.name, ',')
 
-            paste(or_record.creator_name_without_comma, c.creator.name.1, c.creator.name.0, join_char:" ")
+                trim(c.creator.name.0)
+                trim(c.creator.name.1)
 
-            lido_basenameset(
-                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
-                or_record.creator_name_without_comma,
-                -value_pref: alternate,
-                -value_lang: nl
-            )
+                paste(or_record.creator_name_without_comma, c.creator.name.1, c.creator.name.0, join_char:" ")
 
-        else
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                    or_record.creator_name_without_comma,
+                    -value_pref: alternate,
+                    -value_lang: nl
+                )
 
-            lido_basenameset(
-                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
-                c.creator.name,
-                -value_pref: alternate,
-                -value_lang: nl
-            )
+            else
+
+                lido_basenameset(
+                    descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                    c.creator.name,
+                    -value_pref: alternate,
+                    -value_lang: nl
+                )
+
+            end
+
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last.appellationValue.$last.label, "name-without-comma")
 
         end
-
-        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last.appellationValue.$last.label, "name-without-comma")
 
     end
 
