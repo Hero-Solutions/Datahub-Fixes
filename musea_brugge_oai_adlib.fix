@@ -123,6 +123,7 @@
 #                                                                           pref: preferred
 #   Production.creator.name                                                 lang: nl                        Vervaardiger            naam vervaardiger
 #                                                                           pref: alternate
+#                                                                           label: name-without-comma
 #                                                                       lido:vitalDatesActor
 #   Production.creator\.date_of_birth                                       lido:earliestDate
 #   Production.creator\.date_of_death                                       lido:latestDate
@@ -1422,6 +1423,37 @@
             end
 
         end
+
+        # Creator name notation: first name followed by last name
+
+        if all_match(c.creator.name, '.*,.*')
+
+            split_field(c.creator.name, ',')
+
+            trim(c.creator.name.0)
+            trim(c.creator.name.1)
+
+            paste(or_record.creator_name_without_comma, c.creator.name.1, c.creator.name.0, join_char:" ")
+
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                or_record.creator_name_without_comma,
+                -value_pref: alternate,
+                -value_lang: nl
+            )
+
+        else
+
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                c.creator.name,
+                -value_pref: alternate,
+                -value_lang: nl
+            )
+
+        end
+
+        add_field(escriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last.appellationValue.$last.label, "name-without-comma")
 
     end
 
