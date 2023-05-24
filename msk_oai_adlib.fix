@@ -2023,7 +2023,7 @@
 
             if all_match(c.creator_pid.viaf_uri, '.*\S.*')
 
-                replace_all(c.creator_pid.viaf_uri, 'http://(.*), 'https://$1')
+                replace_all(c.creator_pid.viaf_uri, 'http://(.*)', 'https://$1')
 
                 lido_baseid(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
@@ -2042,7 +2042,7 @@
 
             if all_match(c.creator_pid.rkd_uri, '.*\S.*')
 
-                replace_all(c.creator_pid.rkd_uri, 'http://(.*), 'https://$1')
+                replace_all(c.creator_pid.rkd_uri, 'http://(.*)', 'https://$1')
 
                 lido_baseid(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
@@ -2061,7 +2061,7 @@
 
             if all_match(c.creator_pid.wikidata_uri, '.*\S.*')
 
-                replace_all(c.creator_pid.wikidata_uri, 'http://(.*), 'https://$1')
+                replace_all(c.creator_pid.wikidata_uri, 'http://(.*)', 'https://$1')
 
                 lido_baseid(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
