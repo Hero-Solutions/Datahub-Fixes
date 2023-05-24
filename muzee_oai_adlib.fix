@@ -1427,6 +1427,12 @@
 
         do list (path: c.creator_source, var: s)
 
+            if all_match(s.source, 'http://.*')
+
+                replace_all(s.source, 'http://(.*), 'https://$1')
+
+            end
+
             if all_match(s.source, 'https?://viaf.org/viaf/')
 
                 if all_match('s.source\.number', '.*\S.*')
@@ -1490,6 +1496,8 @@
 
             if all_match(c.creator_pid.viaf_uri, '.*\S.*')
 
+                replace_all(c.creator_pid.viaf_uri, 'http://(.*), 'https://$1')
+
                 lido_baseid(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
                     c.creator_pid.viaf_uri,
@@ -1507,6 +1515,8 @@
 
             if all_match(c.creator_pid.rkd_uri, '.*\S.*')
 
+                replace_all(c.creator_pid.rkd_uri, 'http://(.*), 'https://$1')
+
                 lido_baseid(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
                     c.creator_pid.rkd_uri,
@@ -1523,6 +1533,8 @@
         unless in(c.creator_wikidata, c.creator_pid.wikidata_uri)
 
             if all_match(c.creator_pid.wikidata_uri, '.*\S.*')
+
+                replace_all(c.creator_pid.wikidata_uri, 'http://(.*), 'https://$1')
 
                 lido_baseid(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,

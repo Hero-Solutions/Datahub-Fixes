@@ -916,6 +916,8 @@
 
         if all_match(c.creator.pid.viaf_uri, '.*\S.*')
 
+            replace_all(c.creator.pid.viaf_uri, 'http://(.*), 'https://$1')
+
             lido_baseid(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
                 c.creator.pid.viaf_uri,
@@ -929,6 +931,8 @@
 
         if all_match(c.creator.pid.rkd_uri, '.*\S.*')
 
+            replace_all(c.creator.pid.rkd_uri, 'http://(.*), 'https://$1')
+
             lido_baseid(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
                 c.creator.pid.rkd_uri,
@@ -941,6 +945,8 @@
         # Add the corresponding Wikidata URI from the creators vocabulary (if present) to LIDO eventActor as LIDO actorID (source:Wikidata)
 
         if all_match(c.creator.pid.wikidata_uri, '.*\S.*')
+
+            replace_all(c.creator.pid.wikidata_uri, 'http://(.*), 'https://$1')
 
             lido_baseid(
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
