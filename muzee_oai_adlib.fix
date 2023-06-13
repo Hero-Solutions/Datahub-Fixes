@@ -159,6 +159,7 @@
 #   Production.creator.name                                                 lang: nl                        Vervaardiger            naam vervaardiger
 #                                                                           pref: alternate
 #                                                                           label: name-without-comma
+#                                                                           label: name-with-comma
 #                                                                       lido:vitalDatesActor
 #   Production.creator\.date_of_birth                                       lido:earliestDate
 #   Production.creator\.date_of_death                                       lido:latestDate
@@ -1549,18 +1550,20 @@
 
         end
 
-        # Creator name notation: first name followed by last name
+        # Creator name notation
 
         if all_match(c.creator.name, '.*\S.*')
 
             if all_match(c.creator.name, '.*,.*')
 
-                split_field(c.creator.name, ',')
+                copy_field(c.creator.name, or_record.creator_name_without_comma)
 
-                trim(c.creator.name.0)
-                trim(c.creator.name.1)
+                split_field(or_record.creator_name_without_comma, ',')
 
-                paste(or_record.creator_name_without_comma, c.creator.name.1, c.creator.name.0, join_char:" ")
+                trim(or_record.creator_name_without_comma.0)
+                trim(or_record.creator_name_without_comma.1)
+
+                paste(or_record.creator_name_without_comma, or_record.creator_name_without_comma.1, or_record.creator_name_without_comma.0, join_char:" ")
 
                 lido_basenameset(
                     descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
@@ -1581,6 +1584,15 @@
             end
 
             add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last.appellationValue.$last.label, "name-without-comma")
+
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                c.creator.name,
+                -value_pref: alternate,
+                -value_lang: nl
+            )
+
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last.appellationValue.$last.label, "name-with-comma")
 
         end
 
