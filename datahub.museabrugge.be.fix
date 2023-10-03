@@ -34,6 +34,7 @@
     copy_field('_metadata.production\.period', or_record.production_period)
     copy_field('_metadata.production\.period\.lref', or_record.production_period_id)
     copy_field(_metadata.Material, or_record.materials)
+    copy_field(_metadata.notes, or_record.notes)
     copy_field(_metadata.physical_description, or_record.physical_description)
     copy_field('_metadata.content\.motif\.general', or_record.content_motif_general)
     copy_field('_metadata.content\.motif\.general\.lref', or_record.content_motif_general_id)
@@ -84,6 +85,8 @@
 #                                                               lido:term
 #                                                           type: collection
 #   collection                                                  lido:term
+#                                                           no type
+#   notes                                                       lido:term
 #                                                       lido:titleSet
 #   Title.title\.type                                       type
 #   Title.title                                                 pref: preferred                                                     titel
@@ -851,6 +854,31 @@
     end
 
     remove_field(or_record.nonsearchable)
+
+# LIDO classification
+
+    unless is_array(or_record.notes)
+        move_field(or_record.notes, or_record.tmp)
+        set_array(or_record.notes)
+        move_field(or_record.tmp, or_record.notes.$append)
+    end
+
+    do list(path:or_record.notes, var:n)
+
+        if all_match(n, 'topstuk')
+
+            set_field(or_record.masterpiece_term, "masterpiece")
+
+            lido_term(
+                descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+                or_record.masterpiece_term
+            )
+
+            remove_field(or_record.masterpiece_term)
+
+        end
+
+    end
 
 
 ## LIDO objectIdentificationWrap
