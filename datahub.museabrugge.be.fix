@@ -1357,13 +1357,11 @@
 
         do list (path: c.creator_source, var: s)
 
-            if in(s.source, 'viaf')
+            if all_match(s.source, 'https://viaf.org/viaf/')
 
                 if all_match('s.source\.number', '.*\S.*')
 
-                    set_field(c.creator_source_viaf, 'https://viaf.org/viaf/')
-
-                    paste(c.creator_viaf, c.creator_source_viaf, 's.source\.number', join_char:'')
+                    paste(c.creator_viaf, s.source, 's.source\.number', join_char:'')
 
                     lido_baseid(
                         descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
@@ -1376,45 +1374,59 @@
 
                 end
 
-            end
+            else
 
-            if in(s.source, 'rkd')
+                if all_match(s.source, 'https://rkd.nl/explore/artists/')
 
-                if all_match('s.source\.number', '.*\S.*')
+                    if all_match('s.source\.number', '.*\S.*')
 
-                    set_field(c.creator_source_rkd, 'https://rkd.nl/explore/artists/')
+                        paste(c.creator_rkd, s.source, 's.source\.number', join_char:'')
 
-                    paste(c.creator_rkd, c.creator_source_rkd, 's.source\.number', join_char:'')
+                        lido_baseid(
+                            descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                            c.creator_rkd,
+                            -source: RKD,
+                            -type: purl
+                        )
 
-                    lido_baseid(
-                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
-                        c.creator_rkd,
-                        -source: RKD,
-                        -type: purl
-                    )
+                        set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
 
-                    set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+                    end
 
-                end
+                else
 
-            end
+                    if all_match(s.source, 'https://www.wikidata.org/wiki/')
 
-            if in(s.source, 'wikidata')
+                        if all_match('s.source\.number', '.*\S.*')
 
-                if all_match('s.source\.number', '.*\S.*')
+                            paste(c.creator_wikidata, s.source, 's.source\.number', join_char:'')
 
-                    set_field(c.creator_source_wikidata, 'https://www.wikidata.org/wiki/')
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                c.creator_wikidata,
+                                -source: Wikidata,
+                                -type: purl
+                            )
 
-                    paste(c.creator_wikidata, c.creator_source_wikidata, 's.source\.number', join_char:'')
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
 
-                    lido_baseid(
-                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
-                        c.creator_wikidata,
-                        -source: Wikidata,
-                        -type: purl
-                    )
+                        end
 
-                    set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+                    else
+
+                        if all_match(s.source, '.*\S.*')
+
+                            lido_baseid(
+                                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                                s.source,
+                                -type: url
+                            )
+
+                            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID.$last.pref, 'preferred')
+
+                        end
+
+                    end
 
                 end
 
