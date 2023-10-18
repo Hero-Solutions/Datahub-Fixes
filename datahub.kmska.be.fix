@@ -3189,23 +3189,19 @@
 
     do list(path:or_record.translations.db.translations, var:t)
 
-        unless exists(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine)
+        # Add a new, empty LIDO rightsWorkSet field (if lender is present)
 
-            # Add a new, empty LIDO rightsWorkSet field (if lender is present)
+        set_array(translations, "181", "182", "183", "184", "185", "186", "187", "188")
 
-            set_array(translations, "181", "182", "183", "184", "185", "186", "187", "188")
+        if in(t.textTypeID, translations)
 
-            if in(t.textTypeID, translations)
-
-                add_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$append)
-
-            end
-
-            # Remove the created field translations
-
-            remove_field(translations)
+            add_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$append)
 
         end
+
+        # Remove the created field translations
+
+        remove_field(translations)
 
         if all_match(t.textTypeID, '181')
 
