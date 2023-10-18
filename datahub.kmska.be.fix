@@ -3187,6 +3187,8 @@
 
     # Add the lender to LIDO creditLine
 
+    set_field(or_record.lender, 'false')
+
     do list(path:or_record.translations.db.translations, var:t)
 
         # Add a new, empty LIDO rightsWorkSet field (if lender is present)
@@ -3195,7 +3197,19 @@
 
         if in(t.textTypeID, translations)
 
+            set_field(or_record.lender, 'true')
+
+        end
+
+    end
+
+    do list(path:or_record.translations.db.translations, var:t)
+
+        if all_match(or_record.lender, 'true')
+
             add_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$append)
+
+            set_field(or_record.lender, 'false')
 
         end
 
@@ -3292,6 +3306,8 @@
         end
 
     end
+
+    remove_field(or_record.lender)
 
 # LIDO recordID
 
