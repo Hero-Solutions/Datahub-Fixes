@@ -3118,6 +3118,73 @@
 
 # LIDO rightsWorkWrap
 
+    # Loop over the different constituents from TMS
+
+    do list(path:or_record.constituentWrap.db.constituents, var:c)
+
+        # Copy the copyright notice for each constituent from TMS
+
+        copy_field(c.copyright, or_record.copyrights.$append)
+
+    end
+
+    # Loop over the created array with copyright notices
+
+    do list(path:or_record.copyrights, var: c)
+
+        # Remove unnecessary whitespaces
+
+        trim(c)
+
+        # If one of the copyright notices contains "SABAM", use this copyright notice
+
+        if all_match(c, '.*SABAM.*')
+
+            copy_field(c, or_record.copyright)
+
+        else
+
+            unless exists(or_record.copyright)
+
+                copy_field(c, or_record.copyright)
+
+            end
+
+        end
+
+    end
+
+    # If the copyright notice is "CC0", add this to LIDO rightsType as LIDO term along with the URI from creativecommons.org as LIDO conceptID
+
+    if all_match(or_record.copyright, '.*\S.*')
+
+        # Add a new, empty LIDO rightsWorkSet
+
+        add_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$append)
+
+        if all_match(or_record.copyright, 'CC0')
+
+            set_field(or_record.copyrightUrl, 'https://creativecommons.org/publicdomain/zero/1.0/')
+
+            lido_term(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.rightsType,
+                or_record.copyright,
+                -conceptid: or_record.copyrightUrl,
+                -source: 'Creative Commons',
+                -type: 'purl'
+            )
+
+        end
+
+        # Add the copyright notice to LIDO creditLine
+
+        lido_basevalue(
+            administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
+            or_record.copyright
+        )
+
+    end
+
     # Add the lender to LIDO creditLine
 
     do list(path:or_record.translations.db.translations, var:t)
@@ -3227,73 +3294,6 @@
             )
 
         end
-
-    end
-
-    # Loop over the different constituents from TMS
-
-    do list(path:or_record.constituentWrap.db.constituents, var:c)
-
-        # Copy the copyright notice for each constituent from TMS
-
-        copy_field(c.copyright, or_record.copyrights.$append)
-
-    end
-
-    # Loop over the created array with copyright notices
-
-    do list(path:or_record.copyrights, var: c)
-
-        # Remove unnecessary whitespaces
-
-        trim(c)
-
-        # If one of the copyright notices contains "SABAM", use this copyright notice
-
-        if all_match(c, '.*SABAM.*')
-
-            copy_field(c, or_record.copyright)
-
-        else
-
-            unless exists(or_record.copyright)
-
-                copy_field(c, or_record.copyright)
-
-            end
-
-        end
-
-    end
-
-    # If the copyright notice is "CC0", add this to LIDO rightsType as LIDO term along with the URI from creativecommons.org as LIDO conceptID
-
-    if all_match(or_record.copyright, '.*\S.*')
-
-        # Add a new, empty LIDO rightsWorkSet
-
-        add_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$append)
-
-        if all_match(or_record.copyright, 'CC0')
-
-            set_field(or_record.copyrightUrl, 'https://creativecommons.org/publicdomain/zero/1.0/')
-
-            lido_term(
-                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.rightsType,
-                or_record.copyright,
-                -conceptid: or_record.copyrightUrl,
-                -source: 'Creative Commons',
-                -type: 'purl'
-            )
-
-        end
-
-        # Add the copyright notice to LIDO creditLine
-
-        lido_basevalue(
-            administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
-            or_record.copyright
-        )
 
     end
 
