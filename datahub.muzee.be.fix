@@ -2453,13 +2453,16 @@
 
         if all_match('r.related_object\.notes', '.*\S.*')
 
-            copy_field('r.related_object\.notes', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.displayRelatedWork.$append._)
+            copy_field('r.related_object\.notes', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.displayRelatedWork._)
 
         end
 
         if all_match('r.related_object\.title', '.*\S.*')
 
-            copy_field('r.related_object\.title', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.$append._)
+            lido_basenameset(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName,
+                'r.related_object\.title'
+            )
 
         end
 
