@@ -2400,7 +2400,7 @@
 
         else
 
-            if all_match('r.related_object\.association', '.*\S.*')
+            if all_match('r.related_object\.notes', '.*\S.*')
 
                 add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
                 set_field(r.relation_exists, 'true')
@@ -2414,7 +2414,7 @@
 
                 else
 
-                    if all_match('r.related_object\.notes', '.*\S.*')
+                    if all_match('r.related_object\.association', '.*\S.*')
 
                         add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
                         set_field(r.relation_exists, 'true')
@@ -2451,26 +2451,23 @@
 
         end
 
-        if all_match('r.related_object\.association', '.*\S.*')
+        if all_match('r.related_object\.notes', '.*\S.*')
 
-            copy_field('r.related_object\.association', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.displayRelatedWork.$append._)
+            copy_field('r.related_object\.notes', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.displayRelatedWork.$append._)
 
         end
 
         if all_match('r.related_object\.title', '.*\S.*')
 
-            lido_basenameset(
-                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName,
-                'r.related_object\.title'
-            )
+            copy_field('r.related_object\.title', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.$append._)
 
         end
 
-        if all_match('r.related_object\.notes', '.*\S.*')
+        if all_match('r.related_object\.association', '.*\S.*')
 
             lido_term(
                 descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWorkRelType,
-                'r.related_object\.notes'
+                'r.related_object\.association'
             )
 
         else
