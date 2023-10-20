@@ -2292,6 +2292,29 @@
         if all_match(r.parts_reference, '.*\S.*')
 
             add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+            set_field(r.parts_exists, 'true')
+
+        else
+
+            if all_match('r.parts\.notes', '.*\S.*')
+
+                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+                set_field(r.parts_exists, 'true')
+
+            else
+
+                if all_match('r.parts\.title', '.*\S.*')
+
+                    add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+                    set_field(r.parts_exists, 'true')
+
+                end
+
+            end
+
+        end
+
+        if all_match(r.parts_reference, '.*\S.*')
 
             lido_baseid(
                 descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
@@ -2313,6 +2336,25 @@
 
             end
 
+        end
+
+        if all_match('r.parts\.notes', '.*\S.*')
+
+            copy_field('r.parts\.notes', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.displayRelatedWork._)
+
+        end
+
+        if all_match('r.parts\.title', '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName,
+                'r.parts\.title'
+            )
+
+        end
+
+        if all_match(r.parts_exists, 'true')
+
             set_field(r.relationshipEn, 'Has Part')
             set_field(r.relationshipURI, 'http://purl.org/dc/terms/hasPart')
 
@@ -2327,6 +2369,7 @@
 
         end
 
+        remove_field(r.parts_exists)
         remove_field(r.object_number)
         remove_field(r.relationshipEn)
         remove_field(r.relationshipURI)
@@ -2344,6 +2387,29 @@
         if all_match(r.part_of_reference, '.*\S.*')
 
             add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+            set_field(r.part_of_exists, 'true')
+
+        else
+
+            if all_match('r.part_of\.notes', '.*\S.*')
+
+                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+                set_field(r.part_of_exists, 'true')
+
+            else
+
+                if all_match('r.part_of\.title', '.*\S.*')
+
+                    add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append)
+                    set_field(r.part_of_exists, 'true')
+
+                end
+
+            end
+
+        end
+
+        if all_match(r.part_of_reference, '.*\S.*')
 
             lido_baseid(
                 descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
@@ -2365,6 +2431,25 @@
 
             end
 
+        end
+
+        if all_match('r.part_of\.notes', '.*\S.*')
+
+            copy_field('r.part_of\.notes', descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.displayRelatedWork._)
+
+        end
+
+        if all_match('r.part_of\.title', '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName,
+                'r.part_of\.title'
+            )
+
+        end
+
+        if all_match(r.part_of_exists, 'true')
+
             set_field(r.relationshipEn, 'Is Part Of')
             set_field(r.relationshipURI, 'http://purl.org/dc/terms/isPartOf')
 
@@ -2379,6 +2464,7 @@
 
         end
 
+        remove_field(r.part_of_exists)
         remove_field(r.object_number)
         remove_field(r.relationshipEn)
         remove_field(r.relationshipURI)
