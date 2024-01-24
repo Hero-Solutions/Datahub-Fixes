@@ -2047,6 +2047,72 @@
 
         end
 
+        if all_match(c.EnglishDisplay, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                c.EnglishDisplay,
+                -value_pref: preferred,
+                -value_lang: en
+            )
+
+        end
+
+        if all_match(c.GermanDisplay, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                c.GermanDisplay,
+                -value_pref: preferred,
+                -value_lang: de
+            )
+
+        end
+
+        if all_match(c.ItalianDisplay, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                c.ItalianDisplay,
+                -value_pref: preferred,
+                -value_lang: it
+            )
+
+        end
+
+        if all_match(c.SpanishDisplay, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                c.SpanishDisplay,
+                -value_pref: preferred,
+                -value_lang: es
+            )
+
+        end
+
+        if all_match(c.RussianDisplay, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                c.RussianDisplay,
+                -value_pref: preferred,
+                -value_lang: ru
+            )
+
+        end
+
+        if all_match(c.ChineseDisplay, '.*\S.*')
+
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                c.ChineseDisplay,
+                -value_pref: preferred,
+                -value_lang: zh
+            )
+
+        end
+
         # Retrieve the corresponding values from the creators vocabulary
 
         unless all_match(c.role_nl, 'vroegere toeschrijving')
