@@ -2036,6 +2036,14 @@
 
         end
 
+        if all_match(c.FrenchDisplay, '.*\S.*')
+
+            copy_field(c.FrenchDisplay, descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.appellationValue.$append._)
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.appellationValue.$last.pref, "preferred")
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.appellationValue.$last.lang, "fr")
+
+        end
+
         # Retrieve the corresponding values from the creators vocabulary
 
         unless all_match(c.role_nl, 'vroegere toeschrijving')
