@@ -739,6 +739,15 @@
 
 # LIDO classification
 
+    # Add term "artwork" to all artworks
+
+    set_field(or_record.classification_artwork_term, "artwork")
+
+    lido_term(
+        descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+        or_record.classification_artwork_term
+    )
+
     # Highlights
 
     # Add term "highlights" from TMS (if present) to LIDO classification as LIDO term
