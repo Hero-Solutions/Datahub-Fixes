@@ -1666,7 +1666,7 @@
 
         # Create library link
 
-        prepend(or_record.linkLibrary, 'http://anet.be/record/opackmska/')
+        prepend(or_record.linkLibrary, 'https://anet.be/record/kmska/opackmska/')
 
         # Add the created library link to last created LIDO relatedWorkSet
 
