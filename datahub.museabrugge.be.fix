@@ -88,9 +88,9 @@
 #                                                           no type
 #   notes                                                       lido:term
 #                                                       lido:titleSet
-#   Title.title\.type                                       type
-#   Title.title                                                 pref: preferred                                                     titel
-#   Titel_translation.title\.translation                        pref: alternate
+#   Title.title                                             lang: nl                                                                titel
+#   Titel_translation.title\.translation                    lang: fr
+#   Titel_translation.title\.translation                    lang: en
 #                                                       lido:inscriptions
 #   Inscription.inscription\.content                        lido:inscriptionTranscription
 #                                                           lido:inscriptionDescription
@@ -893,17 +893,18 @@
 
     do list(path: or_record.title, var: c)
 
-        if all_match(c.title, '.*\S.*')
+        unless all_match(or_record.dutch_title, 'true')
 
-            lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$append,
-                c.title,
-                -value_pref: preferred
-            )
+            if all_match(c.title, '.*\S.*')
 
-            if all_match('c.title\.type', '.*\S.*')
+                set_field(or_record.dutch_title, 'true')
 
-                copy_field('c.title\.type', descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$last.type)
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$append,
+                    c.title,
+                    -value_pref: preferred,
+                    -value_lang: nl
+                )
 
             end
 
@@ -911,23 +912,141 @@
 
     end
 
-    unless is_array(or_record.title_translation) 
+    remove_field(or_record.dutch_title)
+
+    unless is_array(or_record.title_translation)
         move_field(or_record.title_translation, or_record.tmp)
         set_array(or_record.title_translation)
         move_field(or_record.tmp, or_record.title_translation.$append)
     end
 
+    set_field(or_record.count, '0')
+
     do list(path: or_record.title_translation, var: c)
 
-        if all_match('c.title\.translation', '.*\S.*')
+        if all_match('c.title\.language', 'Frans')
 
-            lido_basenameset(
-                descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$first,
-                'c.title\.translation',
-                -value_pref: alternate
-            )
+            if all_match('c.title\.translation', '.*\S.*')
+
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$first,
+                    'c.title\.translation',
+                    -value_pref: preferred,
+                    -value_lang: fr
+                )
+
+            end
+
+        else
+
+            if all_match('c.title\.language', 'Engels')
+
+                if all_match('c.title\.translation', '.*\S.*')
+
+                    lido_basenameset(
+                        descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$first,
+                        'c.title\.translation',
+                        -value_pref: preferred,
+                        -value_lang: en
+                    )
+
+                end
+
+            else
+
+                if all_match('c.title\.language', 'Duits')
+
+                    if all_match('c.title\.translation', '.*\S.*')
+
+                        lido_basenameset(
+                            descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$first,
+                            'c.title\.translation',
+                            -value_pref: preferred,
+                            -value_lang: de
+                        )
+
+                    end
+
+                else
+
+                    if all_match(or_record.count, '0')
+
+                        if all_match('c.title\.translation', '.*\S.*')
+
+                            lido_basenameset(
+                                descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$first,
+                                'c.title\.translation',
+                                -value_pref: preferred,
+                                -value_lang: fr
+                            )
+
+                        end
+
+                        set_field(or_record.count, '1')
+
+                    else
+
+                        if all_match(or_record.count, '1')
+
+                            if all_match('c.title\.translation', '.*\S.*')
+
+                                lido_basenameset(
+                                    descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$first,
+                                    'c.title\.translation',
+                                    -value_pref: preferred,
+                                    -value_lang: en
+                                )
+
+                            end
+
+                            set_field(or_record.count, '2')
+
+                        else
+
+                            if all_match(or_record.count, '2')
+
+                                if all_match('c.title\.translation', '.*\S.*')
+
+                                    lido_basenameset(
+                                        descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$first,
+                                        'c.title\.translation',
+                                        -value_pref: preferred,
+                                        -value_lang: de
+                                    )
+
+                                end
+
+                                set_field(or_record.count, '3')
+
+                            else
+
+                                if all_match('c.title\.translation', '.*\S.*')
+
+                                    lido_basenameset(
+                                        descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$first,
+                                        'c.title\.translation',
+                                        -value_pref: alternate
+                                    )
+
+                                end
+
+                            end
+
+                        end
+
+                    end
+
+                end
+
+            end
 
         end
+
+    end
+
+    if exists(or_record.count)
+
+        remove_field(or_record.count)
 
     end
 
@@ -973,6 +1092,9 @@
 
 
         if all_match('c.inscription\.content', '.*\S.*')
+
+            replace_all('c.inscription\.content', '<br>', '\n')
+            replace_all('c.inscription\.content', '<[^>]+>', '')
 
             copy_field('c.inscription\.content', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionTranscription._)
 

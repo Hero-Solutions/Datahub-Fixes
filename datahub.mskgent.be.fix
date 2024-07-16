@@ -1537,6 +1537,9 @@
 
         if all_match('c.inscription\.content', '.*\S.*')
 
+            replace_all('c.inscription\.content', '<br>', '\n')
+            replace_all('c.inscription\.content', '<[^>]+>', '')
+
             copy_field('c.inscription\.content', descriptiveMetadata.objectIdentificationWrap.inscriptionsWrap.inscriptions.$last.inscriptionTranscription._)
             copy_field('c.inscription\.content', or_record.inscription_content)
 
