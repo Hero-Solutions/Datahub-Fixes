@@ -147,7 +147,7 @@ do list(path:filteredDescriptiveMetadata.objectIdentificationWrap.titleWrap.titl
     end
 end
 
-# If no preferred nl title exists, try to get any title from LIDO
+# If no preferred nl title exists, try to get any preferred title from LIDO
 
 unless all_match(title_display, '.*\S.*')
     do list(path:filteredDescriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.0.appellationValue, var:el)
