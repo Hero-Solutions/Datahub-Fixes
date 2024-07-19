@@ -752,6 +752,13 @@
             or_record.classification_artwork_term
         )
 
+        set_field(or_record.classification_collection_catalogue_term, "collection catalogue")
+
+        lido_term(
+            descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+            or_record.classification_collection_catalogue_term
+        )
+
     end
 
     # Highlights
