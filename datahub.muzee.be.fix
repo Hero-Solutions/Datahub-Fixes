@@ -2758,11 +2758,11 @@
 
             if all_match(c.digital_reference, '.*\S.*')
 
-                copy_field(c.digital_reference, administrativeMetadata.resourceWrap.resourceSet.resourceID._)
-                add_field(administrativeMetadata.resourceWrap.resourceSet.resourceID.type, "purl")
-                add_field(administrativeMetadata.resourceWrap.resourceSet.resourceID.label, "representationPID")
+                copy_field(c.digital_reference, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+                add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
+                add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.label, "representationPID")
 
-                copy_field(c.digital_reference, administrativeMetadata.resourceWrap.resourceSet.resourceRepresentation.linkResource._)
+                copy_field(c.digital_reference, administrativeMetadata.resourceWrap.resourceSet.$last.resourceRepresentation.linkResource._)
 
             end
 
