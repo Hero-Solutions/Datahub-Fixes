@@ -743,7 +743,7 @@
 
     # Add term "artwork" to all artworks
 
-    if all_match(or_record.DepartmentID, '1')
+    if all_match(or_record.DepartmentID, '^1$')
 
         set_field(or_record.classification_artwork_term, "artwork")
 
