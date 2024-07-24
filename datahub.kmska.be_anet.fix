@@ -1,0 +1,2100 @@
+# Catmandu Fix
+#
+# Institution: Royal Museum for Fine Arts Antwerp
+# Description: Converts Adlib Structured XML exposed via ErfgoedInzicht OAI to LIDO 1.0
+# Created: 24/6/2024
+
+### Prepare an intermediate structure
+
+# Copy relevant fields in order to create a dedicated lido structure
+
+copy_field(_metadata.loi, or_record.loi)
+copy_field(_metadata.zhrmaterialstechniques.li, or_record.materials_techniques)
+copy_field(_metadata.zhridentity.li, or_record.identity)
+copy_field(_metadata.zhridentity, or_record.catlevel)
+copy_field(_metadata.zhraccessuse.li, or_record.access_use)
+copy_field(_metadata.zhrassociations.li, or_record.associations)
+copy_field(_metadata.zhrdimensions.li, or_record.dimensions)
+copy_field(_metadata.zhrdocumentation.li, or_record.documentation)
+copy_field(_metadata.zhrisad.li, or_record.isad)
+copy_field(_metadata.zhrlocation.li, or_record.location)
+copy_field(_metadata.zhrproduction.li, or_record.production)
+copy_field(_metadata.zhrrelations.li, or_record.relations)
+copy_field(_metadata.zhrsubjects.li, or_record.subjects)
+copy_field(_metadata.zhrsubjects, or_record.subjglob)
+copy_field(_metadata.identifier, or_record.identifier)
+copy_field(_metadata.short, or_record.short_description)
+
+# Remove all Adlib fields, retaining only the fields to create the lido structure
+
+retain(or_record)
+
+# Map LOI to lidoRecID
+if all_match(or_record.loi, '.*\S.*')
+    copy_field(or_record.loi, or_record.lidoRecID)
+    prepend(or_record.lidoRecID, 'oai:datahub.kmska.be:kmska.be:')
+    lido_baseid(
+        lidoRecID,
+        or_record.lidoRecID,
+        -type: urn
+    )
+end
+
+# Map LOI to recordID
+if all_match(or_record.loi, '.*\S.*')
+    lido_baseid(
+        administrativeMetadata.recordWrap.recordID,
+        or_record.loi,
+        -type: local
+    )
+end
+
+# Map identity information
+unless is_array(or_record.identity)
+    move_field(or_record.identity, or_record.tmp)
+    set_array(or_record.identity)
+    move_field(or_record.tmp, or_record.identity.$append)
+end
+
+do list(path: or_record.identity, var: a)
+    unless is_array(a.titlegroup)
+        move_field(a.titlegroup, tmp)
+        set_array(a.titlegroup)
+        move_field(tmp, a.titlegroup.$append)
+    end
+
+    do list(path: a.titlegroup, var: b)
+        unless in(b.titlety_dsc_eng, or_record.titletype)
+            if all_match(b.titlety_dsc_eng, '.*\S.*')
+                copy_field(b.titlety_dsc_eng, or_record.titletype)
+                downcase(b.titlety_dsc_eng)
+                copy_field(b.titlety_dsc_eng, descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$append.type)
+            end
+        end
+        if all_match(b.titlelg, 'dut')
+            if all_match(b.titleti, '.*\S.*')
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$last,
+                    b.titleti,
+                    -value_lang: nl
+                )
+            end
+        end
+        if all_match(b.titlelg, 'eng')
+            if all_match(b.titleti, '.*\S.*')
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$last,
+                    b.titleti,
+                    -value_lang: en
+                )
+            end
+        end
+        if all_match(b.titlelg, 'fre')
+            if all_match(b.titleti, '.*\S.*')
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$last,
+                    b.titleti,
+                    -value_lang: fr
+                )
+            end
+        end
+        if all_match(b.titlelg, 'ger')
+            if all_match(b.titleti, '.*\S.*')
+                lido_basenameset(
+                    descriptiveMetadata.objectIdentificationWrap.titleWrap.titleSet.$last,
+                    b.titleti,
+                    -value_lang: de
+                )
+            end
+        end
+    end
+    remove_field(or_record.titletype)
+
+    unless is_array(a.descrgroup)
+        move_field(a.descrgroup, tmp)
+        set_array(a.descrgroup)
+        move_field(tmp, a.descrgroup.$append)
+    end
+
+    do list(path: a.descrgroup, var: b)
+        unless all_match(or_record.description_exists, 'true')
+            if all_match(b.descr, '.*\S.*')
+                add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
+                add_field(or_record.description_exists, 'true')
+            end
+        end
+
+        if all_match(b.descrlg, 'dut')
+            if all_match(b.descr, '.*\S.*')
+                copy_field(b.descr, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'nl')
+            end
+        end
+        if all_match(b.descrlg, 'eng')
+            if all_match(b.descr, '.*\S.*')
+                copy_field(b.descr, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'en')
+            end
+        end
+        if all_match(b.descrlg, 'fre')
+            if all_match(b.descr, '.*\S.*')
+                copy_field(b.descr, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'fr')
+            end
+        end
+        if all_match(b.descrlg, 'ger')
+            if all_match(b.descr, '.*\S.*')
+                copy_field(b.descr, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'de')
+            end
+        end
+    end
+
+    remove_field(or_record.description_exists)
+
+    unless is_array(a.objectname_grp)
+        move_field(a.objectname_grp, tmp)
+        set_array(a.objectname_grp)
+        move_field(tmp, a.objectname_grp.$append)
+    end
+
+    do list(path: a.objectname_grp, var: b)
+        if all_match(b.objectname, '.*\S.*')
+            add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append)
+        else
+            if all_match(b.objectname_dsc_dut, '.*\S.*')
+                add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append)
+            else
+                if all_match(b.objectname_dsc_eng, '.*\S.*')
+                    add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append)
+                else
+                    if all_match(b.objectname_dsc_fre, '.*\S.*')
+                        add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append)
+                    else
+                        if all_match(b.objectname_dsc_ger, '.*\S.*')
+                            add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append)
+                        else
+                            if all_match(b.li.objectname_att.objectname_att_url, '.*\S.*')
+                                add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append)
+                            else
+                                if all_match(b.li.0.objectname_att.objectname_att_url, '.*\S.*')
+                                    add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append)
+                                else
+                                    if all_match(b.li.objectname_att.0.objectname_att_url, '.*\S.*')
+                                        add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append)
+                                    else
+                                        if all_match(b.li.0.objectname_att.0.objectname_att_url, '.*\S.*')
+                                            add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append)
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        if all_match(b.objectname_dsc_dut, '.*\S.*')
+            copy_field(b.objectname_dsc_dut, descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last.term.$append._)
+            set_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last.term.$last.lang, 'nl')
+        end
+        if all_match(b.objectname_dsc_eng, '.*\S.*')
+            copy_field(b.objectname_dsc_eng, descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last.term.$append._)
+            set_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last.term.$last.lang, 'en')
+        end
+        if all_match(b.objectname_dsc_fre, '.*\S.*')
+            copy_field(b.objectname_dsc_fre, descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last.term.$append._)
+            set_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last.term.$last.lang, 'fr')
+        end
+        if all_match(b.objectname_dsc_ger, '.*\S.*')
+            copy_field(b.objectname_dsc_ger, descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last.term.$append._)
+            set_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last.term.$last.lang, 'de')
+        end
+
+        unless is_array(b.li)
+            move_field(b.li, tmp)
+            set_array(b.li)
+            move_field(tmp, b.li.$append)
+        end
+
+        do list(path: b.li, var: c)
+            unless is_array(c.objectname_att)
+                move_field(c.objectname_att, tmp)
+                set_array(c.objectname_att)
+                move_field(tmp, c.objectname_att.$append)
+            end
+
+            do list(path: c.objectname_att, var: d)
+                if all_match(d.objectname_att_url, 'https?://vocab.getty.edu/page/aat/*')
+                    lido_baseid(
+                        descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$last.conceptID,
+                        d.objectname_att_url,
+                        -type: purl,
+                        -source: AAT
+                    )
+                end
+            end
+        end
+    end
+
+    unless is_array(a.altnrgroup)
+        move_field(a.altnrgroup, tmp)
+        set_array(a.altnrgroup)
+        move_field(tmp, a.altnrgroup.$append)
+    end
+
+    do list(path: a.altnrgroup, var: b)
+        if all_match(b.altnrty, 'dignr')
+            if all_match(b.altnr, '.*\S.*')
+                copy_field(b.altnr, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+                set_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, 'local')
+            end
+        end
+
+        unless all_match(or_record.iiif, 'true')
+            if all_match(b.altnrty, 'iiifid')
+                if all_match(b.altnr, '.*\S.*')
+                    set_field(or_record.iiif, 'true')
+                    prepend(b.altnr, 'https://iiif.kmska.be/iiif/3/')
+                    append(b.altnr, '/manifest.json')
+                    copy_field(b.altnr, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+                    set_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, 'purl')
+                    add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, 'IIIF Manifest')
+                end
+            end
+        end
+    end
+
+    unless is_array(a.idennotegroup)
+        move_field(a.idennotegroup, tmp)
+        set_array(a.idennotegroup)
+        move_field(tmp, a.idennotegroup.$append)
+    end
+
+    do list(path: a.idennotegroup, var: b)
+        if all_match(b.idennote, '.*\S.*')
+            add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append.type, 'note-general')
+        end
+        if all_match(b.idennotelg, 'dut')
+            if all_match(b.idennote, '.*\S.*')
+                copy_field(b.idennote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'nl')
+            end
+        end
+        if all_match(b.idennotelg, 'eng')
+            if all_match(b.idennote, '.*\S.*')
+                copy_field(b.idennote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'en')
+            end
+        end
+        if all_match(b.idennotelg, 'fre')
+            if all_match(b.idennote, '.*\S.*')
+                copy_field(b.idennote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'fr')
+            end
+        end
+        if all_match(b.idennotelg, 'ger')
+            if all_match(b.idennote, '.*\S.*')
+                copy_field(b.idennote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'de')
+            end
+        end
+    end
+
+    remove_field(or_record.note_general_exists)
+end
+
+# Map production information
+add_field(or_record.event_type, 'production')
+lido_term(
+    descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
+    or_record.event_type
+)
+
+unless is_array(or_record.production)
+    move_field(or_record.production, or_record.tmp)
+    set_array(or_record.production)
+    move_field(or_record.tmp, or_record.production.$append)
+end
+
+do list(path: or_record.production, var: a)
+    unless is_array(a.contextgroup)
+        move_field(a.contextgroup, tmp)
+        set_array(a.contextgroup)
+        move_field(tmp, a.contextgroup.$append)
+    end
+
+    do list(path: a.contextgroup, var: b)
+        unless all_match(b.bdatedisp, 'nodate')
+            unless all_match(b.edatedisp, 'nodate')
+                if all_match(b.bdate, '.*\S.*')
+                    if all_match(b.bdatedisp_dsc_dut, '.*\S.*')
+                        if all_match(b.bdatedisp_dsc_dut, '\[datum\]')
+                            copy_field(b.bdate, or_record.display_date_nl)
+                        else
+                            paste(or_record.display_date_nl, b.bdatedisp_dsc_dut, b.bdate, join_char:' ')
+                        end
+                    else
+                        copy_field(b.bdate, or_record.display_date_nl)
+                    end
+                    if all_match(b.bdatedisp_dsc_eng, '.*\S.*')
+                        if all_match(b.bdatedisp_dsc_eng, '\[date\]')
+                            copy_field(b.bdate, or_record.display_date_en)
+                        else
+                            paste(or_record.display_date_en, b.bdatedisp_dsc_eng, b.bdate, join_char:' ')
+                        end
+                    else
+                        copy_field(b.bdate, or_record.display_date_en)
+                    end
+                    if all_match(b.bdatedisp_dsc_fre, '.*\S.*')
+                        if all_match(b.bdatedisp_dsc_fre, '\[date\]')
+                            copy_field(b.bdate, or_record.display_date_fr)
+                        else
+                            paste(or_record.display_date_fr, b.bdatedisp_dsc_fre, b.bdate, join_char:' ')
+                        end
+                    else
+                        copy_field(b.bdate, or_record.display_date_fr)
+                    end
+                    if all_match(b.bdatedisp_dsc_ger, '.*\S.*')
+                        if all_match(b.bdatedisp_dsc_ger, '\[datum\]')
+                            copy_field(b.bdate, or_record.display_date_de)
+                        else
+                            paste(or_record.display_date_de, b.bdatedisp_dsc_ger, b.bdate, join_char:' ')
+                        end
+                    else
+                        copy_field(b.bdate, or_record.display_date_de)
+                    end
+                end
+            end
+        end
+        unless all_match(b.bdatedisp, 'nodate')
+            unless all_match(b.edatedisp, 'nodate')
+                if all_match(b.edate, '.*\S.*')
+                    if all_match(b.edatedisp_dsc_dut, '.*\S.*')
+                        if all_match(b.edatedisp_dsc_dut, '\[datum\]')
+                            if all_match(or_record.display_date_nl, '.*\S.*')
+                                unless in(b.edate, or_record.display_date_nl)
+                                    paste(or_record.display_date_nl, or_record.display_date_nl, b.edate, join_char:' - ')
+                                end
+                            else
+                                copy_field(b.edate, or_record.display_date_nl)
+                            end
+                        else
+                            if all_match(or_record.display_date_nl, '.*\S.*')
+                                paste(or_record.enddate_nl, b.edatedisp_dsc_dut, b.edate, join_char:' ')
+                                unless in(or_record.enddate_nl, or_record.display_date_nl)
+                                    paste(or_record.display_date_nl, or_record.display_date_nl, or_record.enddate_nl, join_char:' - ')
+                                end
+                            else
+                                paste(or_record.display_date_nl, b.edatedisp_dsc_dut, b.edate, join_char:' ')
+                            end
+                        end
+                    else
+                        if all_match(or_record.display_date_nl, '.*\S.*')
+                            unless in(b.edate, or_record.display_date_nl)
+                                paste(or_record.display_date_nl, or_record.display_date_nl, b.edate, join_char:' - ')
+                            end
+                        else
+                            copy_field(b.edate, or_record.display_date_nl)
+                        end
+                    end
+                    if all_match(b.edatedisp_dsc_eng, '.*\S.*')
+                        if all_match(b.edatedisp_dsc_eng, '\[date\]')
+                            if all_match(or_record.display_date_en, '.*\S.*')
+                                unless in(b.edate, or_record.display_date_en)
+                                    paste(or_record.display_date_en, or_record.display_date_en, b.edate, join_char:' - ')
+                                end
+                            else
+                                copy_field(b.edate, or_record.display_date_en)
+                            end
+                        else
+                            if all_match(or_record.display_date_en, '.*\S.*')
+                                paste(or_record.enddate_en, b.edatedisp_dsc_eng, b.edate, join_char:' ')
+                                unless in(or_record.enddate_en, or_record.display_date_en)
+                                    paste(or_record.display_date_en, or_record.display_date_en, or_record.enddate_en, join_char:' - ')
+                                end
+                            else
+                                paste(or_record.display_date_en, b.edatedisp_dsc_eng, b.edate, join_char:' ')
+                            end
+                        end
+                    else
+                        if all_match(or_record.display_date_en, '.*\S.*')
+                            unless in(b.edate, or_record.display_date_en)
+                                paste(or_record.display_date_en, or_record.display_date_en, b.edate, join_char:' - ')
+                            end
+                        else
+                            copy_field(b.edate, or_record.display_date_en)
+                        end
+                    end
+                    if all_match(b.edatedisp_dsc_fre, '.*\S.*')
+                        if all_match(b.edatedisp_dsc_fre, '\[date\]')
+                            if all_match(or_record.display_date_fr, '.*\S.*')
+                                unless in(b.edate, or_record.display_date_fr)
+                                    paste(or_record.display_date_fr, or_record.display_date_fr, b.edate, join_char:' - ')
+                                end
+                            else
+                                copy_field(b.edate, or_record.display_date_fr)
+                            end
+                        else
+                            if all_match(or_record.display_date_fr, '.*\S.*')
+                                paste(or_record.enddate_fr, b.edatedisp_dsc_fre, b.edate, join_char:' ')
+                                unless in(or_record.enddate_fr, or_record.display_date_fr)
+                                    paste(or_record.display_date_fr, or_record.display_date_fr, or_record.enddate_fr, join_char:' - ')
+                                end
+                            else
+                                paste(or_record.display_date_fr, b.edatedisp_dsc_fre, b.edate, join_char:' ')
+                            end
+                        end
+                    else
+                        if all_match(or_record.display_date_fr, '.*\S.*')
+                            unless in(b.edate, or_record.display_date_fr)
+                                paste(or_record.display_date_fr, or_record.display_date_fr, b.edate, join_char:' - ')
+                            end
+                        else
+                            copy_field(b.edate, or_record.display_date_fr)
+                        end
+                    end
+                    if all_match(b.edatedisp_dsc_ger, '.*\S.*')
+                        if all_match(b.edatedisp_dsc_ger, '\[datum\]')
+                            if all_match(or_record.display_date_de, '.*\S.*')
+                                unless in(b.edate, or_record.display_date_de)
+                                    paste(or_record.display_date_de, or_record.display_date_de, b.edate, join_char:' - ')
+                                end
+                            else
+                                copy_field(b.edate, or_record.display_date_de)
+                            end
+                        else
+                            if all_match(or_record.display_date_de, '.*\S.*')
+                                paste(or_record.enddate_de, b.edatedisp_dsc_ger, b.edate, join_char:' ')
+                                unless in(or_record.enddate_de, or_record.display_date_de)
+                                    paste(or_record.display_date_de, or_record.display_date_de, or_record.enddate_de, join_char:' - ')
+                                end
+                            else
+                                paste(or_record.display_date_de, b.edatedisp_dsc_ger, b.edate, join_char:' ')
+                            end
+                        end
+                    else
+                        if all_match(or_record.display_date_de, '.*\S.*')
+                            unless in(b.edate, or_record.display_date_de)
+                                paste(or_record.display_date_de, or_record.display_date_de, b.edate, join_char:' - ')
+                            end
+                        else
+                            copy_field(b.edate, or_record.display_date_de)
+                        end
+                    end
+                end
+            end
+        end
+        if all_match(or_record.display_date_nl, '.*\S.*')
+            copy_field(or_record.display_date_nl, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate.$last.lang, 'nl')
+        end
+        if all_match(or_record.display_date_en, '.*\S.*')
+            copy_field(or_record.display_date_en, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate.$last.lang, 'en')
+        end
+        if all_match(or_record.display_date_fr, '.*\S.*')
+            copy_field(or_record.display_date_fr, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate.$last.lang, 'fr')
+        end
+        if all_match(or_record.display_date_de, '.*\S.*')
+            copy_field(or_record.display_date_de, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.displayDate.$last.lang, 'de')
+        end
+
+        remove_field(or_record.display_date_nl)
+        remove_field(or_record.display_date_en)
+        remove_field(or_record.display_date_fr)
+        remove_field(or_record.display_date_de)
+        remove_field(or_record.enddate_nl)
+        remove_field(or_record.enddate_en)
+        remove_field(or_record.enddate_fr)
+        remove_field(or_record.enddate_de)
+
+        if all_match(b.location_dsc_dut, '.*\S.*')
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+        else
+            if all_match(b.location_dsc_eng, '.*\S.*')
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+            else
+                if all_match(b.location_dsc_fre, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+                else
+                    if all_match(b.location_dsc_ger, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+                    else
+                        if all_match(b.li.location_att.location_att_url, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+                        else
+                            if all_match(b.li.0.location_att.location_att_url, '.*\S.*')
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+                            else
+                                if all_match(b.li.location_att.0.location_att_url, '.*\S.*')
+                                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+                                else
+                                    if all_match(b.li.0.location_att.0.location_att_url, '.*\S.*')
+                                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        if all_match(b.location_dsc_dut, '.*\S.*')
+            copy_field(b.location_dsc_dut, descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.namePlaceSet.appellationValue.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.namePlaceSet.appellationValue.$last.lang, 'nl')
+        end
+        if all_match(b.location_dsc_eng, '.*\S.*')
+            copy_field(b.location_dsc_eng, descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.namePlaceSet.appellationValue.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.namePlaceSet.appellationValue.$last.lang, 'en')
+        end
+        if all_match(b.location_dsc_fre, '.*\S.*')
+            copy_field(b.location_dsc_fre, descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.namePlaceSet.appellationValue.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.namePlaceSet.appellationValue.$last.lang, 'fr')
+        end
+        if all_match(b.location_dsc_ger, '.*\S.*')
+            copy_field(b.location_dsc_ger, descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.namePlaceSet.appellationValue.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.namePlaceSet.appellationValue.$last.lang, 'de')
+        end
+
+        unless is_array(b.li)
+            move_field(b.li, tmp)
+            set_array(b.li)
+            move_field(tmp, b.li.$append)
+        end
+
+        do list(path: b.li, var: c)
+            unless is_array(c.location_att)
+                move_field(c.location_att, tmp)
+                set_array(c.location_att)
+                move_field(tmp, c.location_att.$append)
+            end
+
+            do list(path: c.location_att, var: d)
+                if all_match(d.location_att_ty, 'dbpedia')
+                    if all_match(d.location_att_url, 'https?://dbpedia.org/page/*')
+                        lido_baseid(
+                            descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.placeID,
+                            d.location_att_url,
+                            -type: purl,
+                            -source: DBpedia
+                        )
+                    end
+                end
+            end
+        end
+    end
+
+    unless is_array(a.prodnotegroup)
+        move_field(a.prodnotegroup, tmp)
+        set_array(a.prodnotegroup)
+        move_field(tmp, a.prodnotegroup.$append)
+    end
+
+    do list(path: a.prodnotegroup, var: b)
+        if all_match(b.prodnote, '.*\S.*')
+            add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append.type, 'note-date')
+        end
+        if all_match(b.prodnotelg, 'dut')
+            if all_match(b.prodnote, '.*\S.*')
+                copy_field(b.prodnote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'nl')
+            end
+        end
+        if all_match(b.prodnotelg, 'eng')
+            if all_match(b.prodnote, '.*\S.*')
+                copy_field(b.prodnote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'en')
+            end
+        end
+        if all_match(b.prodnotelg, 'fre')
+            if all_match(b.prodnote, '.*\S.*')
+                copy_field(b.prodnote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'fr')
+            end
+        end
+        if all_match(b.prodnotelg, 'ger')
+            if all_match(b.prodnote, '.*\S.*')
+                copy_field(b.prodnote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'de')
+            end
+        end
+    end
+
+    remove_field(or_record.note_date_exists)
+
+    unless is_array(a.creatorgroup)
+        move_field(a.creatorgroup, tmp)
+        set_array(a.creatorgroup)
+        move_field(tmp, a.creatorgroup.$append)
+    end
+
+    do list(path: a.creatorgroup, var: b)
+        if all_match(b.creator_dsc_dut, '.*\S.*')
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+        else
+            if all_match(b.creator_dsc_eng, '.*\S.*')
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+            else
+                if all_match(b.creator_dsc_fre, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                else
+                    if all_match(b.creator_dsc_ger, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                    end
+                end
+            end
+        end
+        if all_match(b.creator_dsc_dut, '.*\S.*')
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                b.creator_dsc_dut,
+                -value_lang: nl
+            )
+        end
+        if all_match(b.creator_dsc_eng, '.*\S.*')
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                b.creator_dsc_eng,
+                -value_lang: en
+            )
+        end
+        if all_match(b.creator_dsc_fre, '.*\S.*')
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                b.creator_dsc_fre,
+                -value_lang: fr
+            )
+        end
+        if all_match(b.creator_dsc_ger, '.*\S.*')
+            lido_basenameset(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                b.creator_dsc_ger,
+                -value_lang: de
+            )
+        end
+
+        if all_match(b.creatorrole_dsc_dut, '.*\S.*')
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+        else
+            if all_match(b.creatorrole_dsc_eng, '.*\S.*')
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+            else
+                if all_match(b.creatorrole_dsc_fre, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                else
+                    if all_match(b.creatorrole_dsc_ger, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                    end
+                end
+            end
+        end
+        if all_match(b.creatorrole_dsc_dut, '.*\S.*')
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                b.creatorrole_dsc_dut,
+                -lang: nl
+            )
+        end
+        if all_match(b.creatorrole_dsc_eng, '.*\S.*')
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                b.creatorrole_dsc_eng,
+                -lang: en
+            )
+        end
+        if all_match(b.creatorrole_dsc_fre, '.*\S.*')
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                b.creatorrole_dsc_fre,
+                -lang: fr
+            )
+        end
+        if all_match(b.creatorrole_dsc_ger, '.*\S.*')
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                b.creatorrole_dsc_ger,
+                -lang: de
+            )
+        end
+    end
+end
+
+# Map ISAD information
+unless is_array(or_record.isad)
+    move_field(or_record.isad, or_record.tmp)
+    set_array(or_record.isad)
+    move_field(or_record.tmp, or_record.isad.$append)
+end
+
+do list(path: or_record.isad, var: a)
+    unless is_array(a.isadgrp)
+        move_field(a.isadgrp, tmp)
+        set_array(a.isadgrp)
+        move_field(tmp, a.isadgrp.$append)
+    end
+
+    do list(path: a.isadgrp, var: b)
+        if all_match(b.isadloi_dsc_dut, '.*\S.*')
+            add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'archive')
+        else
+            if all_match(b.isadloi_dsc_eng, '.*\S.*')
+                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'archive')
+            else
+                if all_match(b.isadloi_dsc_fre, '.*\S.*')
+                    add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'archive')
+                else
+                    if all_match(b.isadloi_dsc_ger, '.*\S.*')
+                        add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'archive')
+                    else
+                        if all_match(b.isadloi, '.*\S.*')
+                            add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'archive')
+                        end
+                    end
+                end
+            end
+        end
+
+        if all_match(b.isadloi_dsc_dut, '.*\S.*')
+            copy_field(b.isadloi_dsc_dut, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.appellationValue.$append._)
+            set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.appellationValue.$last.lang, 'nl')
+        end
+        if all_match(b.isadloi_dsc_eng, '.*\S.*')
+            copy_field(b.isadloi_dsc_eng, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.appellationValue.$append._)
+            set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.appellationValue.$last.lang, 'en')
+        end
+        if all_match(b.isadloi_dsc_fre, '.*\S.*')
+            copy_field(b.isadloi_dsc_fre, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.appellationValue.$append._)
+            set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.appellationValue.$last.lang, 'fr')
+        end
+        if all_match(b.isadloi_dsc_ger, '.*\S.*')
+            copy_field(b.isadloi_dsc_ger, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.appellationValue.$append._)
+            set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectName.appellationValue.$last.lang, 'de')
+        end
+
+        if all_match(b.isadloi, 'isad:*')
+            prepend(b.isadloi, 'https://anet.be/isadtree/kmska/opackmskaisad/')
+            lido_baseid(
+                descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                b.isadloi,
+                -type: purl
+            )
+        end
+    end
+end
+
+# Map location
+unless is_array(or_record.location)
+    move_field(or_record.location, or_record.tmp)
+    set_array(or_record.location)
+    move_field(or_record.tmp, or_record.location.$append)
+end
+
+do list(path: or_record.location, var: a)
+    unless is_array(a.locgroup)
+        move_field(a.locgroup, tmp)
+        set_array(a.locgroup)
+        move_field(tmp, a.locgroup.$append)
+    end
+
+    do list(path: a.locgroup, var: b)
+        if all_match(b.locif, '.*\S.*')
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryLocation.namePlaceSet.$append,
+                b.locif,
+                -value_lang: nl
+            )
+        end
+    end
+end
+
+# Map catlevel
+unless is_array(or_record.catlevel)
+    move_field(or_record.catlevel, or_record.tmp)
+    set_array(or_record.catlevel)
+    move_field(or_record.tmp, or_record.catlevel.$append)
+end
+
+do list(path: or_record.catlevel, var: a)
+    if all_match(a.catlevel_dsc_dut, '.*\S.*')
+        copy_field(a.catlevel_dsc_dut, administrativeMetadata.recordWrap.recordType.term.$append._)
+        set_field(administrativeMetadata.recordWrap.recordType.term.$last.lang, 'nl')
+    end
+    if all_match(a.catlevel_dsc_eng, '.*\S.*')
+        copy_field(a.catlevel_dsc_eng, administrativeMetadata.recordWrap.recordType.term.$append._)
+        set_field(administrativeMetadata.recordWrap.recordType.term.$last.lang, 'en')
+    end
+    if all_match(a.catlevel_dsc_fre, '.*\S.*')
+        copy_field(a.catlevel_dsc_fre, administrativeMetadata.recordWrap.recordType.term.$append._)
+        set_field(administrativeMetadata.recordWrap.recordType.term.$last.lang, 'fr')
+    end
+    if all_match(a.catlevel_dsc_ger, '.*\S.*')
+        copy_field(a.catlevel_dsc_ger, administrativeMetadata.recordWrap.recordType.term.$append._)
+        set_field(administrativeMetadata.recordWrap.recordType.term.$last.lang, 'de')
+    end
+
+    if all_match(a.catlevel_dsc_dut, '.*\S.*')
+        add_field(or_record.catlevel_exists, 'true')
+    else
+        if all_match(a.catlevel_dsc_eng, '.*\S.*')
+            add_field(or_record.catlevel_exists, 'true')
+        else
+            if all_match(a.catlevel_dsc_fre, '.*\S.*')
+                add_field(or_record.catlevel_exists, 'true')
+            else
+                if all_match(a.catlevel_dsc_ger, '.*\S.*')
+                    add_field(or_record.catlevel_exists, 'true')
+                end
+            end
+        end
+    end
+
+    unless all_match(or_record.catlevel_exists, 'true')
+        add_field(or_record.aat_record_type_term, 'Item')
+
+        lido_term(
+            administrativeMetadata.recordWrap.recordType,
+            or_record.aat_record_type_term
+        )
+    end
+
+    remove_field(or_record.catlevel_exists)
+end
+
+# Map dimensions
+unless is_array(or_record.dimensions)
+    move_field(or_record.dimensions, or_record.tmp)
+    set_array(or_record.dimensions)
+    move_field(or_record.tmp, or_record.dimensions.$append)
+end
+
+do list(path: or_record.dimensions, var: a)
+    unless is_array(a.dmsgroup)
+        move_field(a.dmsgroup, tmp)
+        set_array(a.dmsgroup)
+        move_field(tmp, a.dmsgroup.$append)
+    end
+
+    add_field(or_record.extent_dimension, '')
+
+    do list(path: a.dmsgroup, var: b)
+        if all_match(b.dmspart, '.*\S.*')
+            unless all_match(b.dmspart, '\*')
+                unless in(b.dmspart, or_record.extent_dimension)
+                    copy_field(b.dmspart, or_record.extent_dimension)
+                    add_field(descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$append)
+                end
+            end
+        else
+            if all_match(b.dms, '.*\S.*')
+                add_field(descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$append)
+            else
+                if all_match(b.dmspr_dsc_dut, '.*\S.*')
+                    add_field(descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$append)
+                else
+                    if all_match(b.dmsty_dsc_dut, '.*\S.*')
+                        add_field(descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$append)
+                    else
+                        if all_match(b.dmsunit_dsc_dut, '.*\S.*')
+                            add_field(descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$append)
+                        end
+                    end
+                end
+            end
+        end
+    
+        if all_match(b.dmsty_dsc_dut, '.*\S.*')
+            if all_match(b.dms, '.*\S.*')
+                if all_match(b.dmsty_dsc_dut, 'Hoogte')
+                    copy_field(b.dms, or_record.display_dimension)
+                else
+                    if all_match(b.dmsty_dsc_dut, 'Breedte')
+                        paste(or_record.display_dimension, or_record.display_dimension, b.dms, join_char:' x ')
+                        if all_match(b.dmsunit, '.*\S.*')
+                            paste(or_record.display_dimension, or_record.display_dimension, b.dmsunit, join_char:' ')
+                        end
+                        move_field(or_record.display_dimension, or_record.display_dimensions.$append)
+                    end
+                end
+            end
+        end
+
+        do list(path: or_record.display_dimensions, var: c)
+            if all_match(c, '.*\S.*')
+                copy_field(c, descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.displayObjectMeasurements.$append._)
+            end
+            if all_match(b.dmspart, '.*\S.*')
+                unless all_match(b.dmspart, '\*')
+                    copy_field(b.dmspart, descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.extentMeasurements.$append._)
+                end
+            end
+            remove_field(or_record.display_dimensions)
+        end
+    end
+    unless exists(or_record.display_dimensions)
+        if all_match(or_record.display_dimension, '.*\S.*')
+            move_field(or_record.display_dimension, or_record.display_dimensions.$append)
+        end
+        do list(path: or_record.display_dimensions, var: b)
+            if all_match(b, '.*\S.*')
+                copy_field(b, descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.displayObjectMeasurements.$append._)
+            end
+        end
+        remove_field(or_record.display_dimensions)
+    end
+end
+remove_field(or_record.extent_dimension)
+
+# Map subjects
+unless is_array(or_record.subjects)
+    move_field(or_record.subjects, or_record.tmp)
+    set_array(or_record.subjects)
+    move_field(or_record.tmp, or_record.subjects.$append)
+end
+
+do list(path: or_record.subjects, var: a)
+    unless is_array(a.subjspecgroup)
+        move_field(a.subjspecgroup, or_record.tmp)
+        set_array(a.subjspecgroup)
+        move_field(or_record.tmp, a.subjspecgroup.$append)
+    end
+
+    do list(path: a.subjspecgroup, var: b)
+        if all_match(b.subjspeccat, 'genre')
+            copy_field(b.subjspeccat, descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append.type)
+            if all_match(b.subjspecdesc_dsc_dut, '.*\S.*')
+                copy_field(b.subjspecdesc_dsc_dut, descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$append._)
+                set_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$last.lang, 'nl')
+            end
+            if all_match(b.subjspecdesc_dsc_eng, '.*\S.*')
+                copy_field(b.subjspecdesc_dsc_eng, descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$append._)
+                set_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$last.lang, 'en')
+            end
+            if all_match(b.subjspecdesc_dsc_fre, '.*\S.*')
+                copy_field(b.subjspecdesc_dsc_fre, descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$append._)
+                set_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$last.lang, 'fr')
+            end
+            if all_match(b.subjspecdesc_dsc_ger, '.*\S.*')
+                copy_field(b.subjspecdesc_dsc_ger, descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$append._)
+                set_field(descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last.term.$last.lang, 'de')
+            end
+
+            unless is_array(b.li)
+                move_field(b.li, tmp)
+                set_array(b.li)
+                move_field(tmp, b.li.$append)
+            end
+
+            do list(path: b.li, var: c)
+                unless is_array(c.subjspecdesc_att)
+                    move_field(c.subjspecdesc_att, tmp)
+                    set_array(c.subjspecdesc_att)
+                    move_field(tmp, c.subjspecdesc_att.$append)
+                end
+
+                do list(path: c.subjspecdesc_att, var: d)
+                    if all_match(d.subjspecdesc_att_url, 'https?://vocab.getty.edu/page/aat/*')
+                        lido_baseid(
+                            descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteID,
+                            d.subjspecdesc_att_url,
+                            -type: purl,
+                            -source: AAT
+                        )
+                    end
+                end
+            end
+        end
+
+        if all_match(b.subjspeccat, 'language')
+            copy_field(b.subjspeccat, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append.type)
+            if all_match(b.subjspecdesc_dsc_dut, '.*\S.*')
+                copy_field(b.subjspecdesc_dsc_dut, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'nl')
+            end
+            if all_match(b.subjspecdesc_dsc_eng, '.*\S.*')
+                copy_field(b.subjspecdesc_dsc_eng, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'en')
+            end
+            if all_match(b.subjspecdesc_dsc_fre, '.*\S.*')
+                copy_field(b.subjspecdesc_dsc_fre, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'fr')
+            end
+            if all_match(b.subjspecdesc_dsc_ger, '.*\S.*')
+                copy_field(b.subjspecdesc_dsc_ger, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'de')
+            end      
+
+            unless is_array(b.li)
+                move_field(b.li, tmp)
+                set_array(b.li)
+                move_field(tmp, b.li.$append)
+            end
+
+            do list(path: b.li, var: c)
+                unless is_array(c.subjspecdesc_att)
+                    move_field(c.subjspecdesc_att, tmp)
+                    set_array(c.subjspecdesc_att)
+                    move_field(tmp, c.subjspecdesc_att.$append)
+                end
+
+                do list(path: c.subjspecdesc_att, var: d)
+                    if all_match(d.subjspecdesc_att_url, 'https?://vocab.getty.edu/page/aat/*')
+                        lido_baseid(
+                            descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteID,
+                            d.subjspecdesc_att_url,
+                            -type: purl,
+                            -source: AAT
+                        )
+                    end
+                end
+            end
+        end
+
+        unless all_match(b.subjspeccat, 'genre')
+            unless all_match(b.subjspeccat, 'language')
+                if all_match(b.subjspecdesc_type, '[OP]')
+                    if all_match(b.subjspecdesc_dsc_dut, '.*\S.*')
+                        add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                    else
+                        if all_match(b.subjspecdesc_dsc_eng, '.*\S.*')
+                            add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                        else
+                            if all_match(b.subjspecdesc_dsc_fre, '.*\S.*')
+                                add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                            else
+                                if all_match(b.subjspecdesc_dsc_ger, '.*\S.*')
+                                    add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                else
+                                    if all_match(b.li.subjspecdesc_att.subjspecdesc_att_url, '.*\S.*')
+                                        add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                    else
+                                        if all_match(b.li.0.subjspecdesc_att.subjspecdesc_att_url, '.*\S.*')
+                                            add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                        else
+                                            if all_match(b.li.subjspecdesc_att.0.subjspecdesc_att_url, '.*\S.*')
+                                                add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                            else
+                                                if all_match(b.li.0.subjspecdesc_att.0.subjspecdesc_att_url, '.*\S.*')
+                                                    add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                else
+                                                    if all_match(b.li.subjspecdesc_att.1.subjspecdesc_att_url, '.*\S.*')
+                                                        add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                    else
+                                                        if all_match(b.li.0.subjspecdesc_att.1.subjspecdesc_att_url, '.*\S.*')
+                                                            add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                        else
+                                                            if all_match(b.li.subjspecdesc_att.2.subjspecdesc_att_url, '.*\S.*')
+                                                                add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                            else
+                                                                if all_match(b.li.0.subjspecdesc_att.2.subjspecdesc_att_url, '.*\S.*')
+                                                                    add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                                end
+                                                            end
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                    if all_match(b.subjspecdesc_dsc_dut, '.*\S.*')
+                        copy_field(b.subjspecdesc_dsc_dut, descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.nameActorSet.$last.appellationValue.$append._)
+                        set_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.nameActorSet.$last.appellationValue.$last.lang, 'nl')
+                    end
+                    if all_match(b.subjspecdesc_dsc_eng, '.*\S.*')
+                        copy_field(b.subjspecdesc_dsc_eng, descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.nameActorSet.$last.appellationValue.$append._)
+                        set_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.nameActorSet.$last.appellationValue.$last.lang, 'en')
+                    end
+                    if all_match(b.subjspecdesc_dsc_fre, '.*\S.*')
+                        copy_field(b.subjspecdesc_dsc_fre, descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.nameActorSet.$last.appellationValue.$append._)
+                        set_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.nameActorSet.$last.appellationValue.$last.lang, 'fr')
+                    end
+                    if all_match(b.subjspecdesc_dsc_ger, '.*\S.*')
+                        copy_field(b.subjspecdesc_dsc_ger, descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.nameActorSet.$last.appellationValue.$append._)
+                        set_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.nameActorSet.$last.appellationValue.$last.lang, 'de')
+                    end
+
+                    unless is_array(b.li)
+                        move_field(b.li, tmp)
+                        set_array(b.li)
+                        move_field(tmp, b.li.$append)
+                    end
+
+                    do list(path: b.li, var: c)
+                        unless is_array(c.subjspecdesc_att)
+                            move_field(c.subjspecdesc_att, tmp)
+                            set_array(c.subjspecdesc_att)
+                            move_field(tmp, c.subjspecdesc_att.$append)
+                        end
+
+                        do list(path: c.subjspecdesc_att, var: d)
+                            if all_match(d.subjspecdesc_att_url, 'https?://vocab.getty.edu/page/aat/*')
+                                lido_baseid(
+                                    descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.actorID,
+                                    d.subjspecdesc_att_url,
+                                    -type: purl,
+                                    -source: AAT
+                                )
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    unless is_array(a.dmsnotegroup)
+        move_field(a.dmsnotegroup, tmp)
+        set_array(a.dmsnotegroup)
+        move_field(tmp, a.dmsnotegroup.$append)
+    end
+
+    do list(path: a.dmsnotegroup, var: b)
+        if all_match(b.dmsnote, '.*\S.*')
+            add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append.type, 'note-content')
+        end
+        if all_match(b.dmsnotelg, 'dut')
+            if all_match(b.dmsnote, '.*\S.*')
+                copy_field(b.dmsnote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'nl')
+            end
+        end
+        if all_match(b.dmsnotelg, 'eng')
+            if all_match(b.dmsnote, '.*\S.*')
+                copy_field(b.dmsnote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'en')
+            end
+        end
+        if all_match(b.dmsnotelg, 'fre')
+            if all_match(b.dmsnote, '.*\S.*')
+                copy_field(b.dmsnote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'fr')
+            end
+        end
+        if all_match(b.dmsnotelg, 'ger')
+            if all_match(b.dmsnote, '.*\S.*')
+                copy_field(b.dmsnote, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
+                set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'de')
+            end
+        end
+    end
+
+    remove_field(or_record.note_content_exists)
+end
+
+unless is_array(or_record.subjglob)
+    move_field(or_record.subjglob, or_record.tmp)
+    set_array(or_record.subjglob)
+    move_field(or_record.tmp, or_record.subjglob.$append)
+end
+
+do list(path: or_record.subjglob, var: a)
+    unless is_array(a.subjglobgroup)
+        move_field(a.subjglobgroup, or_record.tmp)
+        set_array(a.subjglobgroup)
+        move_field(or_record.tmp, a.subjglobgroup.$append)
+    end
+
+    do list(path: a.subjglobgroup, var: b)
+        if all_match(b.subjglob_type, 'AAT')
+            if all_match(b.subjglob_dsc_dut, '.*\S.*')
+                add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+            else
+                if all_match(b.subjglob_dsc_eng, '.*\S.*')
+                    add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                else
+                    if all_match(b.subjglob_dsc_fre, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+                    else
+                        if all_match(b.subjglob_dsc_ger, '.*\S.*')
+                            add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                        else
+                            if all_match(b.li.subjglob_att.subjglob_att_url, '.*\S.*')
+                                add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                            else
+                                if all_match(b.li.0.subjglob_att.subjglob_att_url, '.*\S.*')
+                                    add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                else
+                                    if all_match(b.li.subjglob_att.0.subjglob_att_url, '.*\S.*')
+                                        add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                    else
+                                        if all_match(b.li.0.subjglob_att.0.subjglob_att_url, '.*\S.*')
+                                            add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                        else
+                                            if all_match(b.li.subjglob_att.1.subjglob_att_url, '.*\S.*')
+                                                add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                            else
+                                                if all_match(b.li.0.subjglob_att.1.subjglob_att_url, '.*\S.*')
+                                                    add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                else
+                                                    if all_match(b.li.subjglob_att.2.subjglob_att_url, '.*\S.*')
+                                                        add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                    else
+                                                        if all_match(b.li.0.subjglob_att.2.subjglob_att_url, '.*\S.*')
+                                                            add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                        end
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            if all_match(b.subjglob_dsc_dut, '.*\S.*')
+                copy_field(b.subjglob_dsc_dut, descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last.term.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last.term.$last.lang, 'nl')
+            end
+            if all_match(b.subjglob_dsc_eng, '.*\S.*')
+                copy_field(b.subjglob_dsc_eng, descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last.term.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last.term.$last.lang, 'en')
+            end
+            if all_match(b.subjglob_dsc_fre, '.*\S.*')
+                copy_field(b.subjglob_dsc_fre, descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last.term.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last.term.$last.lang, 'fr')
+            end
+            if all_match(b.subjglob_dsc_ger, '.*\S.*')
+                copy_field(b.subjglob_dsc_ger, descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last.term.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last.term.$last.lang, 'de')
+            end
+
+            unless is_array(b.li)
+                move_field(b.li, tmp)
+                set_array(b.li)
+                move_field(tmp, b.li.$append)
+            end
+
+            do list(path: b.li, var: c)
+                unless is_array(c.subjglob_att)
+                    move_field(c.subjglob_att, tmp)
+                    set_array(c.subjglob_att)
+                    move_field(tmp, c.subjglob_att.$append)
+                end
+
+                do list(path: c.subjglob_att, var: d)
+                    if all_match(d.subjglob_att_url, 'https?://vocab.getty.edu/page/aat/*')
+                        lido_baseid(
+                            descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectConcept.$last.conceptID,
+                            d.subjglob_att_url,
+                            -type: purl,
+                            -source: AAT
+                        )
+                    end
+                end
+            end
+        end
+    end
+end
+
+# Map materials and techniques
+unless is_array(or_record.materials_techniques)
+    move_field(or_record.materials_techniques, or_record.tmp)
+    set_array(or_record.materials_techniques)
+    move_field(or_record.tmp, or_record.materials_techniques.$append)
+end
+
+do list(path: or_record.materials_techniques, var: a)
+    unless is_array(a.matgroup)
+        move_field(a.matgroup, or_record.tmp)
+        set_array(a.matgroup)
+        move_field(or_record.tmp, a.matgroup.$append)
+    end
+
+    do list(path: a.matgroup, var: b)
+        if all_match(b.matrole, 'a::aat.5139')
+            if all_match(b.mat, '.*\S.*')
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'support')
+            else
+                if all_match(b.mat_dsc_dut, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'support')
+                else
+                    if all_match(b.mat_dsc_eng, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'support')
+                    else
+                        if all_match(b.mat_dsc_fre, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'support')
+                        else
+                            if all_match(b.mat_dsc_ger, '.*\S.*')
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'support')
+                            else
+                                if all_match(b.li.mat_att.mat_att_url, '.*\S.*')
+                                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'support')
+                                else
+                                    if all_match(b.li.0.mat_att.mat_att_url, '.*\S.*')
+                                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'support')
+                                    else
+                                        if all_match(b.li.mat_att.0.mat_att_url, '.*\S.*')
+                                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'support')
+                                        else
+                                            if all_match(b.li.0.mat_att.0.mat_att_url, '.*\S.*')
+                                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'support')
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            if all_match(b.mat_dsc_dut, '.*\S.*')
+                copy_field(b.mat_dsc_dut, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'nl')
+            end
+            if all_match(b.mat_dsc_eng, '.*\S.*')
+                copy_field(b.mat_dsc_eng, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'en')
+            end
+            if all_match(b.mat_dsc_fre, '.*\S.*')
+                copy_field(b.mat_dsc_fre, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'fr')
+            end
+            if all_match(b.mat_dsc_ger, '.*\S.*')
+                copy_field(b.mat_dsc_ger, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'de')
+            end
+
+            unless is_array(b.li)
+                move_field(b.li, tmp)
+                set_array(b.li)
+                move_field(tmp, b.li.$append)
+            end
+
+            do list(path: b.li, var: c)
+                unless is_array(c.mat_att)
+                    move_field(c.mat_att, tmp)
+                    set_array(c.mat_att)
+                    move_field(tmp, c.mat_att.$append)
+                end
+
+                do list(path: c.mat_att, var: d)
+                    if all_match(d.mat_att_url, 'https?://vocab.getty.edu/page/aat/*')
+                        lido_baseid(
+                            descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.conceptID,
+                            d.mat_att_url,
+                            -type: purl,
+                            -source: AAT
+                        )
+                    end
+                end
+            end
+        end
+
+        if all_match(b.matrole, 'a::aat.46741')
+            if all_match(b.mat, '.*\S.*')
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'writing equipment')
+            else
+                if all_match(b.mat_dsc_dut, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'writing equipment')
+                else
+                    if all_match(b.mat_dsc_eng, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'writing equipment')
+                    else
+                        if all_match(b.mat_dsc_fre, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'writing equipment')
+                        else
+                            if all_match(b.mat_dsc_ger, '.*\S.*')
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'writing equipment')
+                            else
+                                if all_match(b.li.mat_att.mat_att_url, '.*\S.*')
+                                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'writing equipment')
+                                else
+                                    if all_match(b.li.0.mat_att.mat_att_url, '.*\S.*')
+                                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'writing equipment')
+                                    else
+                                        if all_match(b.li.mat_att.0.mat_att_url, '.*\S.*')
+                                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'writing equipment')
+                                        else
+                                            if all_match(b.li.0.mat_att.0.mat_att_url, '.*\S.*')
+                                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'writing equipment')
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            if all_match(b.mat_dsc_dut, '.*\S.*')
+                copy_field(b.mat_dsc_dut, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'nl')
+            end
+            if all_match(b.mat_dsc_eng, '.*\S.*')
+                copy_field(b.mat_dsc_eng, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'en')
+            end
+            if all_match(b.mat_dsc_fre, '.*\S.*')
+                copy_field(b.mat_dsc_fre, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'fr')
+            end
+            if all_match(b.mat_dsc_ger, '.*\S.*')
+                copy_field(b.mat_dsc_ger, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+                set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'de')
+            end
+
+            unless is_array(b.li)
+                move_field(b.li, tmp)
+                set_array(b.li)
+                move_field(tmp, b.li.$append)
+            end
+
+            do list(path: b.li, var: c)
+                unless is_array(c.mat_att)
+                    move_field(c.mat_att, tmp)
+                    set_array(c.mat_att)
+                    move_field(tmp, c.mat_att.$append)
+                end
+
+                do list(path: c.mat_att, var: d)
+                    if all_match(d.mat_att_url, 'https?://vocab.getty.edu/page/aat/*')
+                        lido_baseid(
+                            descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.conceptID,
+                            d.mat_att_url,
+                            -type: purl,
+                            -source: AAT
+                        )
+                    end
+                end
+            end
+        end
+    end
+
+    unless is_array(a.techgroup)
+        move_field(a.techgroup, or_record.tmp)
+        set_array(a.techgroup)
+        move_field(or_record.tmp, a.techgroup.$append)
+    end
+
+    do list(path: a.techgroup, var: b)
+        if all_match(b.tech_dsc_dut, '.*\S.*')
+            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'technique')
+        else
+            if all_match(b.tech_dsc_eng, '.*\S.*')
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'technique')
+            else
+                if all_match(b.tech_dsc_fre, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'technique')
+                else
+                    if all_match(b.tech_dsc_ger, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'technique')
+                    else
+                        if all_match(b.li.tech_att.tech_att_url, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'technique')
+                        else
+                            if all_match(b.li.0.tech_att.tech_att_url, '.*\S.*')
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'technique')
+                            else
+                                if all_match(b.li.tech_att.0.tech_att_url, '.*\S.*')
+                                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'technique')
+                                else
+                                    if all_match(b.li.0.tech_att.0.tech_att_url, '.*\S.*')
+                                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$append.termMaterialsTech.$append.type, 'technique')
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+        if all_match(b.tech_dsc_dut, '.*\S.*')
+            copy_field(b.tech_dsc_dut, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'nl')
+        end
+        if all_match(b.tech_dsc_eng, '.*\S.*')
+            copy_field(b.tech_dsc_eng, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'en')
+        end
+        if all_match(b.tech_dsc_fre, '.*\S.*')
+            copy_field(b.tech_dsc_fre, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'fr')
+        end
+        if all_match(b.tech_dsc_ger, '.*\S.*')
+            copy_field(b.tech_dsc_ger, descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'de')
+        end
+
+        unless is_array(b.li)
+            move_field(b.li, tmp)
+            set_array(b.li)
+            move_field(tmp, b.li.$append)
+        end
+
+        do list(path: b.li, var: c)
+            unless is_array(c.tech_att)
+                move_field(c.tech_att, tmp)
+                set_array(c.tech_att)
+                move_field(tmp, c.tech_att.$append)
+            end
+
+            do list(path: c.tech_att, var: d)
+                if all_match(d.tech_att_url, 'https?://vocab.getty.edu/page/aat/*')
+                    lido_baseid(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventMaterialsTech.$last.materialsTech.$last.termMaterialsTech.$last.conceptID,
+                        d.tech_att_url,
+                        -type: purl,
+                        -source: AAT
+                    )
+                end
+            end
+        end
+    end
+end
+
+# Map access and use information
+unless is_array(or_record.access_use)
+    move_field(or_record.access_use, or_record.tmp)
+    set_array(or_record.access_use)
+    move_field(or_record.tmp, or_record.access_use.$append)
+end
+
+do list(path: or_record.access_use, var: a)
+    unless is_array(a.copyrightgrp)
+        move_field(a.copyrightgrp, tmp)
+        set_array(a.copyrightgrp)
+        move_field(tmp, a.copyrightgrp.$append)
+    end
+
+    do list(path: a.copyrightgrp, var: b)
+        if all_match(b.cprlicense_dsc_dut, '.*\S.*')
+            lido_term(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.rightsType,
+                b.cprlicense_dsc_dut,
+                -lang: nl
+            )
+        end
+        if all_match(b.cprlicense_dsc_eng, '.*\S.*')
+            lido_term(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.rightsType,
+                b.cprlicense_dsc_eng,
+                -lang: en
+            )
+        end
+        if all_match(b.cprlicense_dsc_fre, '.*\S.*')
+            lido_term(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.rightsType,
+                b.cprlicense_dsc_fre,
+                -lang: fr
+            )
+        end
+        if all_match(b.cprlicense_dsc_ger, '.*\S.*')
+            lido_term(
+                administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.rightsType,
+                b.cprlicense_dsc_ger,
+                -lang: de
+            )
+        end
+    end
+end
+
+# Map association information
+unless is_array(or_record.associations)
+    move_field(or_record.associations, or_record.tmp)
+    set_array(or_record.associations)
+    move_field(or_record.tmp, or_record.associations.$append)
+end
+
+do list(path: or_record.associations, var: a)
+    unless is_array(a.assogroup)
+        move_field(a.assogroup, tmp)
+        set_array(a.assogroup)
+        move_field(tmp, a.assogroup.$append)
+    end
+
+    do list(path: a.assogroup, var: b)
+        if all_match(b.assocat, 'person')
+            if all_match(b.assorel, 'dedicated')
+                unless all_match(or_record.dedication, 'true')
+                    set_field(or_record.dedication, 'true')
+                    add_field(or_record.event_type, 'dedication')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
+                        or_record.event_type
+                    )
+                end
+
+                if all_match(b.association_dsc_dut, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                else
+                    if all_match(b.association_dsc_eng, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                    else
+                        if all_match(b.association_dsc_fre, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                        else
+                            if all_match(b.association_dsc_ger, '.*\S.*')
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                            end
+                        end
+                    end
+                end
+                if all_match(b.association_dsc_dut, '.*\S.*')
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        b.association_dsc_dut,
+                        -value_lang: nl
+                    )
+                end
+                if all_match(b.association_dsc_eng, '.*\S.*')
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        b.association_dsc_eng,
+                        -value_lang: en
+                    )
+                end
+                if all_match(b.association_dsc_fre, '.*\S.*')
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        b.association_dsc_fre,
+                        -value_lang: fr
+                    )
+                end
+                if all_match(b.association_dsc_ger, '.*\S.*')
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        b.association_dsc_ger,
+                        -value_lang: de
+                    )
+                end
+
+                if all_match(b.assorel_dsc_dut, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                else
+                    if all_match(b.assorel_dsc_eng, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                    else
+                        if all_match(b.assorel_dsc_fre, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                        else
+                            if all_match(b.assorel_dsc_ger, '.*\S.*')
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                            end
+                        end
+                    end
+                end
+                if all_match(b.assorel_dsc_dut, '.*\S.*')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                        b.assorel_dsc_dut,
+                        -lang: nl
+                    )
+                end
+                if all_match(b.assorel_dsc_eng, '.*\S.*')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                        b.assorel_dsc_eng,
+                        -lang: en
+                    )
+                end
+                if all_match(b.assorel_dsc_fre, '.*\S.*')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                        b.assorel_dsc_fre,
+                        -lang: fr
+                    )
+                end
+                if all_match(b.assorel_dsc_ger, '.*\S.*')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                        b.assorel_dsc_ger,
+                        -lang: de
+                    )
+                end
+            end
+
+            if all_match(b.assorel, 'addressed')
+                unless all_match(or_record.correspondence, 'true')
+                    set_field(or_record.correspondence, 'true')
+                    add_field(or_record.event_type, 'correspondence')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
+                        or_record.event_type
+                    )
+                end
+                if all_match(b.association_dsc_dut, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                else
+                    if all_match(b.association_dsc_eng, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                    else
+                        if all_match(b.association_dsc_fre, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                        else
+                            if all_match(b.association_dsc_ger, '.*\S.*')
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                            end
+                        end
+                    end
+                end
+                if all_match(b.association_dsc_dut, '.*\S.*')
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        b.association_dsc_dut,
+                        -value_lang: nl
+                    )
+                end
+                if all_match(b.association_dsc_eng, '.*\S.*')
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        b.association_dsc_eng,
+                        -value_lang: en
+                    )
+                end
+                if all_match(b.association_dsc_fre, '.*\S.*')
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        b.association_dsc_fre,
+                        -value_lang: fr
+                    )
+                end
+                if all_match(b.association_dsc_ger, '.*\S.*')
+                    lido_basenameset(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
+                        b.association_dsc_ger,
+                        -value_lang: de
+                    )
+                end
+
+                if all_match(b.assorel_dsc_dut, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                else
+                    if all_match(b.assorel_dsc_eng, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                    else
+                        if all_match(b.assorel_dsc_fre, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                        else
+                            if all_match(b.assorel_dsc_ger, '.*\S.*')
+                                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$append)
+                            end
+                        end
+                    end
+                end
+                if all_match(b.assorel_dsc_dut, '.*\S.*')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                        b.assorel_dsc_dut,
+                        -lang: nl
+                    )
+                end
+                if all_match(b.assorel_dsc_eng, '.*\S.*')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                        b.assorel_dsc_eng,
+                        -lang: en
+                    )
+                end
+                if all_match(b.assorel_dsc_fre, '.*\S.*')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                        b.assorel_dsc_fre,
+                        -lang: fr
+                    )
+                end
+                if all_match(b.assorel_dsc_ger, '.*\S.*')
+                    lido_term(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.roleActor.$last,
+                        b.assorel_dsc_ger,
+                        -lang: de
+                    )
+                end
+            end
+        end
+
+        if all_match(b.assorel, 'kmskakunstwerk')
+            if all_match(b.association_dsc_dut, '.*\S.*')
+                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'artwork')
+            else
+                if all_match(b.association_dsc_eng, '.*\S.*')
+                    add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'artwork')
+                else
+                    if all_match(b.association_dsc_fre, '.*\S.*')
+                        add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'artwork')
+                    else
+                        if all_match(b.association_dsc_ger, '.*\S.*')
+                            add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'artwork')
+                        else
+                            if all_match(b.li.association_att.association_att_url, '.*\S.*')
+                                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'artwork')
+                            else
+                                if all_match(b.li.0.association_att.association_att_url, '.*\S.*')
+                                    add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'artwork')
+                                else
+                                    if all_match(b.li.association_att.0.association_att_url, '.*\S.*')
+                                        add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'artwork')
+                                    else
+                                        if all_match(b.li.0.association_att.0.association_att_url, '.*\S.*')
+                                            add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'artwork')
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            if all_match(b.association_dsc_dut, '.*\S.*')
+                copy_field(b.association_dsc_dut, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'nl')
+            end
+            if all_match(b.association_dsc_eng, '.*\S.*')
+                copy_field(b.association_dsc_eng, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'en')
+            end
+            if all_match(b.association_dsc_fre, '.*\S.*')
+                copy_field(b.association_dsc_fre, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'fr')
+            end
+            if all_match(b.association_dsc_ger, '.*\S.*')
+                copy_field(b.association_dsc_ger, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'de')
+            end
+
+            unless is_array(b.li)
+                move_field(b.li, tmp)
+                set_array(b.li)
+                move_field(tmp, b.li.$append)
+            end
+
+            do list(path: b.li, var: c)
+                unless is_array(c.association_att)
+                    move_field(c.association_att, tmp)
+                    set_array(c.association_att)
+                    move_field(tmp, c.association_att.$append)
+                end
+
+                do list(path: c.association_att, var: d)
+                    if all_match(d.association_att_url, 'https?://kmska.be/collection/work/data/*')
+                        lido_baseid(
+                            descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                            d.association_att_url,
+                            -type: purl
+                        )
+                    end
+                end
+            end
+        end
+    end
+end
+
+# Map relations
+unless is_array(or_record.relations)
+    move_field(or_record.relations, or_record.tmp)
+    set_array(or_record.relations)
+    move_field(or_record.tmp, or_record.relations.$append)
+end
+
+do list(path: or_record.relations, var: a)
+    unless is_array(a.reltggroup)
+        move_field(a.reltggroup, tmp)
+        set_array(a.reltggroup)
+        move_field(tmp, a.reltggroup.$append)
+    end
+
+    do list(path: a.reltggroup, var: b)
+        if all_match(b.reltgty, 'isrelated')
+            if all_match(b.reltgloi_dsc_dut, '.*\S.*')
+                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'object')
+            else
+                if all_match(b.reltgloi_dsc_eng, '.*\S.*')
+                    add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'object')
+                else
+                    if all_match(b.reltgloi_dsc_fre, '.*\S.*')
+                        add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'object')
+                    else
+                        if all_match(b.reltgloi_dsc_ger, '.*\S.*')
+                            add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'object')
+                        else
+                            if all_match(b.reltgloi, '.*\S.*')
+                                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'object')
+                            end
+                        end
+                    end
+                end
+            end
+            if all_match(b.reltgloi_dsc_dut, '.*\S.*')
+                copy_field(b.reltgloi_dsc_dut, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'nl')
+            end
+            if all_match(b.reltgloi_dsc_eng, '.*\S.*')
+                copy_field(b.reltgloi_dsc_eng, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'en')
+            end
+            if all_match(b.reltgloi_dsc_fre, '.*\S.*')
+                copy_field(b.reltgloi_dsc_fre, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'fr')
+            end
+            if all_match(b.reltgloi_dsc_ger, '.*\S.*')
+                copy_field(b.reltgloi_dsc_ger, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'de')
+            end
+
+            if all_match(b.reltgloi, 'tg:*')
+                prepend(b.reltgloi, 'https://anet.be/record/opackmskaobjstaff/')
+                lido_baseid(
+                    descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                    b.reltgloi,
+                    -type: purl
+                )
+            end
+        end
+    end
+end
+
+# Map documentation
+unless is_array(or_record.documentation)
+    move_field(or_record.documentation, or_record.tmp)
+    set_array(or_record.documentation)
+    move_field(or_record.tmp, or_record.documentation.$append)
+end
+
+do list(path: or_record.documentation, var: a)
+    unless is_array(a.idocugroup)
+        move_field(a.idocugroup, tmp)
+        set_array(a.idocugroup)
+        move_field(tmp, a.idocugroup.$append)
+    end
+
+    do list(path: a.idocugroup, var: b)
+        if all_match(b.idocurel, 'pub')
+            if all_match(b.idocucloi_dsc_dut, '.*\S.*')
+                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'publication')
+            else
+                if all_match(b.idocucloi_dsc_eng, '.*\S.*')
+                    add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'publication')
+                else
+                    if all_match(b.idocucloi_dsc_fre, '.*\S.*')
+                        add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'publication')
+                    else
+                        if all_match(b.idocucloi_dsc_ger, '.*\S.*')
+                            add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'publication')
+                        else
+                            if all_match(b.idocucloi, '.*\S.*')
+                                add_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$append.relatedWorkRelType.term._, 'publication')
+                            end
+                        end
+                    end
+                end
+            end
+            if all_match(b.idocucloi_dsc_dut, '.*\S.*')
+                copy_field(b.idocucloi_dsc_dut, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'nl')
+            end
+            if all_match(b.idocucloi_dsc_eng, '.*\S.*')
+                copy_field(b.idocucloi_dsc_eng, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'en')
+            end
+            if all_match(b.idocucloi_dsc_fre, '.*\S.*')
+                copy_field(b.idocucloi_dsc_fre, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'fr')
+            end
+            if all_match(b.idocucloi_dsc_ger, '.*\S.*')
+                copy_field(b.idocucloi_dsc_ger, descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$append._)
+                set_field(descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectNote.$last.lang, 'de')
+            end
+
+            if all_match(b.idocucloi, 'c:lvd:*')
+                prepend(b.idocucloi, 'https://anet.be/record/kmska/opackmska/')
+                lido_baseid(
+                    descriptiveMetadata.objectRelationWrap.relatedWorksWrap.relatedWorkSet.$last.relatedWork.object.objectID,
+                    b.idocucloi,
+                    -type: purl
+                )
+            end
+        end
+    end
+end
+
+# Add set archive
+
+if all_match(or_record.loi, '.*\S.*')
+    set_field(or_record.archive, 'archive')
+    lido_term(
+        descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+        or_record.archive
+    )
+
+    set_field(or_record.ensor_archive, 'ensor archive')
+    lido_term(
+        descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+        or_record.ensor_archive
+    )
+
+    if all_match(or_record.loi, '.*hs:.*')
+        set_field(or_record.archive_nl, "handschrift")
+        set_field(or_record.archive_en, "manuscript")
+        set_field(or_record.archive_fr, "manuscrite")
+    else
+        if all_match(or_record.loi, '.*br:.*')
+            set_field(or_record.archive_nl, "brief")
+            set_field(or_record.archive_en, "letter")
+            set_field(or_record.archive_fr, "lettre")
+        else
+            if all_match(or_record.loi, '.*dc:.*')
+                set_field(or_record.archive_nl, "document")
+                set_field(or_record.archive_en, "document")
+                set_field(or_record.archive_fr, "document")
+            else
+                if all_match(or_record.loi, '.*ph:.*')
+                    set_field(or_record.archive_nl, "foto")
+                    set_field(or_record.archive_en, "photo")
+                    set_field(or_record.archive_fr, "photo")
+                end
+            end
+        end
+    end
+    lido_term(
+        descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+        or_record.archive_nl,
+        -lang: nl
+    )
+    lido_term(
+        descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last,
+        or_record.archive_en,
+        -lang: en
+    )
+    lido_term(
+        descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$last,
+        or_record.archive_fr,
+        -lang: fr
+    )
+
+    remove_field(or_record.archive)
+    remove_field(or_record.ensor_archive)
+end
+
+# Add additional LIDO elements
+add_field(or_record.record_source, 'Koninklijk Museum voor Schone Kunsten Antwerpen')
+
+lido_basenameset(
+    administrativeMetadata.recordWrap.recordSource.legalBodyName,
+    or_record.record_source,
+    -value_lang: nl
+)
+
+### Add empty values for required LIDO elements/attributes if not already exist
+
+unless exists(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType)
+    add_field(descriptiveMetadata.objectClassificationWrap.objectWorkTypeWrap.objectWorkType.$append.term._, '')
+end
+
+### Add lang attributes to descriptiveMetadata and administrativeMetadata (required LIDO attributes)
+
+add_field(descriptiveMetadata.lang, nl)
+add_field(administrativeMetadata.lang, nl)
+
+### Remove the 'or_record' structure
+
+remove_field(or_record)
