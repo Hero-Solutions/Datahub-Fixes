@@ -127,6 +127,11 @@
     copy_field(ObjectID, or_record.handling.db)
     lookup_in_store(or_record.handling.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.handling.sqlite')
 
+    # osc
+
+    copy_field(ObjectID, or_record.oscobjecttexts.db)
+    lookup_in_store(or_record.oscobjecttexts.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.oscobjecttexts.sqlite')
+
     # objectMeasurements
 
     copy_field(ObjectID, or_record.objectMeasurements.db)
@@ -168,6 +173,11 @@
     # eventMaterialsTech
 
     copy_field(Medium, or_record.eventMaterialsTech.display)
+
+    # osc aat
+
+    copy_field(ObjectID, or_record.oscaat.db)
+    lookup_in_store(or_record.oscaat.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.oscaat.sqlite')
 
     # provenance
 
@@ -262,6 +272,7 @@
 #   vclassifications.classification_fr                    lang: fr
 #   vhighlights                                      lido:term
 #   vcollectionpresentation                          lido:term
+#   voscobjecttexts                                  lido:term
 #                                             lido:titleSet
 #                                                 lido:appellationValue
 #   vobjtitles.title                                  lang: en                                                            titel
@@ -290,6 +301,8 @@
 #   vpagenumbers.pageNumber                           lido:descriptiveNoteValue
 #                                                 type: handling
 #   vhandling.handling                                lido:descriptiveNoteValue
+#                                                 type
+#   voscobjecttexts.statement                         lido:descriptiveNoteValue
 #                                             lido:objectMeasurementsSet
 #   vdimensions.display                           lido:displayObjectMeasurements
 #                                                 lido:objectMeasurements
@@ -298,6 +311,13 @@
 #   vdimensions.unit                                      lido:measurementUnit                    Dimensies               eenheid afmeting
 #   vdimensions.dimension                                 lido:measurementValue                   Dimensies               waarde afmeting
 #   vdimensions.element                               lido:extentMeasurements                                             onderdeel afmeting
+#                                             lido:objectMaterialsTechSet
+#                                                 lido:materialsTech
+#                                                     lido:termMaterialsTech
+#   voscaat.Term                                          lido:term
+#   voscaat.languageID                                        lang: nl
+#   voscaat.languageID                                        lang: en
+#   voscaat.languageID                                        lang: fr
 #                                             lido:eventType
 #                                                 lido:term
 #                                                     acquisition
@@ -788,6 +808,42 @@
             descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
             or_record.collectionPresentation_term
         )
+
+    end
+
+    # Oscensor and osc
+
+    # Loop over the different online scholarly catalogue text entries from TMS
+
+    do list(path:or_record.oscobjecttexts.db.oscobjecttexts, var:o)
+
+        # Add term "oscensor" from TMS (if present) to LIDO classification as LIDO term
+
+        unless all_match(or_record.osc_exists, 'true')
+
+            if all_match(o.project, 'OSC.*')
+
+                set_field(or_record.osc_exists, 'true')
+
+                set_field(or_record.osc_term, "osc")
+
+                lido_term(
+                    descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+                    or_record.osc_term
+                )
+
+                copy_field(o.project, or_record.osc_specific_term)
+
+                downcase(or_record.osc_specific_term)
+
+                lido_term(
+                    descriptiveMetadata.objectClassificationWrap.classificationWrap.classification.$append,
+                    or_record.osc_specific_term
+                )
+
+            end
+
+        end
 
     end
 
@@ -1510,6 +1566,68 @@
 
     end
 
+    # Loop over the different online scholarly catalogue text entries from TMS
+
+    do list(path:or_record.oscobjecttexts.db.oscobjecttexts, var:o)
+
+        # Add each online scholarly catalogue text entry from TMS (if present) to LIDO objectDescriptionSet as LIDO descriptiveNoteValue
+
+        if all_match(o.project, 'OSC.*')
+
+            if all_match(o.statement, '.*\S.*')
+
+                # Add a new, empty LIDO objectDescriptionSet field
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
+
+                # Remove unnecessary whitespaces
+
+                trim(o.statement)
+
+                # Add the online scholarly catalogue text entry to last created LIDO objectDescriptionSet
+
+                copy_field(o.statement, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                # Add the type for LIDO objectDescriptionSet
+
+                paste(or_record.osctype, o.briefDescription, o.attributeType, join_char:' ')
+
+                downcase(or_record.osctype)
+
+                copy_field(or_record.osctype, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type)
+
+            end
+
+            if all_match(o.footnotes, '.*\S.*')
+
+                # Add a new, empty LIDO objectDescriptionSet field
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
+
+                # Remove unnecessary whitespaces
+
+                trim(o.footnotes)
+
+                # Add the footnotes to last created LIDO objectDescriptionSet
+
+                copy_field(o.footnotes, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                # Add the type for LIDO objectDescriptionSet
+
+                set_field(or_record.footnotes, 'footnotes')
+
+                paste(or_record.osctype_footnotes, o.briefDescription, o.attributeType, or_record.footnotes, join_char:' ')
+
+                downcase(or_record.osctype_footnotes)
+
+                copy_field(or_record.osctype_footnotes, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type)
+
+            end
+
+        end
+
+    end
+
 # LIDO objectMeasurementsSet
 
     # Loop over the different dimensions from TMS
@@ -1559,6 +1677,40 @@
         if all_match(d.element, '.*\S.*')
 
             copy_field(d.element, descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.extentMeasurements._)
+
+        end
+
+    end
+
+# LIDO termMaterialsTech
+
+    # Loop over the different online scholarly catalogue AAT terms from TMS
+
+    do list(path:or_record.oscaat.db.oscaat, var:o)
+
+        # Add the online scholarly catalogue AAT term from TMS as LIDO termMaterialsTech
+
+        if all_match(o.Term, '.*\S.*')
+
+            copy_field(o.Term, descriptiveMetadata.objectIdentificationWrap.objectMaterialsTechWrap.objectMaterialsTechSet.$append.materialsTech.$last.termMaterialsTech.$last.term.$append._)
+
+        end
+
+        if all_match(o.languageID, '^2$')
+
+            set_field(descriptiveMetadata.objectIdentificationWrap.objectMaterialsTechWrap.objectMaterialsTechSet.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'nl')
+
+        end
+
+        if all_match(o.languageID, '^1$')
+
+            set_field(descriptiveMetadata.objectIdentificationWrap.objectMaterialsTechWrap.objectMaterialsTechSet.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'en')
+
+        end
+
+        if all_match(o.languageID, '^3$')
+
+            set_field(descriptiveMetadata.objectIdentificationWrap.objectMaterialsTechWrap.objectMaterialsTechSet.$last.materialsTech.$last.termMaterialsTech.$last.term.$last.lang, 'fr')
 
         end
 
