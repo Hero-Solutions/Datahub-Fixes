@@ -217,6 +217,9 @@
     copy_field(ObjectNumber, or_record.iiif_manifest)
     lookup_in_store(or_record.iiif_manifest, DBI, data_source: 'dbi:SQLite:/tmp/import.iiif_manifests.sqlite')
 
+    copy_field(ObjectID, or_record.oscmanifests.db)
+    lookup_in_store(or_record.oscmanifests.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.oscmanifests.sqlite')
+
     # Set placeholder if no manifest exists (look up 'placeholder_manifest' in sqlite)
 
     unless all_match(or_record.iiif_manifest.manifest, '.*\S.*')
@@ -443,6 +446,13 @@
 #   vdepartments.department                           lido:legalBodyName                                                  naam data provider
 #                                                     lido:legalBodyWeblink
 #                                             lido:resourceWrap
+#   viiif_manifests.manifest                      lido:resourceID
+#                                                 lido:resourceType
+#                                                     lido:term
+#   voscmanifests.manifest                        lido:resourceID
+#                                                     label: research-images
+#                                                 lido:resourceType
+#                                                     lido:term
 #   vrepresentationpids.representationPid         lido:resourceID
 #                                                 lido:resourceRepresentation
 #   vrepresentationpids.representationPid             lido:linkResource
@@ -3646,6 +3656,23 @@
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubKMSKA")
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "IIIF Manifest")
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
+
+    end
+
+    # Add IIIF manifest for research images from the ImageHub to LIDO resourceSet as LIDO resourceID
+
+    do list(path:or_record.oscmanifests.db.oscmanifests, var:o)
+
+        if all_match(o.manifest, '.*\S.*')
+
+            copy_field(o.manifest, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubKMSKA")
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.label, "research-images")
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "IIIF Manifest")
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
+
+        end
 
     end
 
