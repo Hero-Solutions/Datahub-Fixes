@@ -311,6 +311,7 @@ lido_term(
     descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
     or_record.event_type
 )
+remove_field(or_record.event_type)
 
 unless is_array(or_record.production)
     move_field(or_record.production, or_record.tmp)
@@ -326,9 +327,48 @@ do list(path: or_record.production, var: a)
     end
 
     do list(path: a.contextgroup, var: b)
+        if all_match(b.bdate, '00/00/.*')
+            move_field(b.bdate, tmp)
+            split_field(tmp, '/')
+            copy_field(tmp.2, b.bdate)
+            remove_field(tmp)
+        else
+            if all_match(b.bdate, '00/.*')
+                move_field(b.bdate, tmp)
+                split_field(tmp, '/')
+                copy_field(tmp.1, b.bdate)
+                remove_field(tmp)
+            end
+        end
+        if all_match(b.edate, '00/00/.*')
+            move_field(b.edate, tmp)
+            split_field(tmp, '/')
+            copy_field(tmp.2, b.edate)
+            remove_field(tmp)
+        else
+            if all_match(b.edate, '00/.*')
+                move_field(b.edate, tmp)
+                split_field(tmp, '/')
+                copy_field(tmp.1, b.edate)
+                remove_field(tmp)
+            end
+        end
         unless all_match(b.bdatedisp, 'nodate')
             unless all_match(b.edatedisp, 'nodate')
                 if all_match(b.bdate, '.*\S.*')
+                    if all_match(b.bdate, '.*/.*/.*')
+                        copy_field(b.bdate, tmp)
+                        split_field(tmp, '/')
+                        copy_field(tmp.2, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.date.earliestDate._)
+                        remove_field(tmp)
+                    else
+                        if all_match(b.bdate, '.*/.*')
+                            copy_field(b.bdate, tmp)
+                            split_field(tmp, '/')
+                            copy_field(tmp.1, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.date.earliestDate._)
+                            remove_field(tmp)
+                        end
+                    end
                     if all_match(b.bdatedisp_dsc_dut, '.*\S.*')
                         if all_match(b.bdatedisp_dsc_dut, '\[datum\]')
                             copy_field(b.bdate, or_record.display_date_nl)
@@ -371,6 +411,19 @@ do list(path: or_record.production, var: a)
         unless all_match(b.bdatedisp, 'nodate')
             unless all_match(b.edatedisp, 'nodate')
                 if all_match(b.edate, '.*\S.*')
+                    if all_match(b.edate, '.*/.*/.*')
+                        copy_field(b.edate, tmp)
+                        split_field(tmp, '/')
+                        copy_field(tmp.2, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.date.latestDate._)
+                        remove_field(tmp)
+                    else
+                        if all_match(b.edate, '.*/.*')
+                            copy_field(b.edate, tmp)
+                            split_field(tmp, '/')
+                            copy_field(tmp.1, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDate.date.latestDate._)
+                            remove_field(tmp)
+                        end
+                    end
                     if all_match(b.edatedisp_dsc_dut, '.*\S.*')
                         if all_match(b.edatedisp_dsc_dut, '\[datum\]')
                             if all_match(or_record.display_date_nl, '.*\S.*')
@@ -535,6 +588,10 @@ do list(path: or_record.production, var: a)
                                 else
                                     if all_match(b.li.0.location_att.0.location_att_url, '.*\S.*')
                                         add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+                                    else
+                                        if all_match(b.location, '.*\S.*')
+                                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$append)
+                                        end
                                     end
                                 end
                             end
@@ -586,6 +643,15 @@ do list(path: or_record.production, var: a)
                     end
                 end
             end
+        end
+
+        if all_match(b.location, '.*:anet:.*')
+            prepend(b.location, 'https://anet.be/record/isaarkmska/')
+            lido_baseid(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventPlace.$last.place.placeID,
+                b.location,
+                -type: purl
+            )
         end
     end
 
@@ -645,6 +711,10 @@ do list(path: or_record.production, var: a)
                 else
                     if all_match(b.creator_dsc_ger, '.*\S.*')
                         add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                    else
+                        if all_match(b.creator, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                        end
                     end
                 end
             end
@@ -675,6 +745,15 @@ do list(path: or_record.production, var: a)
                 descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
                 b.creator_dsc_ger,
                 -value_lang: de
+            )
+        end
+
+        if all_match(b.creator, '.*:anet:.*')
+            prepend(b.creator, 'https://anet.be/record/isaarkmska/')
+            lido_baseid(
+                descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                b.creator,
+                -type: purl
             )
         end
 
@@ -906,7 +985,7 @@ do list(path: or_record.dimensions, var: a)
                 end
             end
         end
-    
+
         if all_match(b.dmsty_dsc_dut, '.*\S.*')
             if all_match(b.dms, '.*\S.*')
                 if all_match(b.dmsty_dsc_dut, 'Hoogte')
@@ -1026,7 +1105,7 @@ do list(path: or_record.subjects, var: a)
             if all_match(b.subjspecdesc_dsc_ger, '.*\S.*')
                 copy_field(b.subjspecdesc_dsc_ger, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$append._)
                 set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'de')
-            end      
+            end
 
             unless is_array(b.li)
                 move_field(b.li, tmp)
@@ -1092,6 +1171,10 @@ do list(path: or_record.subjects, var: a)
                                                             else
                                                                 if all_match(b.li.0.subjspecdesc_att.2.subjspecdesc_att_url, '.*\S.*')
                                                                     add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                                else
+                                                                    if all_match(b.subjspecdesc, '.*\S.*')
+                                                                        add_field(descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$append)
+                                                                    end
                                                                 end
                                                             end
                                                         end
@@ -1144,6 +1227,15 @@ do list(path: or_record.subjects, var: a)
                                 )
                             end
                         end
+                    end
+
+                    if all_match(b.subjspecdesc, '.*:anet:.*')
+                        prepend(b.subjspecdesc, 'https://anet.be/record/isaarkmska/')
+                        lido_baseid(
+                            descriptiveMetadata.objectRelationWrap.subjectWrap.subjectSet.$last.subject.subjectActor.$last.actor.actorID,
+                            b.subjspecdesc,
+                            -type: purl
+                        )
                     end
                 end
             end
@@ -1623,6 +1715,7 @@ do list(path: or_record.associations, var: a)
                         descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
                         or_record.event_type
                     )
+                    remove_field(or_record.event_type)
                 end
 
                 if all_match(b.association_dsc_dut, '.*\S.*')
@@ -1636,6 +1729,10 @@ do list(path: or_record.associations, var: a)
                         else
                             if all_match(b.association_dsc_ger, '.*\S.*')
                                 add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                            else
+                                if all_match(b.association, '.*\S.*')
+                                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                                end
                             end
                         end
                     end
@@ -1666,6 +1763,15 @@ do list(path: or_record.associations, var: a)
                         descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
                         b.association_dsc_ger,
                         -value_lang: de
+                    )
+                end
+
+                if all_match(b.association, '.*:anet:.*')
+                    prepend(b.association, 'https://anet.be/record/isaarkmska/')
+                    lido_baseid(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                        b.association,
+                        -type: purl
                     )
                 end
 
@@ -1722,6 +1828,7 @@ do list(path: or_record.associations, var: a)
                         descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
                         or_record.event_type
                     )
+                    remove_field(or_record.event_type)
                 end
                 if all_match(b.association_dsc_dut, '.*\S.*')
                     add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
@@ -1734,6 +1841,10 @@ do list(path: or_record.associations, var: a)
                         else
                             if all_match(b.association_dsc_ger, '.*\S.*')
                                 add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                            else
+                                if all_match(b.association, '.*\S.*')
+                                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$append.actorInRole.actor.nameActorSet.$append)
+                                end
                             end
                         end
                     end
@@ -1764,6 +1875,15 @@ do list(path: or_record.associations, var: a)
                         descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.nameActorSet.$last,
                         b.association_dsc_ger,
                         -value_lang: de
+                    )
+                end
+
+                if all_match(b.association, '.*:anet:.*')
+                    prepend(b.association, 'https://anet.be/record/isaarkmska/')
+                    lido_baseid(
+                        descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.actorID,
+                        b.association,
+                        -type: purl
                     )
                 end
 
@@ -2073,6 +2193,61 @@ if all_match(or_record.loi, '.*\S.*')
 
     remove_field(or_record.archive)
     remove_field(or_record.ensor_archive)
+end
+
+# Add transcriptions
+
+if all_match(or_record.loi, '.*\S.*')
+    copy_field(or_record.loi, or_record.transcriptions)
+    lookup_in_store(or_record.transcriptions, DBI, data_source: 'dbi:SQLite:/tmp/import.transcriptions.sqlite')
+
+    unless is_array(or_record.transcriptions)
+        move_field(or_record.transcriptions, or_record.tmp)
+        set_array(or_record.transcriptions)
+        move_field(or_record.tmp, or_record.transcriptions.$append)
+    end
+
+    do list(path: or_record.transcriptions, var: a)
+        if all_match(a.original, '.*\S.*')
+            add_field(or_record.event_type, 'transcription')
+        else
+            if all_match(a.nl, '.*\S.*')
+                add_field(or_record.event_type, 'transcription')
+            else
+                if all_match(a.en, '.*\S.*')
+                    add_field(or_record.event_type, 'transcription')
+                else
+                    if all_match(a.fr, '.*\S.*')
+                        add_field(or_record.event_type, 'transcription')
+                    end
+                end
+            end
+        end
+        if all_match(or_record.event_type, 'transcription')
+            lido_term(
+                descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
+                or_record.event_type
+            )
+        end
+        remove_field(or_record.event_type)
+
+        if all_match(a.original, '.*\S.*')
+            copy_field(a.original, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.label, 'original')
+        end
+        if all_match(a.nl, '.*\S.*')
+            copy_field(a.original, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'nl')
+        end
+        if all_match(a.en, '.*\S.*')
+            copy_field(a.original, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'en')
+        end
+        if all_match(a.fr, '.*\S.*')
+            copy_field(a.original, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'fr')
+        end
+    end
 end
 
 # Add additional LIDO elements
