@@ -132,6 +132,9 @@
     copy_field(ObjectID, or_record.oscobjecttexts.db)
     lookup_in_store(or_record.oscobjecttexts.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.oscobjecttexts.sqlite')
 
+    copy_field(ObjectID, or_record.osccitations.db)
+    lookup_in_store(or_record.osccitations.db, DBI, data_source: 'dbi:SQLite:/tmp/tms_import.osccitations.sqlite')
+
     # objectMeasurements
 
     copy_field(ObjectID, or_record.objectMeasurements.db)
@@ -304,8 +307,11 @@
 #   vpagenumbers.pageNumber                           lido:descriptiveNoteValue
 #                                                 type: handling
 #   vhandling.handling                                lido:descriptiveNoteValue
-#                                                 type
+#   voscobjecttexts                               type
 #   voscobjecttexts.statement                         lido:descriptiveNoteValue
+#                                                 type: osc-citation
+#   vosccitations.textEntry                           lido:descriptiveNoteValue
+#   vosccitations.textType                                label
 #                                             lido:objectMeasurementsSet
 #   vdimensions.display                           lido:displayObjectMeasurements
 #                                                 lido:objectMeasurements
@@ -1633,6 +1639,38 @@
                 copy_field(or_record.osctype_footnotes, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type)
 
             end
+
+        end
+
+    end
+
+    # Loop over the different online scholarly catalogue citations from TMS
+
+    do list(path:or_record.osccitations.db.osccitations, var:o)
+
+        # Add each online scholarly catalogue citation from TMS (if present) to LIDO objectDescriptionSet as LIDO descriptiveNoteValue
+
+        if all_match(o.textEntry, '.*\S.*')
+
+            # Add a new, empty LIDO objectDescriptionSet field
+
+            add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
+
+            # Remove unnecessary whitespaces
+
+            trim(o.textEntry)
+
+            # Add the online scholarly catalogue citation to last created LIDO objectDescriptionSet
+
+            copy_field(o.textEntry, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+            if all_match(o.textType, '.*\S.*')
+                copy_field(o.textType, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue.label)
+            end
+
+            # Add the type for LIDO objectDescriptionSet
+
+            set_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type, 'osc-citation')
 
         end
 
