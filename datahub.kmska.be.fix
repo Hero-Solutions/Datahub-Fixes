@@ -3730,8 +3730,8 @@
 
     if all_match(or_record.iiif_manifest.checksum, '.*\S.*')
 
-        copy_field(or_record.iiif_manifest.checksum, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription._)
-        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.type, "file-checksum")
+        copy_field(or_record.iiif_manifest.checksum, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$append._)
+        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.type, "file-checksum")
 
     end
 
@@ -3745,11 +3745,11 @@
 
             copy_field(m.value, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$append._)
 
-        end
+            if all_match(m.label, '.*\S.*')
 
-        if all_match(m.label, '.*\S.*')
+                copy_field(m.label, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.label)
 
-            copy_field(m.label, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.label)
+            end
 
         end
 
