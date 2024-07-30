@@ -3735,6 +3735,26 @@
 
     end
 
+    # Loop over the different iiif metadata fields from the Imagehub
+
+    do list(path:or_record.iiif_manifest.metadata, var:m)
+
+        # Add value and label from iiif metadata fields to LIDO resourceSet as LIDO resourceDescription with label
+
+        if all_match(m.value, '.*\S.*')
+
+            copy_field(m.value, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$append._)
+
+        end
+
+        if all_match(m.label, '.*\S.*')
+
+            copy_field(m.label, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.label)
+
+        end
+
+    end
+
     # Add representationpid from TMS (if present) to LIDO resourceSet as LIDO resourceID and as LIDO linkResource
 
     if all_match(or_record.object_number.pid.representationPid, '.*\S.*')
