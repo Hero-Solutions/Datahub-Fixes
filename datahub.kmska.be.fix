@@ -1606,11 +1606,35 @@
 
                 # Add the type for LIDO objectDescriptionSet
 
-                paste(or_record.osctype, o.briefDescription, o.attributeType, join_char:' ')
+                if all_match(o.briefDescription, '.*\S.*')
 
-                downcase(or_record.osctype)
+                    if all_match(o.attributeType, '.*\S.*')
 
-                copy_field(or_record.osctype, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type)
+                        paste(or_record.osctype, o.briefDescription, o.attributeType, join_char:' ')
+
+                    else
+
+                        copy_field(o.briefDescription, or_record.osctype)
+
+                    end
+
+                else
+
+                    if all_match(o.attributeType, '.*\S.*')
+
+                        copy_field(o.attributeType, or_record.osctype)
+
+                    end
+
+                end
+
+                if all_match(or_record.osctype, '.*\S.*')
+
+	                downcase(or_record.osctype)
+
+	                copy_field(or_record.osctype, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type)
+
+                end
 
             end
 
@@ -1632,11 +1656,85 @@
 
                 set_field(or_record.footnotes, 'footnotes')
 
-                paste(or_record.osctype_footnotes, o.briefDescription, o.attributeType, or_record.footnotes, join_char:' ')
+                if all_match(o.briefDescription, '.*\S.*')
 
-                downcase(or_record.osctype_footnotes)
+                    if all_match(o.attributeType, '.*\S.*')
 
-                copy_field(or_record.osctype_footnotes, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type)
+                        paste(or_record.osctype_footnotes, o.briefDescription, o.attributeType, or_record.footnotes, join_char:' ')
+
+                    else
+
+                        paste(or_record.osctype_footnotes, o.briefDescription, or_record.footnotes, join_char:' ')
+
+                    end
+
+                else
+
+                    if all_match(o.attributeType, '.*\S.*')
+
+                        paste(or_record.osctype_footnotes, o.attributeType, or_record.footnotes, join_char:' ')
+
+                    end
+
+                end
+
+                if all_match(or_record.osctype_footnotes, '.*\S.*')
+
+                    downcase(or_record.osctype_footnotes)
+
+                    copy_field(or_record.osctype_footnotes, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type)
+
+                end
+
+            end
+
+            if all_match(o.date, '.*\S.*')
+
+                # Add a new, empty LIDO objectDescriptionSet field
+
+                add_field(descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$append)
+
+                # Remove unnecessary whitespaces
+
+                trim(o.date)
+
+                # Add the date to last created LIDO objectDescriptionSet
+
+                copy_field(o.date, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.descriptiveNoteValue._)
+
+                # Add the type for LIDO objectDescriptionSet
+
+                set_field(or_record.date, 'date')
+
+                if all_match(o.briefDescription, '.*\S.*')
+
+                    if all_match(o.attributeType, '.*\S.*')
+
+                        paste(or_record.osctype_date, o.briefDescription, o.attributeType, or_record.date, join_char:' ')
+
+                    else
+
+                        paste(or_record.osctype_date, o.briefDescription, or_record.date, join_char:' ')
+
+                    end
+
+                else
+
+                    if all_match(o.attributeType, '.*\S.*')
+
+                        paste(or_record.osctype_date, o.attributeType, or_record.date, join_char:' ')
+
+                    end
+
+                end
+
+                if all_match(or_record.osctype_date, '.*\S.*')
+
+                    downcase(or_record.osctype_date)
+
+                    copy_field(or_record.osctype_date, descriptiveMetadata.objectIdentificationWrap.objectDescriptionWrap.objectDescriptionSet.$last.type)
+
+                end
 
             end
 
