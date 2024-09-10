@@ -333,11 +333,18 @@ do list(path: or_record.production, var: a)
             copy_field(tmp.2, b.bdate)
             remove_field(tmp)
         else
-            if all_match(b.bdate, '00/.*')
+            if all_match(b.bdate, '00/.*/.*')
                 move_field(b.bdate, tmp)
                 split_field(tmp, '/')
-                copy_field(tmp.1, b.bdate)
+                paste(b.bdate, tmp.1, tmp.2, join_char:'/')
                 remove_field(tmp)
+            else
+                if all_match(b.bdate, '00/.*')
+                    move_field(b.bdate, tmp)
+                    split_field(tmp, '/')
+                    copy_field(tmp.1, b.bdate)
+                    remove_field(tmp)
+                end
             end
         end
         if all_match(b.edate, '00/00/.*')
@@ -346,11 +353,18 @@ do list(path: or_record.production, var: a)
             copy_field(tmp.2, b.edate)
             remove_field(tmp)
         else
-            if all_match(b.edate, '00/.*')
+            if all_match(b.edate, '00/.*/.*')
                 move_field(b.edate, tmp)
                 split_field(tmp, '/')
-                copy_field(tmp.1, b.edate)
+                paste(b.edate, tmp.1, tmp.2, join_char:'/')
                 remove_field(tmp)
+            else
+                if all_match(b.edate, '00/.*')
+                    move_field(b.edate, tmp)
+                    split_field(tmp, '/')
+                    copy_field(tmp.1, b.edate)
+                    remove_field(tmp)
+                end
             end
         end
         unless all_match(b.bdatedisp, 'nodate')
