@@ -2222,17 +2222,35 @@ if all_match(or_record.loi, '.*\S.*')
     end
 
     do list(path: or_record.transcriptions, var: a)
-        if all_match(a.original, '.*\S.*')
-            add_field(or_record.event_type, 'transcription')
+        if all_match(or_record.event_type, 'transcription')
+            if all_match(a.original, '.*\S.*')
+                add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$append)
+            else
+                if all_match(a.nl, '.*\S.*')
+                    add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$append)
+                else
+                    if all_match(a.en, '.*\S.*')
+                        add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$append)
+                     else
+                        if all_match(a.fr, '.*\S.*')
+                            add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$append)
+                        end
+                    end
+                end
+            end
         else
-            if all_match(a.nl, '.*\S.*')
+            if all_match(a.original, '.*\S.*')
                 add_field(or_record.event_type, 'transcription')
             else
-                if all_match(a.en, '.*\S.*')
+                if all_match(a.nl, '.*\S.*')
                     add_field(or_record.event_type, 'transcription')
                 else
-                    if all_match(a.fr, '.*\S.*')
+                    if all_match(a.en, '.*\S.*')
                         add_field(or_record.event_type, 'transcription')
+                    else
+                        if all_match(a.fr, '.*\S.*')
+                            add_field(or_record.event_type, 'transcription')
+                        end
                     end
                 end
             end
