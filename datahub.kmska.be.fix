@@ -1704,17 +1704,17 @@
 
                 # Add the type for LIDO objectDescriptionSet
 
-                set_field(or_record.date, 'date')
+                set_field(or_record.oscdescdate, 'date')
 
                 if all_match(o.briefDescription, '.*\S.*')
 
                     if all_match(o.attributeType, '.*\S.*')
 
-                        paste(or_record.osctype_date, o.briefDescription, o.attributeType, or_record.date, join_char:' ')
+                        paste(or_record.osctype_date, o.briefDescription, o.attributeType, or_record.oscdescdate, join_char:' ')
 
                     else
 
-                        paste(or_record.osctype_date, o.briefDescription, or_record.date, join_char:' ')
+                        paste(or_record.osctype_date, o.briefDescription, or_record.oscdescdate, join_char:' ')
 
                     end
 
@@ -1722,7 +1722,7 @@
 
                     if all_match(o.attributeType, '.*\S.*')
 
-                        paste(or_record.osctype_date, o.attributeType, or_record.date, join_char:' ')
+                        paste(or_record.osctype_date, o.attributeType, or_record.oscdescdate, join_char:' ')
 
                     end
 
