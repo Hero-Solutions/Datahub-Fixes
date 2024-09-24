@@ -2267,15 +2267,15 @@ if all_match(or_record.loi, '.*\S.*')
             set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.label, 'original')
         end
         if all_match(a.nl, '.*\S.*')
-            copy_field(a.original, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            copy_field(a.nl, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
             set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'nl')
         end
         if all_match(a.en, '.*\S.*')
-            copy_field(a.original, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            copy_field(a.en, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
             set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'en')
         end
         if all_match(a.fr, '.*\S.*')
-            copy_field(a.original, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
+            copy_field(a.fr, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
             set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$last.lang, 'fr')
         end
     end
