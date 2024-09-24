@@ -2234,7 +2234,7 @@ if all_match(or_record.loi, '.*\S.*')
                     else
                         if all_match(a.en, '.*\S.*')
                             add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$append)
-                         else
+                        else
                             if all_match(a.fr, '.*\S.*')
                                 add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$append)
                             end
@@ -2272,6 +2272,7 @@ if all_match(or_record.loi, '.*\S.*')
 
         if all_match(a.id, '.*\S.*')
             copy_field(a.id, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteID.$append._)
+            set_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteID.$last.type, 'resource-id')
         end
         if all_match(a.original, '.*\S.*')
             copy_field(a.original, descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$last.descriptiveNoteValue.$append._)
