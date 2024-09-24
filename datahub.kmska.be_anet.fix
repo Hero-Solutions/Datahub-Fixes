@@ -2215,13 +2215,13 @@ if all_match(or_record.loi, '.*\S.*')
     copy_field(or_record.loi, or_record.transcriptions)
     lookup_in_store(or_record.transcriptions, DBI, data_source: 'dbi:SQLite:/tmp/import.transcriptions.sqlite')
 
-    unless is_array(or_record.transcriptions)
-        move_field(or_record.transcriptions, or_record.tmp)
-        set_array(or_record.transcriptions)
-        move_field(or_record.tmp, or_record.transcriptions.$append)
+    unless is_array(or_record.transcriptions.transcriptions)
+        move_field(or_record.transcriptions.transcriptions, or_record.tmp)
+        set_array(or_record.transcriptions.transcriptions)
+        move_field(or_record.tmp, or_record.transcriptions.transcriptions.$append)
     end
 
-    do list(path: or_record.transcriptions, var: a)
+    do list(path: or_record.transcriptions.transcriptions, var: a)
         if all_match(or_record.event_type, 'transcription')
             if all_match(a.original, '.*\S.*')
                 add_field(descriptiveMetadata.eventWrap.eventSet.$last.event.eventDescriptionSet.$append)
@@ -2254,12 +2254,12 @@ if all_match(or_record.loi, '.*\S.*')
                     end
                 end
             end
-        end
-        if all_match(or_record.event_type, 'transcription')
-            lido_term(
-                descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
-                or_record.event_type
-            )
+            if all_match(or_record.event_type, 'transcription')
+                lido_term(
+                    descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
+                    or_record.event_type
+                )
+            end
         end
 
         if all_match(a.original, '.*\S.*')
