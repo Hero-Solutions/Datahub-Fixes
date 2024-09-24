@@ -2254,12 +2254,12 @@ if all_match(or_record.loi, '.*\S.*')
                     end
                 end
             end
-        end
-        if all_match(or_record.event_type, 'transcription')
-            lido_term(
-                descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
-                or_record.event_type
-            )
+            if all_match(or_record.event_type, 'transcription')
+                lido_term(
+                    descriptiveMetadata.eventWrap.eventSet.$append.event.eventType,
+                    or_record.event_type
+                )
+            end
         end
 
         if all_match(a.original, '.*\S.*')
