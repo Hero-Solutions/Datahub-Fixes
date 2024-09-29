@@ -3822,30 +3822,77 @@
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "thumbnail")
         add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
 
+        # Add file checksum from DAM to LIDO resourceSet as LIDO resourceDescription
+
+        if all_match(or_record.iiif_manifest.checksum, '.*\S.*')
+
+            copy_field(or_record.iiif_manifest.checksum, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$append._)
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.type, "file-checksum")
+
+        end
+
+        # Loop over the different iiif metadata fields from the Imagehub
+
+        do list(path:or_record.iiif_manifest.metadata, var:m)
+
+            # Add value and label from iiif metadata fields to LIDO resourceSet as LIDO resourceDescription with label
+
+            if all_match(m.value, '.*\S.*')
+
+                copy_field(m.value, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$append._)
+
+                if all_match(m.label, '.*\S.*')
+
+                    copy_field(m.label, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.label)
+
+                end
+
+            end
+
+        end
+
     end
 
-    # Add file checksum from DAM to LIDO resourceSet as LIDO resourceDescription
+    # Loop over the different iiif images
 
-    if all_match(or_record.iiif_manifest.checksum, '.*\S.*')
+    do list(path:or_record.iiif_manifest.images, var:i)
 
-        copy_field(or_record.iiif_manifest.checksum, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$append._)
-        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.type, "file-checksum")
+        # Add IIIF image from the ImageHub to LIDO resourceSet as LIDO resourceID
 
-    end
+        if all_match(i.id, '.*\S.*')
 
-    # Loop over the different iiif metadata fields from the Imagehub
+            copy_field(i.id, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.source, "ImagehubKMSKA")
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$append._, "image")
+            add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceType.term.$last.pref, "preferred")
 
-    do list(path:or_record.iiif_manifest.metadata, var:m)
+            # Add file checksum from DAM to LIDO resourceSet as LIDO resourceDescription
 
-        # Add value and label from iiif metadata fields to LIDO resourceSet as LIDO resourceDescription with label
+            if all_match(i.checksum, '.*\S.*')
 
-        if all_match(m.value, '.*\S.*')
+                copy_field(i.checksum, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$append._)
+                add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.type, "file-checksum")
 
-            copy_field(m.value, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$append._)
+            end
 
-            if all_match(m.label, '.*\S.*')
+            # Loop over the different iiif metadata fields from the Imagehub
 
-                copy_field(m.label, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.label)
+            do list(path:i.metadata, var:m)
+
+                # Add value and label from iiif metadata fields to LIDO resourceSet as LIDO resourceDescription with label
+
+                if all_match(m.value, '.*\S.*')
+
+                    copy_field(m.value, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$append._)
+
+                    if all_match(m.label, '.*\S.*')
+
+                        copy_field(m.label, administrativeMetadata.resourceWrap.resourceSet.$last.resourceDescription.$last.label)
+
+                    end
+
+                end
 
             end
 
