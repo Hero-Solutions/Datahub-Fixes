@@ -1608,8 +1608,11 @@
 
                 if all_match(o.briefDescription, '.*\S.*')
 
+                    trim(o.briefDescription)
+
                     if all_match(o.attributeType, '.*\S.*')
 
+                        trim(o.attributeType)
                         paste(or_record.osctype, o.briefDescription, o.attributeType, join_char:' ')
 
                     else
@@ -1658,8 +1661,11 @@
 
                 if all_match(o.briefDescription, '.*\S.*')
 
+                    trim(o.briefDescription)
+
                     if all_match(o.attributeType, '.*\S.*')
 
+                        trim(o.attributeType)
                         paste(or_record.osctype_footnotes, o.briefDescription, o.attributeType, or_record.footnotes, join_char:' ')
 
                     else
@@ -1709,10 +1715,10 @@
                 if all_match(o.briefDescription, '.*\S.*')
 
                     trim(o.briefDescription)
-                    trim(o.attributeType)
 
                     if all_match(o.attributeType, '.*\S.*')
 
+                        trim(o.attributeType)
                         paste(or_record.osctype_date, o.briefDescription, o.attributeType, or_record.oscdescdate, join_char:' ')
 
                     else
