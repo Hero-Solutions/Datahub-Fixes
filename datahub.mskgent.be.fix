@@ -414,37 +414,6 @@
 
     end
 
-#    copy_field(or_record.object_number, or_record.identificator)
-
-#    lookup_in_store(or_record.identificator, DBI, data_source: 'dbi:SQLite:/tmp/import.PIDS_ALL_UTF8.sqlite')
-
-#    if all_match(or_record.identificator.dataPid, '.*\S.*')
-
-#        lido_baseid(
-#            lidoRecID,
-#            or_record.identificator.dataPid,
-#            -type: purl,
-#            -source: 'Museum voor Schone Kunsten Gent',
-#            -label: dataPID,
-#            -pref: alternate
-#        )
-
-#        copy_field('or_record.identificator.dataPid', 'or_record.identificator.oaiPid')
-#        parse_text('or_record.identificator.oaiPid', '.*://([A-Za-z0-9\-\.]+)/collection/work/data/(.*)')
-#        join_field('or_record.identificator.oaiPid', ':')
-#        prepend('or_record.identificator.oaiPid', 'oai:datahub.mskgent.be:')
-
-#        lido_baseid(
-#            lidoRecID,
-#            or_record.identificator.oaiPid,
-#            -type: urn,
-#            -source: 'Museum voor Schone Kunsten Gent',
-#            -label: dataPID,
-#            -pref: preferred
-#        )
-
-#    end
-
 
 
 ### LIDO objectPublishedID
@@ -474,18 +443,6 @@
         end
 
     end
-
-#    if all_match(or_record.identificator.workPid, '.*\S.*')
-
-#        lido_baseid(
-#            objectPublishedID,
-#            or_record.identificator.workPid,
-#            -type: purl,
-#            -source: 'Museum voor Schone Kunsten Gent',
-#            -label: workPID
-#        )
-
-#    end
 
 
 
@@ -7054,16 +7011,6 @@
 
     end
 
-#    if all_match(or_record.identificator.dataPid, '.*\S.*')
-
-#        lido_baseid(
-#            administrativeMetadata.recordWrap.recordID,
-#            or_record.identificator.dataPid,
-#            -type: global
-#        )
-
-#    end
-
     unless is_array(or_record.priref)
         move_field(or_record.priref, or_record.tmp)
         set_array(or_record.priref)
@@ -7235,20 +7182,6 @@
         end
 
     end
-
-#    if all_match(or_record.identificator.dataPid, '.*\S.*')
-
-#        copy_field('or_record.identificator.dataPid', 'or_record.identificator.representationPid')
-#        parse_text('or_record.identificator.representationPid', '(.*)/collection/work/data/(.*)')
-#        join_field('or_record.identificator.representationPid', '/collection/work/representation/')
-
-#        copy_field(or_record.identificator.representationPid, administrativeMetadata.resourceWrap.resourceSet.$append.resourceID._)
-#        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.type, "purl")
-#        add_field(administrativeMetadata.resourceWrap.resourceSet.$last.resourceID.label, "representationPID")
-
-#        copy_field(or_record.identificator.representationPid, administrativeMetadata.resourceWrap.resourceSet.$last.resourceRepresentation.linkResource._)
-
-#    end
 
 
 
