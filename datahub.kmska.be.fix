@@ -2416,6 +2416,12 @@
 
 	        end
 
+	        if all_match(c.DisplayDate, '.*\S.*')
+
+	            copy_field(c.DisplayDate, descriptiveMetadata.eventWrap.eventSet.$last.event.eventActor.$last.actorInRole.actor.vitalPlaceActor.$append.namePlaceSet.appellationValue.$append._)
+
+	        end
+
         end
 
         unless all_match(c.role_en, "formerly attributed to")
