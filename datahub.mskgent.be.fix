@@ -2185,11 +2185,16 @@
 
         end
 
+        add_field(or_record.first_height, 'false')
+        add_field(or_record.first_width, 'false')
+        add_field(or_record.first_depth, 'false')
+        add_field(or_record.first_diameter, 'false')
+
         if all_match('c.dimension\.part', '.*\S.*')
 
             copy_field('c.dimension\.part', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.extentMeasurements._)
 
-            if all_match('c.dimension\.part', 'geheel')
+            if all_match(or_record.first_height, 'false')
 
                 if all_match('c.dimension\.type', 'hoogte')
 
@@ -2205,7 +2210,13 @@
 
                     end
 
+                    set_field(or_record.first_height, 'true')
+
                 end
+
+            end
+
+            if all_match(or_record.first_width, 'false')
 
                 if all_match('c.dimension\.type', 'breedte')
 
@@ -2221,7 +2232,13 @@
 
                     end
 
+                    set_field(or_record.first_width, 'true')
+
                 end
+
+            end
+
+            if all_match(or_record.first_depth, 'false')
 
                 if all_match('c.dimension\.type', 'diepte')
 
@@ -2237,7 +2254,13 @@
 
                     end
 
+                    set_field(or_record.first_depth, 'true')
+
                 end
+
+            end
+
+            if all_match(or_record.first_diameter, 'false')
 
                 if all_match('c.dimension\.type', 'diameter')
 
@@ -2252,6 +2275,8 @@
                         copy_field('c.dimension\.value', or_record.dimension_diameter_value)
 
                     end
+
+                    set_field(or_record.first_diameter, 'true')
 
                 end
 
