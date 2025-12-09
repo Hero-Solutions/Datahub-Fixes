@@ -2163,6 +2163,11 @@
         move_field(or_record.tmp, or_record.dimensions.$append)
     end
 
+    add_field(or_record.first_height, 'false')
+    add_field(or_record.first_width, 'false')
+    add_field(or_record.first_depth, 'false')
+    add_field(or_record.first_diameter, 'false')
+
     do list(path:or_record.dimensions, var:c)
 
         add_field(descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$append)
@@ -2184,11 +2189,6 @@
             copy_field('c.dimension\.value', descriptiveMetadata.objectIdentificationWrap.objectMeasurementsWrap.objectMeasurementsSet.$last.objectMeasurements.measurementsSet.measurementValue._)
 
         end
-
-        add_field(or_record.first_height, 'false')
-        add_field(or_record.first_width, 'false')
-        add_field(or_record.first_depth, 'false')
-        add_field(or_record.first_diameter, 'false')
 
         if all_match('c.dimension\.part', '.*\S.*')
 
