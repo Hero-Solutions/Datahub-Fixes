@@ -3537,6 +3537,7 @@
         # Copy the copyright notice for each constituent from TMS
 
         copy_field(c.copyright, or_record.copyrights.$append)
+        copy_field(c.copyrightstatus, or_record.copyrightstatuses.$append)
 
     end
 
@@ -3559,6 +3560,44 @@
             unless exists(or_record.copyright)
 
                 copy_field(c, or_record.copyright)
+
+            end
+
+        end
+
+    end
+
+    # Loop over the created array with copyright statuses
+
+    do list(path:or_record.copyrightstatuses, var: c)
+
+        # Remove unnecessary whitespaces
+
+        trim(c)
+
+        # If one of the copyright statuses contains "SABAM", use this copyright status
+
+        if all_match(c, '.*SABAM.*')
+
+            copy_field(c, or_record.copyrightstatus)
+
+        else
+
+            unless exists(or_record.copyrightstatus)
+
+                if all_match(c, '.*In copyright.*')
+
+                    copy_field(c, or_record.copyrightstatus)
+
+                else
+
+                    unless exists(or_record.copyrightstatus)
+
+                        copy_field(c, or_record.copyrightstatus)
+
+                    end
+
+                end
 
             end
 
@@ -3594,6 +3633,16 @@
             administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine,
             or_record.copyright
         )
+
+        copy_field(or_record.copyright, administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine.$append._)
+        add_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine.$last.label, "copyright-display")
+
+    end
+
+    if all_match(or_record.copyrightstatus, '.*\S.*')
+
+        copy_field(or_record.copyrightstatus, administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine.$append._)
+        add_field(administrativeMetadata.rightsWorkWrap.rightsWorkSet.$last.creditLine.$last.label, "copyright-status")
 
     end
 
