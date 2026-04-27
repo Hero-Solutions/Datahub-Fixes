@@ -713,6 +713,12 @@
                 -value_lang: nl
             )
 
+            lido_basenameset(
+                descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName,
+                c.name,
+                -value_lang: en
+            )
+
         end
 
     end
