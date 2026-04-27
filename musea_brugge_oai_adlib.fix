@@ -713,8 +713,8 @@
                 -value_lang: nl
             )
 
-            copy_field(c.name, descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName.$append._)
-            add_field(descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName.$last.lang, 'en')
+            copy_field(c.name, descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName.$last.appellationValue.$append._)
+            add_field(descriptiveMetadata.objectIdentificationWrap.repositoryWrap.repositorySet.$last.repositoryName.legalBodyName.$last.appellationValue.$last.lang, "en")
 
         end
 
